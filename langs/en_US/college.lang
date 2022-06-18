@@ -1,0 +1,154 @@
+# Copyright (C) 2022 SuperAdmin
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+#
+# Generic
+#
+
+Teacher=Profesor
+
+#
+# other
+#
+
+LinkClass=Clase, Catedra.
+LinkStudent=Estudiante, Alumno.
+LinkToTutor=Padre, encargado o tutor del estudiante.
+LinkToThirparty=Padre, encargado o tutor del estudiante.
+SchoolYear=Ciclo Lectivo
+School_Year=Ciclo lectivo del anio en curso.
+HelpRef= Por lo general suele ser el mismo que el nombre o etiqueta.
+HelpSubject= Asignatura, Materia.
+HelpToTeacher= Profesor a cargo de la asignatura.
+HelpPeriods=Periodo: o, trimestre, semestre etc.
+HelpClass=Aulas, Clases, Catedras
+
+#
+# Menu
+#
+
+ListInscriptions=Incripciones
+NewInscriptions=Nueva Inscripcion
+ListPeriods=Periodos
+NewPeriods=Nuevo Periodo
+ListStudent=Alumnos
+NewStudent=Nuevo Alumno
+ListSubject=Asignaturas
+NewSubject=Nueva Asignatura
+ListClassrooms=Clases
+NewClassrooms=Nueva Clase
+ListNotes=Notas
+NewNotesFromList=Nueva Nota desde Lista
+NewNote=Nueva Nota
+
+
+
+
+# Module label 'ModuleCollegeName'
+ModuleCollegeName=ADM Colegio
+# Module description 'ModuleCollegeDesc'
+ModuleCollegeDesc = Gestion en dministracion de colegios, escuelas o institutos educativos.
+
+#
+# Admin page
+#
+CollegeSetup = College setup
+Settings = Settings
+CollegeSetupPage = College setup page
+COLLEGE_MYPARAM1 = My param 1
+COLLEGE_MYPARAM1Tooltip = My param 1 tooltip
+COLLEGE_MYPARAM2=My param 2
+COLLEGE_MYPARAM2Tooltip=My param 2 tooltip
+COLLEGE_MYPARAM_CICLO_LECTIVO=School Year
+COLLEGE_MYPARAM_CICLO_LECTIVOTooltip=Current school year
+
+COLLEGE_HIDE_FOOTER_MSJ=Ocultar mensaje.
+COLLEGE_HIDE_FOOTER_MSJTooltip=Ocultar mensaje en pie de pagina en inicio de aplicacion.
+
+
+#
+# About page
+#
+About = About
+CollegeAbout = About College
+CollegeAboutPage = College about page
+
+#
+# pages
+#
+Subjects=Asignaturas
+Subject=Asignatura
+Classroomss=Clases
+Classrooms=Clase
+Classroom=Clase
+Students=Estudiantes
+Student=Estudiante
+Inscriptionss=Inscripciones
+Inscriptions=Inscripciones
+Periodss=Periodos
+Periods=Periodo
+Notess=Notas
+Notes=Nota
+
+#
+# Sample widget
+#
+MyWidget = My widget
+MyWidgetDescription = My widget description
+
+
+#
+#list_student
+#
+
+tableheader1=Trimestre
+tableheader2=Asignatura 
+tableheader3=Nota
+nodatafound=No hay datos para mostrar.
+
+#
+#list_create_tudent
+#
+CollegeAreaTitle_a=Crear notas desde lista
+CollegeAreaTitle_b=Ciclo lectivo
+
+#
+#cards_index_college
+#
+card-header-a-notas=NOTAS
+card-header-b-notas=Agregar nuevas nota.
+card-body-notas=Area de ingreso de notas.
+
+card-header-a-inscriptions=INSCRIPCIONES
+card-header-b-inscriptions=Nueva inscripcion.
+card-body-inscriptions=Area de inscriptiones.
+
+card-header-a-students=ALUMNADO
+card-header-b-students=Agregar Alumnos.
+card-body-students=Area de estudiantes.
+
+card-header-a-subject=ASIGNATURAS
+card-header-b-subject=Asignaturas | Materias | Curriculas.
+card-body-subject=Area de asignaturas.
+
+card-header-a-class=AULAS
+card-header-b-class=Aulas | Salon | Catedras.
+card-body-class=Area de aulas.
+
+card-header-a-periods=Periodos
+card-header-b-periods=Periodos escolares.
+card-body-periods=Area de periodos.
+
+
