@@ -223,22 +223,69 @@ $title = $langs->trans("Subject");
 $help_url = '';
 llxHeader('', $title, $help_url);
 
-// Example : Adding jquery code
-// print '<script type="text/javascript">
-// jQuery(document).ready(function() {
-// 	function init_myfunc()
-// 	{
-// 		jQuery("#myid").removeAttr(\'disabled\');
-// 		jQuery("#myid").attr(\'disabled\',\'disabled\');
-// 	}
-// 	init_myfunc();
-// 	jQuery("#mybutton").click(function() {
-// 		init_myfunc();
-// 	});
-// });
-// </script>';
+?>
+<script type="text/javascript">
+jQuery(document).ready(function() {
+  
+  function init_gendoc_button()
+  {
+    if (jQuery("#txtasignatura").val() != 0 && $('#selectclass').val().length > 0 )
+    {
+    	jQuery(".btnsave").removeAttr("disabled");
+    }
+    else
+    {
+    	jQuery(".btnsave").prop("disabled", true);
+    }
+  }
+  
+  init_gendoc_button();
+  jQuery("#txtasignatura").keyup(function() {
+    init_gendoc_button();
+  });
+  
+  var sel_clases=[];
+  var asignatura='';
+  var sel_teacher=[];
+  
+  jQuery('#selectclass').on("change",function() {
+    init_gendoc_button();
+    sel_clases=[];
+		sel_clases.push($(this).val());
+  });
+  
+  jQuery('#selectprofesores').on("change",function() {
+    sel_teacher=[];
+    sel_teacher = $(this).val();
+  });
 
+  jQuery(".btnsave").on("click",function() {
+    $('#loader').show();
+    asignatura =  $('#txtasignatura').val().toUpperCase();
+    console.log(sel_clases);
+    console.log(asignatura);
+    console.log(sel_teacher);
+    $.post("./ajax.php?action=savesubjectinlotes&token=<?php echo newToken() ;?>",
+      {arrclases:sel_clases, subject:asignatura, arrteacher:sel_teacher, msj:"<?php echo $langs->trans('msjsavesubject') ;?>" }, function(response){
+      jQuery("#txtasignatura").focus();
+    }).done(function(){
+      $('#loader').hide();
+      window.location.reload();
+    }).always(function(){
+      jQuery("#txtasignatura").val(null);
+      jQuery('#selectclass').val(null).trigger('change');
+      jQuery('#selectprofesores').val(null).trigger('change');
+    });
+  });
+  
+  setTimeout(function(){
+    jQuery('#tdloading').hide();
+    jQuery('#tdselectclass').removeClass('display-none');
+  }, 1500);
 
+});
+</script>
+<?php
 // Part to create
 if ($action == 'create') {
 	if (empty($permissiontoadd)) {
@@ -261,7 +308,7 @@ if ($action == 'create') {
 	print dol_get_fiche_head(array(), '');
 
 	// Set some default values
-	//if (! GETPOSTISSET('fieldname')) $_POST['fieldname'] = 'myvalue';
+	if (! GETPOSTISSET('school_year')) $_POST['school_year'] = $conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO;
 
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
@@ -280,6 +327,97 @@ if ($action == 'create') {
 	print '</form>';
 
 	//dol_set_focus('input[name="ref"]');
+}
+
+
+
+if ($action == 'createadds') {
+  if (empty($permissiontoadd)) {
+  	accessforbidden($langs->trans('NotEnoughPermissions'), 0, 1);
+  	exit;
+  }
+	print load_fiche_titre($langs->trans("NewObjectSubjects", $langs->transnoentitiesnoconv("Subject")), '', 'object_'.$object->picto);
+	if ($backtopage) {
+		print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+	}
+	if ($backtopageforcancel) {
+		print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
+	}
+	print dol_get_fiche_head(array(), '');
+	print '<table class="border centpercent tableforfieldcreate">'."\n";
+  print '<tr>';
+  print '<td class="titlefieldcreate fieldrequired">';
+  print $form->textwithpicto($langs->trans("subjecttxt1").' &nbsp; '.$langs->trans(""),$langs->trans("helpsubjectxt1"));
+  print '<td id="tdloading"><em>Loading..<em></td>';
+  print '<td id="tdselectclass" class=" display-none">';
+  $subjectLabelArr = $object->getAllClass();
+  print Form::multiselectarray(
+    'selectclass', 
+    $subjectLabelArr, 
+    '', 
+    0, 
+    0, 
+    'minwidth500',
+    $translate = 0,
+ 	  $width = 0,
+ 	  $moreattrib = '',
+ 	  $elemtype = '',
+ 	  $placeholder = '',
+ 	  $addjscombo = -1 
+    );
+  print '</td>';
+  print '</td>';
+  print '</tr>';
+  print '<tr>';
+  print '<td class="titlefieldcreate fieldrequired">';
+  print $form->textwithpicto($langs->trans("subjecttxt2").' &nbsp; '.$langs->trans(""),$langs->trans("helpsubjectxt2"));
+  print '</td>';
+  print '<td>';
+  print '<input type="text" name="label" id="txtasignatura" class="minwidth500" placeholder="'.$langs->trans("subjecttxt2").'" >';
+  print '</td>';
+  print '</tr>';
+  print '</tr>';
+  print '<tr>';
+  print '<td class="titlefieldcreate fieldrequired">';
+  print $form->textwithpicto($langs->trans("subjecttxt3").' &nbsp; '.$langs->trans(""),$langs->trans("helpsubjectxt3"));
+  print '</td>';
+  print '<td>';
+  print Form::selectarray( 	  	
+    'selectprofesores',
+  	$object->getAllTeacher(),
+  	$id = '',
+  	$show_empty = 1,
+  	$key_in_label = 0,
+  	$value_as_key = 0,
+  	$moreparam = '',
+  	$translate = 0,
+  	$maxlen = 0,
+  	$disabled = 0,
+  	$sort = '',
+  	$morecss = 'minwidth500',
+  	$addjscombo = 1,
+  	$moreparamonempty = '',
+  	$disablebademail = 0,
+  	$nohtmlescape = 0 
+	);
+  
+  print '</td>';
+  print '</tr>';
+	print '</table>'."\n";
+
+	print dol_get_fiche_end();
+
+	print $form->buttonsSaveCancel(
+    $save_label = $langs->trans('btnsave'),
+  	$cancel_label = '',
+  	$morebuttons = null,
+  	$withoutdiv = 1,
+  	$morecss = 'btnsave',
+  	$dol_openinpopup = '' 
+   );
+  print '<img class="valignmiddle" style="display: none;" id="loader" src="../../custom/college/img/spinner.gif" height="20px">';
+	dol_set_focus('input[name="label"]');
+
 }
 
 // Part to edit record
@@ -601,6 +739,11 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$trackid = 'subject'.$object->id;
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
+  
+  
+
+  
+  
 }
 
 // End of page

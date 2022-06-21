@@ -161,7 +161,9 @@ print load_fiche_titre($langs->trans(""), '', 'college.png@college');
       <div class="card-footer">
         <a href="<?php echo DOL_URL_ROOT."/custom/college/subject_list.php"; ?>" class="float-left btn btn-primary"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
         <?php if($user->rights->college->subject->write) { ;?>
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/subject_card.php?action=create"; ?>" class="m10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
+        
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/subject_card.php?action=create"; ?>" class="mrl-10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/subject_card.php?action=createadds"; ?>" class="float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i><i class="fa fa-bars" aria-hidden="true"></i></a>
         <?php } ;?>
       </div>
     </div>

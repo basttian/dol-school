@@ -243,9 +243,9 @@ if (empty($reshook)) {
     }
     
     if ($action  == 'getFilterSubject' ){
-        $resql = $db->query("SELECT rowid from ".MAIN_DB_PREFIX."college_subject 
-        WHERE status = 1 and school_year = ".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO." 
-        AND fk_class = ".(int)$idClass." AND fk_user = ".$user->id." ");
+        $resql = $db->query("SELECT rowid, label from ".MAIN_DB_PREFIX."college_subject 
+        WHERE fk_class = ".(int)$idClass." AND status = 1 and school_year = ".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO." 
+        AND fk_user = ".$user->id." ");
         if ($resql)
         {
 		$num = $db->num_rows($resql);
@@ -258,7 +258,7 @@ if (empty($reshook)) {
                 $obj = $db->fetch_object($resql);
                 if ($obj)
                 {  
-                	$arrClass[$i] = $obj->rowid;      
+                	$arrClass[] = (object)array('ides'=>$obj->rowid);      
                 }
                 $i++;
             }
@@ -343,24 +343,14 @@ llxHeader('', $title, $help_url);
             	
             });
        });
+       /*FILTER SUBJECT*/
        $.getJSON( "./notes_card.php?action=getFilterSubject",{ idClass: idclass , token: '<?php echo newToken();?>' }, function(jsonresp) {
-       		$.each(jsonresp, function(index,element) {
-		        subjects.push({'id':Number(element)})
-			}); 
+       		
             matchCustomSubj = function(params,data){
-                params.term = $.map(subjects, function (obj) {
-                    obj.id = obj.id || obj.id;
-                    return obj;
-                });
-                if ($.trim(params.term[0].id) <= 0) {
-                  return null;
-                }
-                for(var i=0; i < params.term.length; i++){
-                    if (data.id.indexOf(params.term[i].id) > -1) {
-                        var modifiedData = $.extend({}, data, true);
-                        modifiedData.text += '';
-                        return modifiedData;
-                    } 
+                for(i in jsonresp){
+                  if (data.id.indexOf(jsonresp[i].ides) > -1) {
+                        return data;
+                    }
                 }
                 return null;
             }

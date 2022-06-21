@@ -38,6 +38,13 @@ $arralumnoperiodo = GETPOST('arralumnoperiodo', 'intcomma');
 $notavalue = GETPOST('notavalue', 'aZ09');
 $idNota = GETPOST('idNota', 'int');
 
+
+$msj = GETPOST('msj', 'alphanohtml');
+$arrclases = GETPOST('arrclases', 'array');
+$subject = GETPOST('subject', 'alphanohtml');
+$arrteacher = GETPOST('arrteacher', 'int');
+
+
 $estudiante = new Student($db);
 
 if($action == 'getsubject' && !empty($idClass) ){
@@ -59,7 +66,7 @@ if($action == 'getsubject' && !empty($idClass) ){
              $i++;
            }
          }
-      echo json_encode($rows);
+      echo json_encode($rows, JSON_UNESCAPED_UNICODE);
       exit;
   }else{
       echo json_encode(0);
@@ -194,8 +201,46 @@ if($action == 'senddata' && !empty($idClass)  && $idSubjejct!= -1  && !empty($ar
   
 }
 
+/**
+ *  ADD SUBJECT
+ *  $arrclases
+ *  $subject
+ *  $arrteacher
+ */
 
-
+if($action == 'savesubjectinlotes'){
+  $langs->loadLangs(array("college@college"));
+  $error = 0;
+  if (empty($arrclases)) {
+    setEventMessages($langs->trans("ErrorFieldRequired", $langs->trans("classrequired")), null, 'warnings');
+    $error++;
+  }
+  if (empty($subject)) {
+    setEventMessages($langs->trans("ErrorFieldRequired", $langs->trans("subjectrequired")), null, 'warnings');
+    $error++;
+  }
+  if($error==0){
+    $db->begin();
+    for($i = 0; $i < count($arrclases); $i++) {
+     for($j=0; $j < count($arrclases[$i]); $j++){
+      $sql = "INSERT INTO ".MAIN_DB_PREFIX."college_subject";
+      $sql.= "(ref,label,fk_user_creat,status,fk_class,fk_user,school_year)";
+      $sql.= "values('".$subject."','".$subject."','".$user->id."',1,'".$arrclases[$i][$j]."','".$arrteacher."','".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO."'  )";
+      $resql = $db->query($sql);
+     }
+    }
+    if($resql){
+      $db->commit();
+      setEventMessages($msj, null ,'mesgs','');
+      exit;
+    }else{
+      $db->rollback();
+      dol_print_error($db);
+      exit;
+    } 
+  }
+  
+}
 
 
 
