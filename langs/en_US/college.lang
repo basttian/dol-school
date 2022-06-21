@@ -19,6 +19,7 @@
 
 Teacher=Profesor
 
+
 #
 # other
 #
@@ -35,6 +36,21 @@ HelpToTeacher= Profesor a cargo de la asignatura.
 HelpPeriods=Periodo: o, trimestre, semestre etc.
 HelpClass=Aulas, Clases, Catedras
 
+
+#Create Subject form II
+NewObjectSubjects=Agregar una asignatura a diferentes clases.
+subjecttxt1=Selecionar clases.
+helpsubjectxt1=Seleccionar mas de una categoria y asignarle la asignatura.
+subjecttxt2=Asignatura
+helpsubjectxt2= Crear asignatura a las clases seleccionadas
+subjecttxt3=Profesores
+helpsubjectxt3=Seleccionar el educador responsable de la asignatura de las clases seleccionadas.
+btnsave= Agregar nueva asignatura.
+msjsavesubject=Asignatura almacenada con exito.
+subjectrequired=Asignatura
+classrequired=Clase
+
+
 #
 # Menu
 #
@@ -47,6 +63,7 @@ ListStudent=Alumnos
 NewStudent=Nuevo Alumno
 ListSubject=Asignaturas
 NewSubject=Nueva Asignatura
+NewAddsSubject=Agregar Asignaturas
 ListClassrooms=Clases
 NewClassrooms=Nueva Clase
 ListNotes=Notas

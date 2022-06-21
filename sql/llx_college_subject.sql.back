@@ -18,7 +18,7 @@ CREATE TABLE llx_college_subject(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	ref varchar(128) NOT NULL, 
-	label varchar(255), 
+	label varchar(255) NOT NULL, 
 	fk_soc integer, 
 	fk_project integer, 
 	description text, 
@@ -33,6 +33,7 @@ CREATE TABLE llx_college_subject(
 	model_pdf varchar(255), 
 	status integer NOT NULL, 
 	fk_class integer NOT NULL, 
-	fk_user integer NOT NULL
+	fk_user integer, 
+	school_year varchar(255) DEFAULT '2022' NOT NULL
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

@@ -121,7 +121,9 @@ div.mainmenu.college {
   margin: 10px 0px 10px 0px;
 }
 
-
+.display-none{
+  display:none;
+}
 
 
 
