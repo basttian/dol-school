@@ -50,7 +50,7 @@ $estudiante = new Student($db);
 if($action == 'getsubject' && !empty($idClass) ){
 //SELECT rowid, label, fk_class FROM llx_college_subject WHERE fk_class = 2 - WHERE fk_class = ".(int)$idClass."  , JSON_UNESCAPED_UNICODE
  $rows = array();
- $resql=$db->query("SELECT rowid, label FROM ".MAIN_DB_PREFIX."college_subject WHERE fk_class = ".(int)$idClass." ");
+ $resql=$db->query("SELECT rowid, label FROM ".MAIN_DB_PREFIX."college_subject WHERE fk_class = ".(int)$idClass." AND fk_user=".$user->id." ");
   if ($resql) {
       $num = $db->num_rows($resql);
          $i = 0;
