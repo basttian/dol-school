@@ -18,6 +18,7 @@ CREATE TABLE llx_college_student(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	ref varchar(128) NOT NULL, 
+	fcha_ingreso datetime, 
 	label varchar(255), 
 	fk_soc integer, 
 	direccion varchar(255), 
@@ -35,7 +36,6 @@ CREATE TABLE llx_college_student(
 	last_main_doc varchar(255), 
 	import_key varchar(14), 
 	model_pdf varchar(255), 
-	status integer NOT NULL, 
-	fcha_ingreso datetime
+	status integer DEFAULT 1 NOT NULL
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

@@ -391,7 +391,7 @@ class modCollege extends DolibarrModules
 			'fk_menu'=>'', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'top', // This is a Top menu entry
 			'titre'=>'ModuleCollegeName',
-			'prefix' => img_picto('', 'college_top@college' , 'class="paddingright mrl-10 pictofixedwidth valignmiddle"'),
+			'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
 			'mainmenu'=>'college',
 			'leftmenu'=>'',
 			'url'=>'/college/collegeindex.php',
@@ -763,7 +763,7 @@ class modCollege extends DolibarrModules
 		// Exports profiles provided by this module
 		$r = 1;
 		/* BEGIN MODULEBUILDER EXPORT STUDENT */
-		/*
+		
 		$langs->load("college@college");
 		$this->export_code[$r]=$this->rights_class.'_'.$r;
 		$this->export_label[$r]='StudentLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
@@ -784,31 +784,33 @@ class modCollege extends DolibarrModules
 		//$this->export_examplevalues_array[$r] = array('t.field'=>'Example');
 		//$this->export_help_array[$r] = array('t.field'=>'FieldDescHelp');
 		$this->export_sql_start[$r]='SELECT DISTINCT ';
-		$this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'student as t';
+		$this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'college_student as t';
 		//$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'student_line as tl ON tl.fk_student = t.rowid';
 		$this->export_sql_end[$r] .=' WHERE 1 = 1';
 		$this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('student').')';
-		$r++; */
+		$r++; 
 		/* END MODULEBUILDER EXPORT STUDENT */
 
 		// Imports profiles provided by this module
-		$r = 1;
+		$r = 0;
 		/* BEGIN MODULEBUILDER IMPORT STUDENT */
-		/*
+    $r++;
 		 $langs->load("college@college");
-		 $this->export_code[$r]=$this->rights_class.'_'.$r;
-		 $this->export_label[$r]='StudentLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
-		 $this->export_icon[$r]='student@college';
-		 $keyforclass = 'Student'; $keyforclassfile='/college/class/student.class.php'; $keyforelement='student@college';
-		 include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		 $keyforselect='student'; $keyforaliasextra='extra'; $keyforelement='student@college';
-		 include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		 //$this->export_dependencies_array[$r]=array('mysubobject'=>'ts.rowid', 't.myfield'=>array('t.myfield2','t.myfield3')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
-		 $this->export_sql_start[$r]='SELECT DISTINCT ';
-		 $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'student as t';
-		 $this->export_sql_end[$r] .=' WHERE 1 = 1';
-		 $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('student').')';
-		 $r++; */
+		 $this->import_code[$r]=$this->rights_class.'_'.$r;
+		 $this->import_label[$r]='StudentLines';
+		 $this->import_icon[$r]='student@college';
+		 $this->import_entities_array[$r] = array();
+     $this->import_tables_array[$r] = array(
+      't' => MAIN_DB_PREFIX.'college_student',
+     );
+     $this->import_fields_array[$r] = array(
+      't.ref' => 'ref*',
+      't.label' => 'label*',
+     );
+     $this->import_fieldshidden_array[$r] = array('t.fk_user_creat'=>'user->id'); 
+     //$this->import_regex_array[$r] = array('t.fk_user_creat'=>'rowid@'.MAIN_DB_PREFIX.'user');
+     $this->import_examplevalues_array[$r] = array('t.ref'=>'ref', 't.label'=>'label');
+     $this->import_updatekeys_array[$r] = array('t.ref'=>'Ref', 't.label'=>'Label');
 		/* END MODULEBUILDER IMPORT STUDENT */
 	}
 

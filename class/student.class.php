@@ -104,8 +104,8 @@ class Student extends CommonObject
 	public $fields=array(
 		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'css'=>'left', 'comment'=>"Id"),
 		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'validate'=>'1', 'comment'=>"Reference of object"),
-	    'fcha_ingreso' => array('type'=>'datetime', 'label'=>'Fecha de Ingreso', 'enabled'=>'1', 'position'=>11, 'notnull'=>0, 'visible'=>1, 'index'=>1, 'help'=>"Fecha de ingreso al establecimiento", 'validate'=>'1',),
-	    'label' => array('type'=>'varchar(255)', 'label'=>'Apellido y Nombre', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth300', 'cssview'=>'wordbreak', 'help'=>"Apellido y Nombre", 'showoncombobox'=>'2', 'validate'=>'1',),
+		'fcha_ingreso' => array('type'=>'datetime', 'label'=>'Fecha de Ingreso', 'enabled'=>'1', 'position'=>11, 'notnull'=>0, 'visible'=>1, 'index'=>1, 'help'=>"Fecha de ingreso al establecimiento", 'validate'=>'1',),
+		'label' => array('type'=>'varchar(255)', 'label'=>'Apellido y Nombre', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth300', 'cssview'=>'wordbreak', 'help'=>"Apellido y Nombre", 'showoncombobox'=>'2', 'validate'=>'1',),
 		'fk_soc' => array('type'=>'integer:Societe:societe/class/societe.class.php:1:status=1 AND entity IN (__SHARED_ENTITIES__)', 'label'=>'Tutor', 'enabled'=>'1', 'position'=>50, 'notnull'=>-1, 'visible'=>1, 'index'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"LinkToThirparty", 'validate'=>'1',),
 		'direccion' => array('type'=>'varchar(255)', 'label'=>'Direccion', 'enabled'=>'1', 'position'=>51, 'notnull'=>0, 'visible'=>1, 'validate'=>'1',),
 		'dni' => array('type'=>'varchar(255)', 'label'=>'DNI', 'enabled'=>'1', 'position'=>52, 'notnull'=>0, 'visible'=>1, 'validate'=>'1',),
@@ -122,10 +122,11 @@ class Student extends CommonObject
 		'last_main_doc' => array('type'=>'varchar(255)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>600, 'notnull'=>0, 'visible'=>0,),
 		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
 		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1010, 'notnull'=>-1, 'visible'=>0,),
-		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'Borrador', '1'=>'Validado', '9'=>'Cancelado'), 'validate'=>'1',),
+		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>1, 'default'=>'1', 'index'=>1, 'arrayofkeyval'=>array('0'=>'Borrador', '1'=>'Validado', '9'=>'Cancelado'), 'validate'=>'1',),
 	);
 	public $rowid;
 	public $ref;
+	public $fcha_ingreso;
 	public $label;
 	public $fk_soc;
 	public $direccion;
@@ -144,7 +145,6 @@ class Student extends CommonObject
 	public $import_key;
 	public $model_pdf;
 	public $status;
-	public $fcha_ingreso;
 	// END MODULEBUILDER PROPERTIES
 
 

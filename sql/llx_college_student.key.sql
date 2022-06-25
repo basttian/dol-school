@@ -17,11 +17,11 @@
 -- BEGIN MODULEBUILDER INDEXES
 ALTER TABLE llx_college_student ADD INDEX idx_college_student_rowid (rowid);
 ALTER TABLE llx_college_student ADD INDEX idx_college_student_ref (ref);
+ALTER TABLE llx_college_student ADD INDEX idx_college_student_fcha_ingreso (fcha_ingreso);
 ALTER TABLE llx_college_student ADD INDEX idx_college_student_fk_soc (fk_soc);
 ALTER TABLE llx_college_student ADD INDEX idx_college_student_fk_project (fk_project);
 ALTER TABLE llx_college_student ADD CONSTRAINT llx_college_student_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
 ALTER TABLE llx_college_student ADD INDEX idx_college_student_status (status);
-ALTER TABLE llx_college_student ADD INDEX idx_college_student_fcha_ingreso (fcha_ingreso);
 -- END MODULEBUILDER INDEXES
 
 --ALTER TABLE llx_college_student ADD UNIQUE INDEX uk_college_student_fieldxy(fieldx, fieldy);
