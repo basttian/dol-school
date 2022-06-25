@@ -787,7 +787,7 @@ class modCollege extends DolibarrModules
 		$this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'college_student as t';
 		//$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'student_line as tl ON tl.fk_student = t.rowid';
 		$this->export_sql_end[$r] .=' WHERE 1 = 1';
-		$this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('student').')';
+		//$this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('student').')';
 		$r++; 
 		/* END MODULEBUILDER EXPORT STUDENT */
 
