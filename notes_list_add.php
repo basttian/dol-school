@@ -13,7 +13,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once __DIR__.'/class/notes.class.php';
 require_once __DIR__.'/class/classrooms.class.php';
 require_once __DIR__.'/class/inscriptions.class.php';
-require_once __DIR__.'/class/student.class.php';
+require_once __DIR__.'/class/students.class.php';
 require_once __DIR__.'/class/subject.class.php';
 /**/
 $action = GETPOST('action', 'aZ09');

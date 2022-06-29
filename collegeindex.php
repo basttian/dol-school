@@ -123,7 +123,7 @@ print load_fiche_titre($langs->trans(""), '', 'college.png@college');
     </div>
   </div>
 <?php } ;?>
-<?php if($user->rights->college->student->read){  ;?>
+<?php if($user->rights->college->students->read){  ;?>
   <div class="column col-4 col-xs-12 p-10">
     <div class="card">
       <div class="card-image m-10">
@@ -137,9 +137,9 @@ print load_fiche_titre($langs->trans(""), '', 'college.png@college');
         <?php echo $langs->trans("card-body-students") ;?>
       </div>
       <div class="card-footer">
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/student_list.php"; ?>" class="float-left btn btn-primary"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
-        <?php if($user->rights->college->student->write){ ;?>
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/student_card.php?action=create"; ?>" class="m10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/students_list.php"; ?>" class="float-left btn btn-primary"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <?php if($user->rights->college->students->write){ ;?>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/students_card.php?action=create"; ?>" class="m10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
         <?php } ;?>
       </div>
     </div>

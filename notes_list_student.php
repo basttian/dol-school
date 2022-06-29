@@ -2,7 +2,7 @@
 require_once"./../../main.inc.php";
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
-require_once DOL_DOCUMENT_ROOT.'/custom/college/class/student.class.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/college/class/students.class.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/college/class/subject.class.php';
 
 global $langs, $db, $user;
@@ -18,7 +18,7 @@ $idStudent = GETPOST('idStudent', 'int') ? GETPOST('idStudent', 'int') : 0;
  */
 
 
-$estudiante = new Student($db);
+$estudiante = new Students($db);
 $asignatura = new Subject($db);
  
 if($action == 'filterStudent' && !empty($idStudent)){

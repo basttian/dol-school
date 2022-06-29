@@ -23,29 +23,35 @@ require '../../main.inc.php';
 // load college libraries
 require_once __DIR__.'/class/notes.class.php';
 require_once __DIR__.'/class/classrooms.class.php';
-require_once __DIR__.'/class/student.class.php';
+require_once __DIR__.'/class/students.class.php';
 require_once __DIR__.'/class/inscriptions.class.php';
 require_once __DIR__.'/class/subject.class.php';
-
+require_once __DIR__.'/class/periods.class.php';
 
 global $db, $user, $langs; 
 
-$action = GETPOST('action', 'aZ09');
-$idClass = GETPOST('idClass', 'int');
+$action     = GETPOST('action', 'aZ09');
+$idClass    = GETPOST('idClass', 'int');
 $idSubjejct = GETPOST('idSubjejct', 'int');
 
 $arralumnoperiodo = GETPOST('arralumnoperiodo', 'intcomma');
-$notavalue = GETPOST('notavalue', 'aZ09');
-$idNota = GETPOST('idNota', 'int');
+$notavalue        = GETPOST('notavalue', 'aZ09');
+$idNota           = GETPOST('idNota', 'int');
 
 
-$msj = GETPOST('msj', 'alphanohtml');
-$arrclases = GETPOST('arrclases', 'array');
-$subject = GETPOST('subject', 'alphanohtml');
+$msj        = GETPOST('msj', 'alphanohtml');
+$arrclases  = GETPOST('arrclases', 'array');
+$subject    = GETPOST('subject', 'alphanohtml');
 $arrteacher = GETPOST('arrteacher', 'int');
 
+$yeartab    = GETPOST('yeartab', 'int');
+$studenttab = GETPOST('studenttab', 'int');
+$subjecttab = GETPOST('subjecttab', 'int');
+$periodstab = GETPOST('periodstab', 'int');
 
-$estudiante = new Student($db);
+$estudiante = new Students($db);
+$asignatura = new Subject($db);
+$periodos   = new Periods($db);
 
 if($action == 'getsubject' && !empty($idClass) ){
 //SELECT rowid, label, fk_class FROM llx_college_subject WHERE fk_class = 2 - WHERE fk_class = ".(int)$idClass."  , JSON_UNESCAPED_UNICODE
@@ -78,7 +84,7 @@ if($action == 'getstudent' && !empty($idClass) ){
   $rows = array();
   $resql = $db->query( "SELECT i.fk_student, s.label 
   FROM ".MAIN_DB_PREFIX."college_inscriptions AS i 
-  INNER JOIN ".MAIN_DB_PREFIX."college_student AS s ON i.fk_student=s.rowid 
+  INNER JOIN ".MAIN_DB_PREFIX."college_students AS s ON i.fk_student=s.rowid 
   WHERE i.fk_class =  ".(int)$idClass."  AND i.`status` = 1 AND i.school_year = ".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO." ORDER BY s.label ASC ");
  
   if ($resql) {
@@ -136,6 +142,7 @@ if($action == 'getperiods'){
   }
   
 }
+
 
 
 if($action == 'getnotes' && !empty($idClass)  && !empty($idSubjejct) ){
@@ -242,20 +249,53 @@ if($action == 'savesubjectinlotes'){
   
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//notes tab student 
+if ($action == 'getnotesforstudent') {
+  $rows=array();
+  $rownotas=array();
+  $sql = "SELECT fk_subject,`status`,";
+  for($i=1;$i<=$periodos->getCountRecord();$i++){
+  $sql .= "SUM(CASE WHEN trimestre = ".$i." THEN nota ELSE 0 END) AS `".$i."`," ;
+  //$sql .="sum(CASE WHEN trimestre = 2 THEN nota ELSE 0 END) AS Tr2,";
+  //$sql .="sum(CASE WHEN trimestre = 3 THEN nota ELSE 0 END) AS Tr3,";  
+  }
+  $sql .=" CAST(AVG(nota) AS DECIMAL(11,2)) AS prom";
+  $sql .=" FROM ".MAIN_DB_PREFIX."college_notes GROUP BY fk_student, fk_subject, school_year";
+  $sql .=" HAVING fk_student=".(int)$studenttab." AND school_year = ".(int)$yeartab." AND `status`=1 ";
+  
+  $resql = $db->query($sql);
+  if ($resql)
+  {
+  	$num = $db->num_rows($resql);
+  	$i = 0;
+  	if ($num)
+  	{
+  		while ($i < $num)
+  		{
+  			$obj = $db->fetch_object($resql);
+  			if ($obj)
+  			{
+         $asignatura->fetch((int)$obj->fk_subject);
+         
+  			 $rows[] = array(
+  				 'asignatura'  => $asignatura->label,
+ 		       'promedio'    => (float)$obj->prom,
+           'idasignatura'=> (int)$obj->fk_subject,
+           'data'        => $obj
+  			 );
+         
+        }
+  			$i++;
+  		}
+      echo json_encode($rows, JSON_UNESCAPED_UNICODE);
+      exit;
+  	}else{
+  	 echo json_encode(0);
+     exit;
+  	}
+  }else{
+      $db->rollback();
+      dol_print_error($db);
+      exit;
+  }
+}
