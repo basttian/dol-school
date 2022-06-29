@@ -287,7 +287,7 @@ if ($id > 0 || !empty($ref)) {
   <div id="idprint">
   <div class="div-table-responsive">
   <table id="tableDataNotess" class="tagtable nobottomiftotal liste">
-  <caption></caption>
+  <caption class="right"><em><b><?php echo $object->label ;?></b></em></caption>
     <thead>
       <tr class="liste_titre">
         <th><?php echo $langs->trans("tablenotesheader1") ;?></th>
