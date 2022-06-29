@@ -236,16 +236,17 @@ if ($id > 0 || !empty($ref)) {
               $("#tableDataNotess>tbody").append(
               "<tr class='pair'><td>"+datanotestudent[key].asignatura+
               "</td><td>"+datanotestudent[key].promedio+
-              "</td></tr><tr><td colspan='2'><table id='tablerecord'><thead><tr></tr></thead><tbody><tr id="+key+"></tr></tbody></table></td></tr>");
+              "</td><td>"+((datanotestudent[key].noterecovery==0)?'-':datanotestudent[key].noterecovery)+
+              "</td></tr><tr><td colspan='3'><table id='tablerecord'><thead><tr></tr></thead><tbody><tr id="+key+"></tr></tbody></table></td></tr>");
             });
             $.getJSON( "./ajax.php?action=getperiods",{ token:"<?php echo newToken() ;?>" }, function(dataperiods) {
             Object.keys(dataperiods).forEach(function(kk,index,arr) {
-          	$("#tableDataNotess>tbody>tr").find("table>thead>tr:eq(0)").append("<th>"+dataperiods[kk].label+"</th>");
+          	$("#tableDataNotess>tbody>tr").find("table>thead>tr:eq(0)").append("<th>"+dataperiods[kk].label+"</th><th></th>");
             });}).done(function(dataperiods){ 
           	Object.keys(datanotestudent).forEach(function(key,index,arr) {
           	  Object.keys(dataperiods).forEach(function(k,i,a){
           	  $("#tableDataNotess>tbody>tr>").find("table>tbody>tr#"+key+" ").append(
-          	  "<td>"+datanotestudent[key].data[dataperiods[k].rowid]+"</td>");
+          	  "<td>"+datanotestudent[key].data[dataperiods[k].rowid]+"</td></td><td>");
           	  });
           	});
             $('#loader').hide();
@@ -291,7 +292,8 @@ if ($id > 0 || !empty($ref)) {
     <thead>
       <tr class="liste_titre">
         <th><?php echo $langs->trans("tablenotesheader1") ;?></th>
-        <th><?php echo $langs->trans("tablenotesheader2") ;?></th>
+        <th><?php echo $form->textwithpicto($langs->trans("tablenotesheader2"),$langs->trans("tablenotesheader2Tooltip"));?></th>
+        <th><?php echo $form->textwithpicto($langs->trans("tablenotesheader3"),$langs->trans("tablenotesheader3Tooltip"));?></th>
       </tr>
     </thead>
     <tbody>

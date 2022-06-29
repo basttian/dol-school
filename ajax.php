@@ -259,7 +259,8 @@ if ($action == 'getnotesforstudent') {
   //$sql .="sum(CASE WHEN trimestre = 2 THEN nota ELSE 0 END) AS Tr2,";
   //$sql .="sum(CASE WHEN trimestre = 3 THEN nota ELSE 0 END) AS Tr3,";  
   }
-  $sql .=" CAST(AVG(nota) AS DECIMAL(11,2)) AS prom";
+  $sql .=" CAST(AVG(nota) AS DECIMAL(11,2)) AS `prom` ,";
+  $sql .=" CAST(AVG(NULLIF(notarecover,0)) AS DECIMAL(11,2)) AS `promnotarecover`";
   $sql .=" FROM ".MAIN_DB_PREFIX."college_notes GROUP BY fk_student, fk_subject, school_year";
   $sql .=" HAVING fk_student=".(int)$studenttab." AND school_year = ".(int)$yeartab." AND `status`=1 ";
   
@@ -281,7 +282,8 @@ if ($action == 'getnotesforstudent') {
   				 'asignatura'  => $asignatura->label,
  		       'promedio'    => (float)$obj->prom,
            'idasignatura'=> (int)$obj->fk_subject,
-           'data'        => $obj
+           'data'        => $obj,
+           'noterecovery'=> (float)$obj->promnotarecover
   			 );
          
         }
