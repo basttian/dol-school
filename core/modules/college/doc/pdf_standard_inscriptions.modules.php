@@ -43,7 +43,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/college/class/classrooms.class.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/college/class/inscriptions.class.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/college/class/notes.class.php';
-require_once DOL_DOCUMENT_ROOT.'/custom/college/class/student.class.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/college/class/students.class.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/college/class/subject.class.php';
 
 
@@ -352,7 +352,7 @@ class pdf_standard_inscriptions extends ModelePDFInscriptions
 				$pdf->SetTextColor(0,0,200); // fixe la couleur du texte
                 $pdf->MultiCell(60, 8, $clase->label , 0, 'L');
                 
-                $estudiante = new Student($db);
+                $estudiante = new Students($db);
                 $estudiante->fetch($object->fk_student);
                 $pdf->SetTextColor(0,0,200); // fixe la couleur du texte
                 $pdf->MultiCell(60, 8, $estudiante->label , 0, 'L');

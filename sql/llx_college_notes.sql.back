@@ -35,6 +35,7 @@ CREATE TABLE llx_college_notes(
 	fk_subject integer NOT NULL, 
 	trimestre integer NOT NULL, 
 	fk_student integer NOT NULL, 
-	nota real NOT NULL
+	nota real NOT NULL, 
+	notarecover real
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

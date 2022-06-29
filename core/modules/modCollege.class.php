@@ -72,7 +72,7 @@ class modCollege extends DolibarrModules
 		$this->editor_url = '';
 
 		// Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-		$this->version = '1.0.1';
+		$this->version = '1.0.2';
 		// Url to the file with your last numberversion of this module
 		//$this->url_last_version = 'http://www.example.com/versionmodule.txt';
 
@@ -182,7 +182,7 @@ class modCollege extends DolibarrModules
 
 		// Array to add new pages in new tabs
 		$this->tabs = array();
-		//$this->tabs[] = array('data'=>'thirdparty:+tabname:Student:college@college:1:/college/student_card.php?id=__ID__');  					// To add a new tab identified by code tabname1
+        $this->tabs[] = array('data'=>'thirdparty:+tabname:StudentThirdTab:college@college:1:/college/students_notes_list.php?id=__ID__');  					// To add a new tab identified by code tabname1
 		
 		// Example:
 		// $this->tabs[] = array('data'=>'objecttype:+tabname1:Title1:mylangfile@college:$user->rights->college->read:/college/mynewtab1.php?id=__ID__');  					// To add a new tab identified by code tabname1
@@ -313,18 +313,18 @@ class modCollege extends DolibarrModules
     //STUDENT
 		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = 'Read objects of Student'; // Permission label
-		$this->rights[$r][4] = 'student';
-		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->college->student->read)
+		$this->rights[$r][4] = 'students';
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->college->students->read)
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = 'Create/Update objects of Student'; // Permission label
-		$this->rights[$r][4] = 'student';
-		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->college->student->write)
+		$this->rights[$r][4] = 'students';
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->college->students->write)
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = 'Delete objects of Student'; // Permission label
-		$this->rights[$r][4] = 'student';
-		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->college->student->delete)
+		$this->rights[$r][4] = 'students';
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->college->students->delete)
 		$r++;
     
     //SUBJECT
@@ -543,10 +543,10 @@ class modCollege extends DolibarrModules
             // This is a Left menu entry
             'type'=>'left',
             'titre'=>'ListStudent',
-            'prefix' => img_picto('', 'object_student@college', 'class="paddingright mrl-10 pictofixedwidth valignmiddle"'),
+            'prefix' => img_picto('', 'object_students@college', 'class="paddingright mrl-10 pictofixedwidth valignmiddle"'),
             'mainmenu'=>'college',
-            'leftmenu'=>'college_student',
-            'url'=>'/college/student_list.php',
+            'leftmenu'=>'college_students',
+            'url'=>'/college/students_list.php',
             // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'langs'=>'college@college',
             'position'=>1100+$r,
@@ -560,14 +560,14 @@ class modCollege extends DolibarrModules
         );
         $this->menu[$r++]=array(
             // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-            'fk_menu'=>'fk_mainmenu=college,fk_leftmenu=college_student',
+            'fk_menu'=>'fk_mainmenu=college,fk_leftmenu=college_students',
             // This is a Left menu entry
             'type'=>'left',
             'titre'=>'NewStudent',
             //'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
             'mainmenu'=>'college',
-            'leftmenu'=>'college_student',
-            'url'=>'/college/student_card.php?action=create',
+            'leftmenu'=>'college_students',
+            'url'=>'/college/students_card.php?action=create',
             // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'langs'=>'college@college',
             'position'=>1100+$r,
@@ -767,15 +767,15 @@ class modCollege extends DolibarrModules
 		$langs->load("college@college");
 		$this->export_code[$r]=$this->rights_class.'_'.$r;
 		$this->export_label[$r]='StudentLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
-		$this->export_icon[$r]='student@college';
+		$this->export_icon[$r]='students@college';
 		// Define $this->export_fields_array, $this->export_TypeFields_array and $this->export_entities_array
-		$keyforclass = 'Student'; $keyforclassfile='/college/class/student.class.php'; $keyforelement='student@college';
+		$keyforclass = 'Students'; $keyforclassfile='/college/class/students.class.php'; $keyforelement='students@college';
 		include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
 		//$this->export_fields_array[$r]['t.fieldtoadd']='FieldToAdd'; $this->export_TypeFields_array[$r]['t.fieldtoadd']='Text';
 		//unset($this->export_fields_array[$r]['t.fieldtoremove']);
 		//$keyforclass = 'StudentLine'; $keyforclassfile='/college/class/student.class.php'; $keyforelement='studentline@college'; $keyforalias='tl';
 		//include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		$keyforselect='student'; $keyforaliasextra='extra'; $keyforelement='student@college';
+		$keyforselect='students'; $keyforaliasextra='extra'; $keyforelement='students@college';
 		include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
 		//$keyforselect='studentline'; $keyforaliasextra='extraline'; $keyforelement='studentline@college';
 		//include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
@@ -784,7 +784,7 @@ class modCollege extends DolibarrModules
 		//$this->export_examplevalues_array[$r] = array('t.field'=>'Example');
 		//$this->export_help_array[$r] = array('t.field'=>'FieldDescHelp');
 		$this->export_sql_start[$r]='SELECT DISTINCT ';
-		$this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'college_student as t';
+		$this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'college_students as t';
 		//$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'student_line as tl ON tl.fk_student = t.rowid';
 		$this->export_sql_end[$r] .=' WHERE 1 = 1';
 		//$this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('student').')';
@@ -798,10 +798,10 @@ class modCollege extends DolibarrModules
 		 $langs->load("college@college");
 		 $this->import_code[$r]=$this->rights_class.'_'.$r;
 		 $this->import_label[$r]='StudentLines';
-		 $this->import_icon[$r]='student@college';
+		 $this->import_icon[$r]='students@college';
 		 $this->import_entities_array[$r] = array();
      $this->import_tables_array[$r] = array(
-      't' => MAIN_DB_PREFIX.'college_student',
+      't' => MAIN_DB_PREFIX.'college_students',
      );
      $this->import_fields_array[$r] = array(
       't.ref' => 'ref*',

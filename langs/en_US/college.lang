@@ -103,15 +103,15 @@ CollegeAbout = About College
 CollegeAboutPage = College about page
 
 #
-# pages
+# pages list/Card
 #
 Subjects=Asignaturas
 Subject=Asignatura
 Classroomss=Clases
 Classrooms=Clase
 Classroom=Clase
-Students=Estudiantes
-Student=Estudiante
+Studentss=Estudiantes
+Students=Estudiante
 Inscriptionss=Inscripciones
 Inscriptions=Inscripciones
 Periodss=Periodos
@@ -167,5 +167,25 @@ card-body-class=Area de aulas.
 card-header-a-periods=Periodos
 card-header-b-periods=Periodos escolares.
 card-body-periods=Area de periodos.
+
+#
+# TAB
+#
+
+StudentThirdTab=Estudiate/s a cargo
+thirdpartytab= Tutor
+studenttab=Notas
+
+
+#
+# Student Note Page 
+#
+titlenotas=Notas
+inputfilterplaceholder = Filtrar por intervalo: ####
+tablenotesheader1=Asignatura
+tablenotesheader2=Promedio
+
+
+
 
 
