@@ -122,8 +122,8 @@ class Notes extends CommonObject
 		'fk_subject' => array('type'=>'integer:Subject:custom/college/class/subject.class.php:1:status=1', 'label'=>'Subject', 'enabled'=>'1', 'position'=>23, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"HelpSubject", 'validate'=>'1',),
 		'trimestre' => array('type'=>'integer:Periods:custom/college/class/periods.class.php:1', 'label'=>'Trimestre', 'enabled'=>'1', 'position'=>4, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"HelpPeriods", 'validate'=>'1',),
 		'fk_student' => array('type'=>'integer:Students:custom/college/class/students.class.php:1', 'label'=>'Student', 'enabled'=>'1', 'position'=>25, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"LinkStudent", 'validate'=>'1',),
-		'nota' => array('type'=>'real', 'label'=>'Nota', 'enabled'=>'1', 'position'=>26, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'validate'=>'1',),
-		'notarecover' => array('type'=>'real', 'label'=>'Nota R', 'enabled'=>'1', 'position'=>27, 'notnull'=>-1, 'visible'=>2, 'help'=>"recovernote",),
+		'nota' => array('type'=>'real', 'label'=>'Nota', 'enabled'=>'1', 'position'=>26, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"notetextform", 'validate'=>'1',),
+		'notarecover' => array('type'=>'real', 'label'=>'NotaR', 'enabled'=>'1', 'position'=>27, 'notnull'=>1, 'visible'=>4, 'help'=>"recovernote",),
 	);
 	public $rowid;
 	public $school_year;

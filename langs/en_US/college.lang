@@ -35,6 +35,9 @@ HelpSubject= Asignatura, Materia.
 HelpToTeacher= Profesor a cargo de la asignatura.
 HelpPeriods=Periodo: o, trimestre, semestre etc.
 HelpClass=Aulas, Clases, Catedras
+notetextform=Nota final del periodo actual.
+NotaR=Recuperatorio
+recovernote=Utilizada para recuperatorios al final del periodo escolar.
 
 
 #Create Subject form II
@@ -184,8 +187,9 @@ titlenotas=Notas
 inputfilterplaceholder = Filtrar por intervalo: ####
 tablenotesheader1=Asignatura
 tablenotesheader2=Promedio
-
-
+tablenotesheader2Tooltip=Promedio final.
+tablenotesheader3=Recupera
+tablenotesheader3Tooltip=Promedio de recuperatorio.
 
 
 
