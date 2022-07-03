@@ -26,6 +26,7 @@
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+require_once DOL_DOCUMENT_ROOT .'/custom/college/class/periods.class.php';  
 
 
 /**
@@ -233,6 +234,7 @@ class Notes extends CommonObject
 				}
 			}
 		}
+    
 	}
 
 	/**
@@ -1106,9 +1108,8 @@ class Notes extends CommonObject
        return $rows;
      }
     }
-  }  
-
-    
+  }
+ 
 }
 
 

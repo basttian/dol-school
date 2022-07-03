@@ -191,5 +191,34 @@ tablenotesheader2Tooltip=Promedio final.
 tablenotesheader3=Recupera
 tablenotesheader3Tooltip=Promedio de recuperatorio.
 
+#
+# PDF STUDENT
+#
+btnpdfstudentcard=pdf
+pdftitle=Boletin de calificaciones
+pdftitlename=Alumno
+pdftitlecicle=Ciclo lectivo
+pdfcabecera=Calificaciones
+pdfheadtablecols1=Asignaturas
+pdfheadtablecolsloop=Tr
+pdfheadprom1=P
+pdfheadprom2=P.R
+pdfheadprom3=P.F
+pdftablerownodata=No se encuentran notas.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -1026,7 +1026,7 @@ class Inscriptions extends CommonObject
 			}
 		}
 
-		$modelpath = "core/modules/college/doc/";
+		$modelpath = "core/modules/college/doc/inscriptions/";
 
 		if ($includedocgeneration && !empty($modele)) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);

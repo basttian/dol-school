@@ -1016,7 +1016,7 @@ class Students extends CommonObject
 		global $conf, $langs;
 
 		$result = 0;
-		$includedocgeneration = 0;
+		$includedocgeneration = 1;
 
 		$langs->load("college@college");
 
@@ -1030,7 +1030,7 @@ class Students extends CommonObject
 			}
 		}
 
-		$modelpath = "core/modules/college/doc/";
+		$modelpath = "core/modules/college/doc/students/";
 
 		if ($includedocgeneration && !empty($modele)) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
