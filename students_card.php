@@ -119,6 +119,9 @@ if (empty($action) && empty($id) && empty($ref)) {
 	$action = 'view';
 }
 
+
+
+
 // Load object
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
@@ -154,6 +157,8 @@ if (!$permissiontoread) accessforbidden();
  * Actions
  */
 
+
+
 $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) {
@@ -177,7 +182,9 @@ if (empty($reshook)) {
 
 	$triggermodname = 'COLLEGE_STUDENTS_MODIFY'; // Name of trigger action code to execute when we modify record
 
-	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
+	include DOL_DOCUMENT_ROOT.'/custom/college/builddoc.php';
+  
+  // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 
 	// Actions when linking object each other
@@ -190,7 +197,7 @@ if (empty($reshook)) {
 	//include DOL_DOCUMENT_ROOT.'/core/actions_lineupdown.inc.php';
 
 	// Action to build doc
-	include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
+	//include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 
 	if ($action == 'set_thirdparty' && $permissiontoadd) {
 		$object->setValueFrom('fk_soc', GETPOST('fk_soc', 'int'), '', '', 'date', '', $user, $triggermodname);
@@ -222,10 +229,10 @@ $formproject = new FormProjets($db);
 $title = $langs->trans("Students");
 $help_url = '';
 llxHeader('', $title, $help_url);
-
-// Example : Adding jquery code
-// print '<script type="text/javascript">
-// jQuery(document).ready(function() {
+?>
+<script type="text/javascript">
+jQuery(document).ready(function(){
+// Example : Adding jquery code  
 // 	function init_myfunc()
 // 	{
 // 		jQuery("#myid").removeAttr(\'disabled\');
@@ -235,10 +242,14 @@ llxHeader('', $title, $help_url);
 // 	jQuery("#mybutton").click(function() {
 // 		init_myfunc();
 // 	});
-// });
-// </script>';
-
-
+// ;butActionRefused
+    $("#btnpdfdoc").click(function(event){
+      $('#loader').show();
+      $(this).addClass( "butActionDelete").addClass("butActionRefused");
+    });
+});
+</script>
+<?php
 // Part to create
 if ($action == 'create') {
 	if (empty($permissiontoadd)) {
@@ -491,15 +502,37 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	// Buttons for actions
 
 	if ($action != 'presend' && $action != 'editline') {
+
 		print '<div class="tabsAction">'."\n";
 		$parameters = array();
 		$reshook = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
 		if ($reshook < 0) {
 			setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 		}
-
 		if (empty($reshook)) {
-			// Send
+		  
+    //print '<span class="butAction btn-print-doc" title="'.$langs->transcountrynoentities("PDF","AR").'" ><span class="fa fa-file-pdf-o" style="color: white"></span></span>';
+		print '<img style="display: none;" id="loader" class="valignmiddle" src="../../custom/college/img/spinner.gif" height="20px">';
+    print dolGetButtonAction(
+      $langs->trans('btnpdfstudentcard'), 
+      $html = $conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO.'-'.$langs->trans('btnpdfstudentcard'), 
+      $actionType = 'default', 
+      $url = $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=builddoc&token='.newToken(), 
+      $id = 'btnpdfdoc', 
+      $userRight = $permissiontoadd, 
+      $params = array()
+     );
+      
+    /*print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+   	print '<input type="hidden" name="id" value="'.$object->id.'">';
+  	print '<input type="hidden" name="token" value="'.newToken().'">';
+  	print '<input type="hidden" name="action" value="builddoc">';
+  	print $form->buttonsSaveCancel("Create Pdf Doc");
+  	print '</form>';*/
+      
+                              	
+      
+      // Send
 			if (empty($user->socid)) {
 				print dolGetButtonAction($langs->trans('SendMail'), '', 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presend&mode=init&token='.newToken().'#formmailbeforetitle');
 			}
@@ -566,10 +599,15 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			$filedir = $conf->college->dir_output.'/'.$object->element.'/'.$objref;
 			$urlsource = $_SERVER["PHP_SELF"]."?id=".$object->id;
 			$genallowed = $permissiontoread; // If you can read, you can build the PDF to read content
-			$delallowed = $permissiontoadd; // If you can create/edit, you can remove a file on card
-			print $formfile->showdocuments('college:Students', $object->element.'/'.$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+			$delallowed = 0;//$permissiontoadd; // If you can create/edit, you can remove a file on card
+			print $formfile->showdocuments(
+      'college:Students', 
+      $object->element.'/'.$objref,
+      $filedir, $urlsource, $genallowed, $delallowed, 
+      $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', 
+      $langs->defaultlang,'',$object,0,'remove_file');
 		}
-
+    
 		// Show links to link elements
 		$linktoelem = $form->showLinkToObjectBlock($object, null, array('students'));
 		$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);

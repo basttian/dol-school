@@ -219,7 +219,7 @@ if (empty($reshook)) {
 
 /*Filtrar por tutor*/
 if($action == 'getTutor'){
-    $sql = "SELECT fk_soc FROM ".MAIN_DB_PREFIX."college_student WHERE rowid = ".$value."";
+    $sql = "SELECT fk_soc FROM ".MAIN_DB_PREFIX."college_students WHERE rowid = ".$value."";
     $resql = $db->query($sql);
     $object = $db->fetch_object($resql);
     if ($resql) {

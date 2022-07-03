@@ -301,7 +301,6 @@ if ($id > 0 || !empty($ref)) {
     <tfoot>
       <tr><td colspan="3" class="liste_titre">
       <a href="#" onclick="printDiv()" class="prl-10" style="float: right;"><i class="fa fa-print fa-2x"></i></a>
-      <a href="#" class="prl-10" style="float: right;"><i class="fa fa-file-pdf-o fa-2x"></i></a>
       </td></tr>
     </tfoot>
   </table>
