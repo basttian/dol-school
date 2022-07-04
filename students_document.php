@@ -130,9 +130,11 @@ $enablepermissioncheck = 1;
 if ($enablepermissioncheck) {
 	$permissiontoread = $user->rights->college->students->read;
 	$permissiontoadd = $user->rights->college->students->write; // Used by the include of actions_addupdatedelete.inc.php and actions_linkedfiles.inc.php
+  $permissiontodelete = $user->rights->college->students->delete;
 } else {
 	$permissiontoread = 1;
 	$permissiontoadd = 1;
+  $permissiontodelete = 1;
 }
 
 // Security check (enable the most restrictive one)
@@ -242,10 +244,10 @@ if ($object->id) {
 	print dol_get_fiche_end();
 
 	$modulepart = 'college';
-	//$permissiontoadd = $user->rights->college->students->write;
-	$permissiontoadd = 1;
-	//$permtoedit = $user->rights->college->students->write;
-	$permtoedit = 1;
+	$permissiontoadd = $user->rights->college->students->write;
+	//$permissiontoadd = 1;
+	$permtoedit = $user->rights->college->students->write;
+	//$permtoedit = 1;
 	$param = '&id='.$object->id;
 
 	//$relativepathwithnofile='students/' . dol_sanitizeFileName($object->id).'/';
