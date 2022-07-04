@@ -239,11 +239,11 @@ class modCollege extends DolibarrModules
 		// Boxes/Widgets
 		// Add here list of php file(s) stored in college/core/boxes that contains a class to show a widget.
 		$this->boxes = array(
-			//  0 => array(
-			//      'file' => 'collegewidget1.php@college',
-			//      'note' => 'Widget provided by College',
-			//      'enabledbydefaulton' => 'Home',
-			//  ),
+			  0 => array(
+			      'file' => 'collegewidget1.php@college',
+			      'note' => 'Widget provided by College',
+			      'enabledbydefaulton' => 'Home',
+			  ),
 			//  ...
 		);
 
@@ -448,7 +448,8 @@ class modCollege extends DolibarrModules
 			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 		*/
-		/*INSCRIPTION MENU*/
+    
+    /*INSCRIPTION MENU*/
 		$this->menu[$r++]=array(
 		    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 		    'fk_menu'=>'fk_mainmenu=college',
@@ -465,7 +466,7 @@ class modCollege extends DolibarrModules
 		    // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 		    'enabled'=>'$conf->college->enabled',
 		    // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-		    'perms'=>'1',
+		    'perms'=> '$user->rights->college->inscriptions->read',
 		    'target'=>'',
 		    // 0=Menu for internal users, 1=external users, 2=both
 		    'user'=>2,
@@ -486,11 +487,12 @@ class modCollege extends DolibarrModules
 		    // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 		    'enabled'=>'$conf->college->enabled',
 		    // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-		    'perms'=>'1',
+		    'perms'=>'$user->rights->college->inscriptions->write',
 		    'target'=>'',
 		    // 0=Menu for internal users, 1=external users, 2=both
 		    'user'=>2
 		);
+    
 		
 		/*PERIODS MENU*/
         $this->menu[$r++]=array(
@@ -509,7 +511,7 @@ class modCollege extends DolibarrModules
             // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'enabled'=>'$conf->college->enabled',
             // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
+            'perms'=>'$user->rights->college->periods->read',
             'target'=>'',
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2,
@@ -530,7 +532,7 @@ class modCollege extends DolibarrModules
             // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'enabled'=>'$conf->college->enabled',
             // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
+            'perms'=>'$user->rights->college->periods->write',
             'target'=>'',
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2
@@ -553,7 +555,7 @@ class modCollege extends DolibarrModules
             // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'enabled'=>'$conf->college->enabled',
             // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
+            'perms'=>'$user->rights->college->students->read',
             'target'=>'',
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2,
@@ -574,7 +576,7 @@ class modCollege extends DolibarrModules
             // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'enabled'=>'$conf->college->enabled',
             // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
+            'perms'=>'$user->rights->college->students->write',
             'target'=>'',
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2
@@ -598,7 +600,7 @@ class modCollege extends DolibarrModules
             // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'enabled'=>'$conf->college->enabled',
             // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
+            'perms'=>'$user->rights->college->subject->read',
             'target'=>'',
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2,
@@ -619,7 +621,7 @@ class modCollege extends DolibarrModules
             // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'enabled'=>'$conf->college->enabled',
             // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
+            'perms'=>'$user->rights->college->subject->write',
             'target'=>'',
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2
@@ -663,7 +665,7 @@ class modCollege extends DolibarrModules
             // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'enabled'=>'$conf->college->enabled',
             // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
+            'perms'=>'$user->rights->college->classrooms->read',
             'target'=>'',
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2,
@@ -684,7 +686,7 @@ class modCollege extends DolibarrModules
             // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'enabled'=>'$conf->college->enabled',
             // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
+            'perms'=>'$user->rights->college->classrooms->write',
             'target'=>'',
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2
@@ -707,7 +709,7 @@ class modCollege extends DolibarrModules
             // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'enabled'=>'$conf->college->enabled',
             // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
+            'perms'=>'$user->rights->college->notes->read',
             'target'=>'',
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2,
@@ -728,7 +730,7 @@ class modCollege extends DolibarrModules
             // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'enabled'=>'$conf->college->enabled',
             // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
+            'perms'=>'$user->rights->college->notes->write',
             'target'=>'',
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2
@@ -749,7 +751,7 @@ class modCollege extends DolibarrModules
             // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'enabled'=>'$conf->college->enabled',
             // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
+            'perms'=>'$user->rights->college->notes->write',
             'target'=>'',
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2

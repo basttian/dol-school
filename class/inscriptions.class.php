@@ -1064,6 +1064,67 @@ class Inscriptions extends CommonObject
 
 		return $error;
 	}
+  
+  /**
+   * 
+   * 
+   * Show Data Widget
+   * 
+   * 
+   */
+  public function getWidgetData(){
+    global $db, $conf, $langs;
+    $rowarray = array();
+    $sql = "SELECT c.fk_class AS idclass, c.school_year , d.label AS labelclass, COUNT(c.fk_student) AS cant ";
+    $sql.= " FROM ".MAIN_DB_PREFIX."college_inscriptions c";
+    $sql.= " INNER JOIN ".MAIN_DB_PREFIX."college_classrooms d";
+    $sql.= " ON d.rowid = c.fk_class";
+    $sql.= " GROUP BY c.fk_class HAVING c.school_year = ".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO." ";
+    
+    $resql= $db->query($sql);
+     if ($resql)
+     {
+       $num = $db->num_rows($resql);
+       $i = 0;
+       if ($num)
+       {
+         while ($i < $num)
+         {
+           $obj = $db->fetch_object($resql);
+           if ($obj)
+           {
+            $rowarray[] = array(
+              // First Column
+              0 => array( 
+      					'tr' => 'class="left"',
+      					'td' => '',
+      					'text' => $obj->labelclass,
+      					'url' => './custom/college/inscriptions_list.php?action=list&search_fk_class='.$obj->idclass.' ',
+      					'target' => '_blank',
+      					'logo' => 'object_students@college',
+      					'textnoformat' => '',
+      					//'text2' => '<p><strong>'.$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO.'</strong></p>',
+      					'maxlength' => 0,
+      					'asis' => false,
+      					'asis2' => true
+      				),
+      				1 => array(
+      					'td' => '',
+      					'text' => $langs->transnoentitiesnoconv("CollegeColsRows").' ('.$obj->cant.')',
+      				)
+            );
+           }
+           $i++;
+         }
+         return $rowarray;
+       }
+     }
+    
+  }
+  
+  
+  
+  
 }
 
 
