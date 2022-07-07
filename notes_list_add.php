@@ -212,7 +212,7 @@ if ($action == 'createlist') {
 	print '<input type="hidden" name="action" value="search">';
 
 	print dol_get_fiche_head(array(), '');
-
+  print '<div class="div-table-responsive-no-min">';
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
   /*
@@ -245,7 +245,10 @@ if ($action == 'createlist') {
  	);
   */
  
-  print '<p></p>';
+  print '<tr>';
+  print '<td>';
+  print $form->textwithpicto($langs->trans("CollegeSelect_Class"),$langs->trans("CollegeSelect_ClassInfo"));
+  print '</td><td>';
   print $form->selectarray(
     'select_class',
     $objectClass->getClass(),
@@ -257,14 +260,20 @@ if ($action == 'createlist') {
   	$translate = 0,
   	$maxlen = 0,
   	$disabled = 0,
-  	$sort = 'ASC',
+  	$sort = '',
   	$morecss = 'flat maxwidth500 widthcentpercentminusxx',
   	$addjscombo = 1,
   	$moreparamonempty = '',
   	$disablebademail = 0,
   	$nohtmlescape = 0 
   );
-  print '<p></p>';
+  print '</td><td rowspan="2">';
+    /*Loading*/
+  print '<img style="display: none;" id="loader" class="m-10" src="../../custom/college/img/spinner.gif" height="20px">';
+  print '</td>';
+  print '</tr><tr><td>';
+  print $form->textwithpicto($langs->trans("CollegeSelect_Subject"),$langs->trans("CollegeSelect_SubjectInfo"));
+  print '</td><td>';
   print $form->selectarray(
     'select_subject', 
     '',
@@ -283,7 +292,8 @@ if ($action == 'createlist') {
   	$disablebademail = 0,
   	$nohtmlescape = 0 
   );
-  print '<p></p>';
+  print '</td>';
+  print '</tr>';
   /*print $form->buttonsSaveCancel(
     $save_label = 'Create List',
     $cancel_label = '',
@@ -294,14 +304,12 @@ if ($action == 'createlist') {
   );*/
 	
   print '</table>'."\n";
+  print '</div>';
 	print dol_get_fiche_end();
 
 	print '</form>';
 
 }
-
-/*TABLA DE DATOS*/
-print '<img style="display: none;" id="loader" class="m-10" src="../../custom/college/img/spinner.gif" height="15px">';
 ?>
 
 <div class="div-table-responsive">

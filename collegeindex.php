@@ -58,7 +58,7 @@ if (!$res) {
 
 if (! ((GETPOST('testmenuhider','int') || ! empty($conf->global->MAIN_TESTMENUHIDER)) && empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)))
 {
-  $conf->dol_hide_leftmenu = 1; // Force hide of left menu.
+  $conf->dol_hide_leftmenu = 1;// Force hide of left menu.
 }
 
 $action = GETPOST('action', 'aZ09');
@@ -66,15 +66,15 @@ $action = GETPOST('action', 'aZ09');
 // Load translation files required by the page
 $langs->loadLangs(array("college@college"));
 llxHeader("
-<link rel='stylesheet' type='text/css' href='./css/spectrecss/spectre.min.css'>
-<link rel='stylesheet' type='text/css' href='./css/spectrecss/spectre-exp.min.css'>
-<link rel='stylesheet' type='text/css' href='./css/spectrecss/spectre-icons.min.css'>
-");
-print load_fiche_titre($langs->trans(""), '', 'college.png@college');
+<link rel='stylesheet' type='text/css' href='./css/spectrecss/dist/spectre.css'>
+<link rel='stylesheet' type='text/css' href='./css/spectrecss/dist/spectre-exp.css'>
+<link rel='stylesheet' type='text/css' href='./css/spectrecss/dist/spectre-icons.css'>
+", $langs->trans("ModuleCollegeName"));
+print load_fiche_titre($langs->trans(''), $morehtmlright = '', $picto = '', $pictoisfullpath = 0, $id = '', $morecssontable = '', $morehtmlcenter = '');
 
 ?>
 
-<div class="section section-updates bg-gray">
+<div class="section section-updates bg-gray" style="box-sizing: border-box;">
 <div class="container grid-xl">
 <div class="columns">
 <?php if ($user->rights->college->notes->read){ ;?>
@@ -96,6 +96,28 @@ print load_fiche_titre($langs->trans(""), '', 'college.png@college');
         <?php if ($user->rights->college->notes->write){ ;?>
         <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_card.php?action=create"; ?>" class="mrl-10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
         <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_list_add.php?action=createlist"; ?>" class="float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i><i class="fa fa-bars" aria-hidden="true"></i></a>
+        <?php } ;?>
+      </div>
+    </div>
+  </div>
+<?php } ;?>
+<?php if ($user->rights->college->assys->read){ ;?>
+  <div class="column col-4 col-xs-12 p-10">
+    <div class="card">
+      <div class="card-image m-10">
+        <i class="fa fa-file-text fa-5x" aria-hidden="true"></i>
+      </div>
+      <div class="card-header">
+        <div class="card-title h5"><?php echo $langs->trans("card-header-a-assys") ;?></div>
+        <div class="card-subtitle text-gray"><?php echo $langs->trans("card-header-b-assys") ;?></div>
+      </div>
+      <div class="card-body">
+        <?php echo $langs->trans("card-body-assys") ;?>
+      </div>
+      <div class="card-footer">
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/assys_list.php"; ?>" class="float-left btn btn-primary"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <?php if ($user->rights->college->assys->write){ ;?>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/assys_card.php?action=create"; ?>" class="mrl-10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
         <?php } ;?>
       </div>
     </div>

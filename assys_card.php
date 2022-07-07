@@ -17,9 +17,9 @@
  */
 
 /**
- *   	\file       subject_card.php
+ *   	\file       assys_card.php
  *		\ingroup    college
- *		\brief      Page to create/edit/view subject
+ *		\brief      Page to create/edit/view assys
  */
 
 //if (! defined('NOREQUIREDB'))              define('NOREQUIREDB', '1');				// Do not create database handler $db
@@ -78,8 +78,8 @@ if (!$res) {
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
-dol_include_once('/college/class/subject.class.php');
-dol_include_once('/college/lib/college_subject.lib.php');
+dol_include_once('/college/class/assys.class.php');
+dol_include_once('/college/lib/college_assys.lib.php');
 
 // Load translation files required by the page
 $langs->loadLangs(array("college@college", "other"));
@@ -90,16 +90,25 @@ $ref = GETPOST('ref', 'alpha');
 $action = GETPOST('action', 'aZ09');
 $confirm = GETPOST('confirm', 'alpha');
 $cancel = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'subjectcard'; // To manage different context of search
+$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'assyscard'; // To manage different context of search
 $backtopage = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $lineid   = GETPOST('lineid', 'int');
 
+
+/*STUDENT*/
+$students = (GETPOST('students', 'alpha') ? GETPOST('students', 'alpha') : null);
+if (!empty($students)) {
+    $students = null;
+  }
+
+
+
 // Initialize technical objects
-$object = new Subject($db);
+$object = new Assys($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->college->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('subjectcard', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('assyscard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -126,11 +135,11 @@ include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be includ
 // Set $enablepermissioncheck to 1 to enable a minimum low level of checks
 $enablepermissioncheck = 1;
 if ($enablepermissioncheck) {
-	$permissiontoread = $user->rights->college->subject->read;
-	$permissiontoadd = $user->rights->college->subject->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
-	$permissiontodelete = $user->rights->college->subject->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
-	$permissionnote = $user->rights->college->subject->write; // Used by the include of actions_setnotes.inc.php
-	$permissiondellink = $user->rights->college->subject->write; // Used by the include of actions_dellink.inc.php
+	$permissiontoread = $user->rights->college->assys->read;
+	$permissiontoadd = $user->rights->college->assys->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
+	$permissiontodelete = $user->rights->college->assys->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
+	$permissionnote = $user->rights->college->assys->write; // Used by the include of actions_setnotes.inc.php
+	$permissiondellink = $user->rights->college->assys->write; // Used by the include of actions_dellink.inc.php
 } else {
 	$permissiontoread = 1;
 	$permissiontoadd = 1; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
@@ -139,7 +148,7 @@ if ($enablepermissioncheck) {
 	$permissiondellink = 1;
 }
 
-$upload_dir = $conf->college->multidir_output[isset($object->entity) ? $object->entity : 1].'/subject';
+$upload_dir = $conf->college->multidir_output[isset($object->entity) ? $object->entity : 1].'/assys';
 
 // Security check (enable the most restrictive one)
 //if ($user->socid > 0) accessforbidden();
@@ -154,6 +163,10 @@ if (!$permissiontoread) accessforbidden();
  * Actions
  */
 
+//dol_getdate( dol_now('tzserver') , $fast = false, $forcetimezone = 'America/Argentina/Buenos_Aires');
+//dol_print_date( dol_now('tzserver'),'','auto' );
+//print getServerTimeZoneInt($refgmtdate = 'now');
+
 $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) {
@@ -163,19 +176,19 @@ if ($reshook < 0) {
 if (empty($reshook)) {
 	$error = 0;
 
-	$backurlforlist = dol_buildpath('/college/subject_list.php', 1);
+	$backurlforlist = dol_buildpath('/college/assys_list.php', 1);
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($id) && (($action != 'add' && $action != 'create') || $cancel)) {
 				$backtopage = $backurlforlist;
 			} else {
-				$backtopage = dol_buildpath('/college/subject_card.php', 1).'?id='.((!empty($id) && $id > 0) ? $id : '__ID__');
+				$backtopage = dol_buildpath('/college/assys_card.php', 1).'?id='.((!empty($id) && $id > 0) ? $id : '__ID__');
 			}
 		}
 	}
 
-	$triggermodname = 'COLLEGE_SUBJECT_MODIFY'; // Name of trigger action code to execute when we modify record
+	$triggermodname = 'COLLEGE_ASSYS_MODIFY'; // Name of trigger action code to execute when we modify record
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
@@ -200,9 +213,9 @@ if (empty($reshook)) {
 	}
 
 	// Actions to send emails
-	$triggersendname = 'COLLEGE_SUBJECT_SENTBYMAIL';
-	$autocopy = 'MAIN_MAIL_AUTOCOPY_SUBJECT_TO';
-	$trackid = 'subject'.$object->id;
+	$triggersendname = 'COLLEGE_ASSYS_SENTBYMAIL';
+	$autocopy = 'MAIN_MAIL_AUTOCOPY_ASSYS_TO';
+	$trackid = 'assys'.$object->id;
 	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
 }
 
@@ -219,82 +232,104 @@ $form = new Form($db);
 $formfile = new FormFile($db);
 $formproject = new FormProjets($db);
 
-$title = $langs->trans("Subject");
+$title = $langs->trans("Assys");
 $help_url = '';
 llxHeader('', $title, $help_url);
-
 ?>
 <script type="text/javascript">
 jQuery(document).ready(function() {
+  var objectid = '<?php echo $object->id ;?>';
+  var dataarr = [];
+  var claseid = 0;
   
-  function init_gendoc_button()
-  {
-    if (jQuery("#txtasignatura").val() != 0 && $('#selectclass').val().length > 0 )
-    {
-    	jQuery(".btnsave").removeAttr("disabled");
-    }
-    else
-    {
-    	jQuery(".btnsave").prop("disabled", true);
-    }
-  }
-  
-  init_gendoc_button();
-  jQuery("#txtasignatura").keyup(function() {
-    init_gendoc_button();
-  });
-  
-  var sel_clases=[];
-  var asignatura='';
-  var sel_teacher=[];
-  
-  jQuery('#selectclass').on("change",function() {
-    init_gendoc_button();
-    sel_clases=[];
-		sel_clases.push($(this).val());
-  });
-  
-  jQuery('#selectprofesores').on("change",function() {
-    sel_teacher=[];
-    sel_teacher = $(this).val();
-  });
-
-  jQuery(".btnsave").on("click",function() {
+  $('#fk_class').on('change', function(e) {
+    dataarr = [];
     $('#loader').show();
-    asignatura =  $('#txtasignatura').val().toUpperCase();
-    console.log(sel_clases);
-    console.log(asignatura);
-    console.log(sel_teacher);
-    $.post("./ajax.php?action=savesubjectinlotes&token=<?php echo newToken() ;?>",
-      {arrclases:sel_clases, subject:asignatura, arrteacher:sel_teacher, msj:"<?php echo $langs->trans('msjsavesubject') ;?>" }, function(response){
-      jQuery("#txtasignatura").focus();
-    }).done(function(){
-      $('#loader').hide();
-      window.location.reload();
-    }).always(function(){
-      jQuery("#txtasignatura").val(null);
-      jQuery('#selectclass').val(null).trigger('change');
-      jQuery('#selectprofesores').val(null).trigger('change');
+    $("#txtstudents").val(null);
+    claseid = $('#fk_class').select2("val");
+    
+    $.getJSON( "./ajax.php?action=getstudent",{idClass:claseid, token:"<?php echo newToken() ;?>"}, function(datastudent) {
+    //console.log(datastudent);
+    $("#tableAssys>tbody").find("tr").remove();
+    }).done(function(datastudent){
+      if(datastudent.length===0){
+        $("#tableAssys>tbody").append("<tr class='liste_titre'><th><?php echo $langs->trans("nodatafound") ;?></th></tr>");
+        $('#loader').hide();
+      }else{
+          Object.keys(datastudent).forEach(function(k,i,a){
+            $("#tableAssys>tbody").append("<tr id=["+datastudent[k].fk_student+"] class='pair'>"+''
+            +"<td>"+datastudent[k].label+"</td>"+''
+            +"<td><input id='inf["+datastudent[k].fk_student+"]' name=["+datastudent[k].fk_student+"] value='p' type='radio'></td>"+''
+            +"<td><input id='inf["+datastudent[k].fk_student+"]' name=["+datastudent[k].fk_student+"] value='a' type='radio'></td>"+''
+            +"<td><input id='inf["+datastudent[k].fk_student+"]' name=["+datastudent[k].fk_student+"] value='j' type='radio'></td>"+''
+            +"</tr>");
+            $('#loader').hide();
+            $("#inf\\["+datastudent[k].fk_student+"\\]").on('change', function(e) {
+              dataarr[k] = { 'id':parseInt(datastudent[k].fk_student) , 'val':$(this).val() };
+              console.log(dataarr);
+              var trimar = $.trim(JSON.stringify(dataarr));
+              //var trimar = JSON.stringify(dataarr);
+              $("#txtstudents").val(trimar);
+            });
+          });
+      }
     });
   });
+  /******************** MODE EDIT ************************/
+  if(objectid > 0){
+    $('#loader').show();
+    $('#fk_class').prop('disabled', 'disabled');
+    var studentdb = '<?php echo $object->students ;?>';
+    var dataarray = JSON.parse(studentdb);
+    //$("#txtstudentsedit").val(studentdb);
+    claseid = $('#fk_class').val();
+    $.getJSON( "./ajax.php?action=getstudent",{idClass:claseid, token:"<?php echo newToken() ;?>"}, function(datastudent) {
+    //console.log(datastudent);
+    $("#tableAssys>tbody").find("tr").remove();
+    }).done(function(datastudent){
+      if(datastudent.length===0){
+        $("#tableAssys>tbody").append("<tr class='liste_titre'><th><?php echo $langs->trans("nodatafound") ;?></th></tr>");
+        $('#loader').hide();
+      }else{
+         Object.keys(datastudent).forEach(function(k,i,a){
+            $("#tableAssys>tbody").append("<tr id=["+datastudent[k].fk_student+"] class='pair'>"+''
+            +"<td>"+datastudent[k].label+"</td>"+''
+            +"<td><input id='inf["+datastudent[k].fk_student+"]' name=["+datastudent[k].fk_student+"] value='p' type='radio'></td>"+''
+            +"<td><input id='inf["+datastudent[k].fk_student+"]' name=["+datastudent[k].fk_student+"] value='a' type='radio'></td>"+''
+            +"<td><input id='inf["+datastudent[k].fk_student+"]' name=["+datastudent[k].fk_student+"] value='j' type='radio'></td>"+''
+            +"</tr>");
+            $('#loader').hide();
+            $("#inf\\["+datastudent[k].fk_student+"\\]").on('change', function(e) {
+              dataarr[k] = { 'id':parseInt(datastudent[k].fk_student) , 'val':$(this).val() };
+              var trimar = $.trim(JSON.stringify(dataarr));
+              $("#txtstudentsedit").val(trimar);
+            });
+          });
+          
+          for(i in dataarray){
+            //console.log(dataarray[i].id);
+            dataarr[i] = { 'id':parseInt(dataarray[i].id) , 'val':dataarray[i].val };
+            $("#inf\\["+dataarray[i].id+"\\][value='"+dataarray[i].val+"']").prop("checked", "checked");
+            var trimar = $.trim(JSON.stringify(dataarr));
+            $("#txtstudentsedit").val(trimar);
+          }
+      }
+    });
+  }
   
-  setTimeout(function(){
-    jQuery('#tdloading').hide();
-    jQuery('#tdselectclass').removeClass('display-none');
-  }, 1500);
 
 });
 </script>
 <?php
 // Part to create
 if ($action == 'create') {
+  
 	if (empty($permissiontoadd)) {
 		accessforbidden($langs->trans('NotEnoughPermissions'), 0, 1);
 		exit;
 	}
 
-	print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv("Subject")), '', 'object_'.$object->picto);
-
+	print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv("Assys")), '', 'object_'.$object->picto);
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="action" value="add">';
@@ -306,22 +341,48 @@ if ($action == 'create') {
 	}
 
 	print dol_get_fiche_head(array(), '');
-
-	// Set some default values
-	if (! GETPOSTISSET('school_year')) $_POST['school_year'] = $conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO;
-
-	print '<table class="border centpercent tableforfieldcreate">'."\n";
-
+  
+  /*STUDENTS ARRAYS*/
+  print '<input type="hidden" id="txtstudents" name="students" value="'.$students.'">';
+	// Set some default values !empty($students)?null:$students
+	//if (! GETPOSTISSET('students')) $_POST['students'] = $students;
+  
+  print '<div class="div-table-responsive">';
+	print '<table id="datatatblecreate" class="border centpercent tableforfieldcreate">'."\n";
+  
 	// Common attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
-
+  
 	// Other attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
-
-	print '</table>'."\n";
-
-	print dol_get_fiche_end();
-
+  
+  print '<tr><td>';
+  print '<h2 style="color:#9B75A6;">Lista de Estudiantes</h2>';
+  print '</td>';
+  print '<td>';
+  print '<img class="valignmiddle" style="display: none;" id="loader" class="m-10" src="../../custom/college/img/spinner.gif" height="20px">';
+  print '</td></tr>';
+  print '<tr><td colspan="2">';
+  /*START TABLE ALUMNOS*/
+  print '<table id="tableAssys" class="tagtable nobottomiftotal liste">';
+  print '<thead>';
+  print '<tr>';
+  print '<th class="left">'.$langs->trans("students").'</th>';
+  print '<th class="left">'.$langs->trans("present").'</th>';
+  print '<th class="left">'.$langs->trans("absent").'</th>';
+  print '<th class="left">'.$langs->trans("justified").'</th>';
+  print '</tr></thead>';
+  print '<tbody>';
+  print '<tr>';
+  print '<td colspan="4" class="liste_titre">'.$langs->trans("nodatafound").'</td>';
+  print '</tr>';
+  print '</tbody>';
+  print '</table>';
+  /*END TABLE ALUMNOS*/
+  print '</td></tr>';
+  print '</table>'."\n";
+  print '</div>';
+  print dol_get_fiche_end();
 	print $form->buttonsSaveCancel("Create");
 
 	print '</form>';
@@ -329,100 +390,9 @@ if ($action == 'create') {
 	//dol_set_focus('input[name="ref"]');
 }
 
-
-
-if ($action == 'createadds') {
-  if (empty($permissiontoadd)) {
-  	accessforbidden($langs->trans('NotEnoughPermissions'), 0, 1);
-  	exit;
-  }
-	print load_fiche_titre($langs->trans("NewObjectSubjects", $langs->transnoentitiesnoconv("Subject")), '', 'object_'.$object->picto);
-	if ($backtopage) {
-		print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
-	}
-	if ($backtopageforcancel) {
-		print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
-	}
-	print dol_get_fiche_head(array(), '');
-	print '<table class="border centpercent tableforfieldcreate">'."\n";
-  print '<tr>';
-  print '<td class="titlefieldcreate fieldrequired">';
-  print $form->textwithpicto($langs->trans("subjecttxt1").' &nbsp; '.$langs->trans(""),$langs->trans("helpsubjectxt1"));
-  print '<td id="tdloading"><em>Loading..<em></td>';
-  print '<td id="tdselectclass" class=" display-none">';
-  $subjectLabelArr = $object->getAllClass();
-  print Form::multiselectarray(
-    'selectclass', 
-    $subjectLabelArr, 
-    '', 
-    0, 
-    0, 
-    'minwidth500',
-    $translate = 0,
- 	  $width = 200,
- 	  $moreattrib = '',
- 	  $elemtype = '',
- 	  $placeholder = '',
- 	  $addjscombo = -1 
-    );
-  print '</td>';
-  print '</td>';
-  print '</tr>';
-  print '<tr>';
-  print '<td class="titlefieldcreate fieldrequired">';
-  print $form->textwithpicto($langs->trans("subjecttxt2").' &nbsp; '.$langs->trans(""),$langs->trans("helpsubjectxt2"));
-  print '</td>';
-  print '<td>';
-  print '<input type="text" name="label" id="txtasignatura" class="minwidth500" placeholder="'.$langs->trans("subjecttxt2").'" >';
-  print '</td>';
-  print '</tr>';
-  print '</tr>';
-  print '<tr>';
-  print '<td class="titlefieldcreate fieldrequired">';
-  print $form->textwithpicto($langs->trans("subjecttxt3").' &nbsp; '.$langs->trans(""),$langs->trans("helpsubjectxt3"));
-  print '</td>';
-  print '<td>';
-  print Form::selectarray( 	  	
-    'selectprofesores',
-  	$object->getAllTeacher(),
-  	$id = '',
-  	$show_empty = 1,
-  	$key_in_label = 0,
-  	$value_as_key = 0,
-  	$moreparam = '',
-  	$translate = 0,
-  	$maxlen = 0,
-  	$disabled = 0,
-  	$sort = '',
-  	$morecss = 'minwidth500',
-  	$addjscombo = 1,
-  	$moreparamonempty = '',
-  	$disablebademail = 0,
-  	$nohtmlescape = 0 
-	);
-  
-  print '</td>';
-  print '</tr>';
-	print '</table>'."\n";
-
-	print dol_get_fiche_end();
-
-	print $form->buttonsSaveCancel(
-    $save_label = $langs->trans('btnsave'),
-  	$cancel_label = '',
-  	$morebuttons = null,
-  	$withoutdiv = 1,
-  	$morecss = 'btnsave',
-  	$dol_openinpopup = '' 
-   );
-  print '<img class="valignmiddle" style="display: none;" id="loader" src="../../custom/college/img/spinner.gif" height="20px">';
-	dol_set_focus('input[name="label"]');
-
-}
-
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
-	print load_fiche_titre($langs->trans("Subject"), '', 'object_'.$object->picto);
+	print load_fiche_titre($langs->trans("Assys"), '', 'object_'.$object->picto);
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -439,11 +409,48 @@ if (($id || $ref) && $action == 'edit') {
 
 	print '<table class="border centpercent tableforfieldedit">'."\n";
 
+  /*EDIT STUDENT FIELDS*/
+  //$arrData = json_decode($object->students);
+  //$idal = array_column($arrData, 'id');
+  //print_r(count($idal));
+
+  /*STUDENTS ARRAYS*/
+  print '<input type="hidden" id="txtstudentsedit" name="students">';
+
 	// Common attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
 
 	// Other attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_edit.tpl.php';
+
+  
+  print '<tr><td>';
+  print '<h2 style="color:#9B75A6;">Lista de Estudiantes</h2>';
+  print '</td>';
+  print '<td>';
+  print '<img class="valignmiddle" style="display: none;" id="loader" class="m-10" src="../../custom/college/img/spinner.gif" height="20px">';
+  print '</td></tr>';
+  print '<tr><td colspan="2">';
+  /*START TABLE ALUMNOS*/
+  print '<table id="tableAssys" class="tagtable nobottomiftotal liste">';
+  print '<thead>';
+  print '<tr>';
+  print '<th class="left">'.$langs->trans("students").'</th>';
+  print '<th class="left">'.$langs->trans("present").'</th>';
+  print '<th class="left">'.$langs->trans("absent").'</th>';
+  print '<th class="left">'.$langs->trans("justified").'</th>';
+  print '</tr></thead>';
+  print '<tbody>';
+  
+  print '<tr>';
+  print '<td colspan="4" class="liste_titre">'.$langs->trans("nodatafound").'</td>';
+  print '</tr>';
+  
+  print '</tbody>';
+  print '</table>';
+  /*END TABLE ALUMNOS*/
+  print '</td></tr>';
+
 
 	print '</table>';
 
@@ -458,14 +465,14 @@ if (($id || $ref) && $action == 'edit') {
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create'))) {
 	$res = $object->fetch_optionals();
 
-	$head = subjectPrepareHead($object);
-	print dol_get_fiche_head($head, 'card', $langs->trans("Subject"), -1, $object->picto);
+	$head = assysPrepareHead($object);
+	print dol_get_fiche_head($head, 'card', $langs->trans("Assys"), -1, $object->picto);
 
 	$formconfirm = '';
 
 	// Confirmation to delete
 	if ($action == 'delete') {
-		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteSubject'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteAssys'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
 	}
 	// Confirmation to delete line
 	if ($action == 'deleteline') {
@@ -509,7 +516,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/college/subject_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$linkback = '<a href="'.dol_buildpath('/college/assys_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
 	$morehtmlref = '<div class="refidno">';
 	/*
@@ -695,7 +702,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print '<div class="fichecenter"><div class="fichehalfleft">';
 		print '<a name="builddoc"></a>'; // ancre
 
-		$includedocgeneration = 0;
+		$includedocgeneration = 1;
 
 		// Documents
 		if ($includedocgeneration) {
@@ -704,20 +711,24 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			$filedir = $conf->college->dir_output.'/'.$object->element.'/'.$objref;
 			$urlsource = $_SERVER["PHP_SELF"]."?id=".$object->id;
 			$genallowed = $permissiontoread; // If you can read, you can build the PDF to read content
-			$delallowed = $permissiontoadd; // If you can create/edit, you can remove a file on card
-			print $formfile->showdocuments('college:Subject', $object->element.'/'.$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+			$delallowed = 0;//$permissiontoadd; // If you can create/edit, you can remove a file on card
+			print $formfile->showdocuments(
+      'college:Assys', 
+      $object->element.'/'.$objref, 
+      $filedir, $urlsource, $genallowed, $delallowed, 
+      $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
 		}
 
 		// Show links to link elements
-		$linktoelem = $form->showLinkToObjectBlock($object, null, array('subject'));
-		$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
+		//$linktoelem = $form->showLinkToObjectBlock($object, null, array('assys'));
+		//$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
 
 
 		print '</div><div class="fichehalfright">';
 
 		$MAXEVENT = 10;
 
-		$morehtmlcenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-list-alt imgforviewmode', dol_buildpath('/college/subject_agenda.php', 1).'?id='.$object->id);
+		$morehtmlcenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-list-alt imgforviewmode', dol_buildpath('/college/assys_agenda.php', 1).'?id='.$object->id);
 
 		// List of actions on element
 		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
@@ -733,17 +744,12 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	}
 
 	// Presend form
-	$modelmail = 'subject';
+	$modelmail = 'assys';
 	$defaulttopic = 'InformationMessage';
 	$diroutput = $conf->college->dir_output;
-	$trackid = 'subject'.$object->id;
+	$trackid = 'assys'.$object->id;
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
-  
-  
-
-  
-  
 }
 
 // End of page
