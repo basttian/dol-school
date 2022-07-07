@@ -98,6 +98,10 @@ if (empty($dolibarr_nocache)) {
 //Arriba | Derecha | Abajo | Izquierda
 ?>
 
+.login_table{
+  background-color: rgba(255, 255, 255, 0.41) !important;
+}
+
 div.mainmenu.college::before {
 	content: "\f249";
 }
@@ -107,6 +111,10 @@ div.mainmenu.college {
 
 .p-10{
   padding: 10px; 
+}
+
+.prl-10{
+  margin: 0px 10px 0px 10px;
 }
 
 .m-10{
@@ -124,23 +132,6 @@ div.mainmenu.college {
 .display-none{
   display:none;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -18,7 +18,8 @@
 #
 
 Teacher=Profesor
-
+CollegeDescription=Administrar instituciones educativas.
+StudentLines=Importar / Exportar estudiantes.
 
 #
 # other
@@ -70,11 +71,8 @@ NewAddsSubject=Agregar Asignaturas
 ListClassrooms=Clases
 NewClassrooms=Nueva Clase
 ListNotes=Notas
-NewNotesFromList=Nueva Nota desde Lista
+NewNotesFromList=Nota desde Rejilla
 NewNote=Nueva Nota
-
-
-
 
 # Module label 'ModuleCollegeName'
 ModuleCollegeName=ADM Colegio
@@ -143,6 +141,10 @@ nodatafound=No hay datos para mostrar.
 #
 CollegeAreaTitle_a=Crear notas desde lista
 CollegeAreaTitle_b=Ciclo lectivo
+CollegeSelect_Class=Clases
+CollegeSelect_ClassInfo=Seleccionar clase
+CollegeSelect_Subject=Asignaturas
+CollegeSelect_SubjectInfo=Seleccionar asignaturas
 
 #
 #cards_index_college
@@ -167,7 +169,7 @@ card-header-a-class=AULAS
 card-header-b-class=Aulas | Salon | Catedras.
 card-body-class=Area de aulas.
 
-card-header-a-periods=Periodos
+card-header-a-periods=PERIODOS
 card-header-b-periods=Periodos escolares.
 card-body-periods=Area de periodos.
 
@@ -205,6 +207,45 @@ pdfheadprom1=P
 pdfheadprom2=P.R
 pdfheadprom3=P.F
 pdftablerownodata=No se encuentran notas.
+
+
+#
+# boxes
+#
+CollegeMyWidgetA=ISJDC Ciclo lectivo
+CollegeMyWidgetBoxADescription=ISJDC Ciclo lectivo
+CollegeColsRows=Cant. de estudiantes
+
+#
+# Assys
+#
+Assys=Asistencias
+Assyss=asistencias
+card-header-a-assys=ASISTENCIAS
+card-header-b-assys=Agregar nuevas asistencias.
+card-body-assys=Area de ingreso de asistencias.
+ListAssys=Asistencias
+NewAssys=Nuevo registro
+students=Estudiante/s
+present=Presente
+absent=Ausente
+justified=Justificado
+
+
+#
+# PDF ASSYS
+#
+DocumentModelStandardPDF = Documento estandar PDF
+pdftitleassys = Hoja de Asistencia
+pdfcabeceraassys=Dia
+pdfheadassys1=Alumno/a
+pdfheadassys2=Listado
+
+
+
+
+
+
 
 
 
