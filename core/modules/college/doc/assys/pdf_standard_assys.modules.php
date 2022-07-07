@@ -31,8 +31,10 @@
  *  \brief      File of class to generate document from standard template
  */
 
-dol_include_once('/college/core/modules/college/modules_students.php');
-require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
+dol_include_once('/college/core/modules/college/modules_assys.php');
+require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/college/class/subject.class.php';
+
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
@@ -45,9 +47,9 @@ require_once DOL_DOCUMENT_ROOT.'/custom/college/class/subject.class.php';
 
 
 /**
- *	Class to manage PDF template standard_subjects
+ *	Class to manage PDF template standard_myobject
  */
-class pdf_standard_students extends ModelePDFStudents
+class pdf_standard_assys extends ModelePDFAssys
 {
 	/**
 	 * @var DoliDb Database handler
@@ -137,7 +139,8 @@ class pdf_standard_students extends ModelePDFStudents
 	 * @var array of document table columns
 	 */
 	public $cols;
-  
+
+
 	/**
 	 *	Constructor
 	 *
@@ -148,7 +151,7 @@ class pdf_standard_students extends ModelePDFStudents
 		global $conf, $langs, $mysoc;
 
 		// Translations
-		$langs->loadLangs(array("main", "bills"));
+		$langs->loadLangs(array("main", "bills","college"));
 
 		$this->db = $db;
 		$this->name = "standard";
@@ -168,16 +171,21 @@ class pdf_standard_students extends ModelePDFStudents
 
 		// Get source company
 		$this->emetteur = $mysoc;
+		if (empty($this->emetteur->country_code)) {
+			$this->emetteur->country_code = substr($langs->defaultlang, -2); // By default, if was not defined
+		}
 
 		// Define position of columns
 		$this->posxdesc = $this->marge_gauche + 1; // used for notes ans other stuff
 
+
 		$this->tabTitleHeight = 5; // default height
 
-		// Use new system for position of columns, view  $this->defineColumnField()
-    
+		//  Use new system for position of columns, view  $this->defineColumnField()
+		$this->atleastoneratenotnull = 0;
+		$this->atleastonediscount = 0;
 		$this->situationinvoice = false;
-    
+  
 	}
 
 
@@ -215,7 +223,7 @@ class pdf_standard_students extends ModelePDFStudents
 			global $outputlangsbis;
 			$outputlangsbis = new Translate('', $conf);
 			$outputlangsbis->setDefaultLang($conf->global->PDF_USE_ALSO_LANGUAGE_CODE);
-			$outputlangsbis->loadLangs(array("college"));
+			$outputlangsbis->loadLangs(array("main", "bills", "products", "dict", "companies","college"));
 		}
 
 		$nblines = (is_array($object->lines) ? count($object->lines) : 0);
@@ -228,16 +236,18 @@ class pdf_standard_students extends ModelePDFStudents
 		// Loop on each lines to detect if there is at least one image to show
 		$realpatharray = array();
 		$this->atleastonephoto = false;
-		
-    if ($conf->college->dir_output.'/students') {
+
+		if ($conf->college->dir_output.'/assys') {
+			$object->fetch_thirdparty();
+
 			// Definition of $dir and $file
 			if ($object->specimen) {
-				$dir = $conf->college->dir_output.'/students';
+				$dir = $conf->college->dir_output.'/assys';
 				$file = $dir."/SPECIMEN.pdf";
 			} else {
-				$objectref = dol_sanitizeFileName($object->ref);
-				$dir = $conf->college->dir_output.'/students/'.$objectref;
-				$file = $dir."/".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO.'-'.$objectref.".pdf";
+				$objectref  = dol_sanitizeFileName($object->ref);
+				$dir = $conf->college->dir_output.'/assys/'.$objectref;
+				$file = $dir."/".$objectref.".pdf";
 			}
 			if (!file_exists($dir)) {
 				if (dol_mkdir($dir) < 0) {
@@ -247,6 +257,18 @@ class pdf_standard_students extends ModelePDFStudents
 			}
 
 			if (file_exists($dir)) {
+				// Add pdfgeneration hook
+				if (!is_object($hookmanager)) {
+					include_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
+					$hookmanager = new HookManager($this->db);
+				}
+				$hookmanager->initHooks(array('pdfgeneration'));
+				$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs);
+				global $action;
+				$reshook = $hookmanager->executeHooks('beforePDFCreation', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+
+				// Set nblines with the new facture lines content after hook
+				$nblines = (is_array($object->lines) ? count($object->lines) : 0);
 
 				// Create pdf instance
 				$pdf = pdf_getInstance($this->format);
@@ -274,10 +296,10 @@ class pdf_standard_students extends ModelePDFStudents
 				$pdf->SetDrawColor(128, 128, 128);
 
 				$pdf->SetTitle($outputlangs->convToOutputCharset($object->ref));
-				$pdf->SetSubject($outputlangs->transnoentities("PdfTitle"));
+				$pdf->SetSubject($outputlangs->transnoentities("pdftitleassys"));
 				$pdf->SetCreator("Dolibarr ".DOL_VERSION);
 				$pdf->SetAuthor($outputlangs->convToOutputCharset($user->getFullName($outputlangs)));
-				$pdf->SetKeyWords($outputlangs->convToOutputCharset($object->ref)." ".$outputlangs->transnoentities("PdfTitle")." ".$outputlangs->convToOutputCharset($object->thirdparty->name));
+				$pdf->SetKeyWords($outputlangs->convToOutputCharset($object->ref)." ".$outputlangs->transnoentities("pdftitleassys")." ".$outputlangs->convToOutputCharset($object->thirdparty->name));
 				if (!empty($conf->global->MAIN_DISABLE_PDF_COMPRESSION)) {
 					$pdf->SetCompression(false);
 				}
@@ -293,7 +315,7 @@ class pdf_standard_students extends ModelePDFStudents
 					$info = array(
 						'Name' => $this->emetteur->name,
 						'Location' => getCountry($this->emetteur->country_code, 0),
-						'Reason' => 'STUDENTS',
+						'Reason' => 'ASSYS',
 						'ContactInfo' => $this->emetteur->email
 					);
 					$pdf->setSignature($cert, $cert, $this->emetteur->name, '', 2, $info);
@@ -320,23 +342,16 @@ class pdf_standard_students extends ModelePDFStudents
 				if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) {
 					$tab_height_newpage -= $top_shift;
 				}
-        $nexY = $tab_top - 1;
-				$pagenb = $pdf->getPage();
-        /**/
+
+/****************************************************************************************************/
+				$nexY = $tab_top - 1;
+        //BODY
         $pdf->MultiCell(0, 3, ''); // Set interline to 3
-        $this->_titlehead($pdf);
-        //$pdf->MultiCell(0, 3, ''); // Set interline to 3
-        $this->_notasbody($pdf, $object);
-        $pdf->MultiCell(0, 3, ''); // Set interline to 3
-  
-        /*footer*/
-        $pdf->SetFont('', 'B', 8);
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->setCellPaddings(1, 1, 1, 1);
-        $pdf->setCellMargins(1, 1, 1, 1);
-        $pdf->SetFillColor(255, 255, 255);
-				// Pagefoot $conf->global->MAIN_INFO_SOCIETE_NOTE
-				$this->_pagefoot($pdf, $object, $outputlangs );
+        $this->_titlebody($pdf, $object);
+        
+        
+				// Pagefoot
+				$this->_pagefoot($pdf, $object, $outputlangs);
 				if (method_exists($pdf, 'AliasNbPages')) {
 					$pdf->AliasNbPages();
 				}
@@ -344,6 +359,20 @@ class pdf_standard_students extends ModelePDFStudents
 				$pdf->Close();
 
 				$pdf->Output($file, 'F');
+
+				// Add pdfgeneration hook
+				$hookmanager->initHooks(array('pdfgeneration'));
+				$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs);
+				global $action;
+				$reshook = $hookmanager->executeHooks('afterPDFCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+				if ($reshook < 0) {
+					$this->error = $hookmanager->error;
+					$this->errors = $hookmanager->errors;
+				}
+
+				if (!empty($conf->global->MAIN_UMASK)) {
+					@chmod($file, octdec($conf->global->MAIN_UMASK));
+				}
 
 					$this->result = array('fullpath'=>$file);
 
@@ -357,6 +386,62 @@ class pdf_standard_students extends ModelePDFStudents
 			return 0;
 		}
 	}
+  /**
+   * 
+   * 
+   * BODY
+   * 
+   * 
+   */
+  public function _titlebody(&$pdf, &$obj){
+    global $conf, $langs, $db; 
+    $aula = new Classrooms($db);
+    $aula->fetch($obj->fk_class);
+    $pdf->SetTextColor(0, 0, 60);
+    $pdf->SetFont('helvetica', '', 14);
+    $pdf->SetFillColor(233, 234, 237);
+    $pdf->Cell(0, 10,$langs->transnoentities("pdfcabeceraassys").' '.dol_print_date($obj->date_creation, "day", false).' - '.$aula->label, 0, 1, 'L', 1,'',1,1,'','M');
+    $pdf->MultiCell(0, 3, ''); // Set interline to 3
+    $arrData = json_decode($obj->students);
+    $idal = array_column($arrData, 'id');
+    $assysal = array_column($arrData, 'val');
+    
+    /*Encabezado de tabla*/
+    $estudiante = new Students($db);
+    $pdf->SetFont('', 'B', 11);
+    $pdf->setCellPaddings(1, 1, 1, 1);
+    $pdf->setCellMargins(1, 1, 1, 1);
+    $pdf->SetFillColor(255, 255, 255);
+   
+    $pdf->MultiCell(160, 5, $langs->transnoentities("pdfheadassys1"), 0, 'L', 1, 0, '', '', true);
+    $pdf->MultiCell(20, 5, $langs->transnoentities("pdfheadassys2"), 0, 'C', 1, 0, '', '', true);
+    $pdf->MultiCell(0, 3, ''); // Set interline to 3 
+    
+    
+    $pdf->SetFont('', 'B', 9);
+    $pdf->setCellPaddings(1, 1, 1, 1);
+    $pdf->setCellMargins(1, 1, 1, 1);
+    $pdf->SetFillColor(236, 232, 237);
+    
+    for($i=0;$i<count($idal);$i++){
+      $pdf->MultiCell(160, 5, $estudiante->fetch($idal[$i])?$estudiante->label:'-' , 0, 'L', 1, 0, '', '', true);
+      $pdf->MultiCell(20, 5, $assysal[$i] , 0, 'C', 1, 0, '', '', true);
+      $pdf->Ln();
+    }
+    
+    $pdf->MultiCell(0, 3, ''); 
+    $pdf->SetFont('', 'B', 10);
+    $pdf->setCellPaddings(1, 1, 1, 1);
+    $pdf->setCellMargins(1, 1, 1, 1);
+    $pdf->SetFillColor(233, 234, 237);
+    $pdf->MultiCell(60, 5, '(p) '.$langs->transnoentities("present") , 0, 'C', 1, 0, '', '', true);
+    $pdf->MultiCell(60, 5, '(a) '.$langs->transnoentities("absent") , 0, 'C', 1, 0, '', '', true);
+    $pdf->MultiCell(60, 5, '(j) '.$langs->transnoentities("justified") , 0, 'C', 1, 0, '', '', true);
+    
+    //$pdf->Circle(2, 100, 1, 0, 360, 'DF', '', array(210, 0, 0));
+    //$pdf->Circle(2, 110, 1, 0, 360, 'DF', '', array(0, 210, 0));
+    //$pdf->Circle(2, 120, 1, 0, 360, 'DF', '', array(0, 0, 210));
+  }
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
@@ -389,6 +474,7 @@ class pdf_standard_students extends ModelePDFStudents
 	 */
 	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0, $currency = '', $outputlangsbis = null)
 	{
+		
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
@@ -404,8 +490,8 @@ class pdf_standard_students extends ModelePDFStudents
 	 */
 	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs, $outputlangsbis = null)
 	{
-		global $conf, $langs;
-
+		global $conf, $langs, $db;
+    
 		// Load traductions files required by page
 		$outputlangs->loadLangs(array("main", "bills", "propal", "companies", "college"));
 
@@ -414,8 +500,8 @@ class pdf_standard_students extends ModelePDFStudents
 		pdf_pagehead($pdf, $outputlangs, $this->page_hauteur);
 
 		// Show Draft Watermark
-		if ($object->statut == $object::STATUS_DRAFT && (!empty($conf->global->MAIN_INFO_SOCIETE_NOM))) {
-			  pdf_watermark($pdf, $outputlangs, $this->page_hauteur, $this->page_largeur, 'mm', $conf->global->MAIN_INFO_SOCIETE_NOM);
+		if ($object->statut == $object::STATUS_DRAFT && (!empty($conf->global->FACTURE_DRAFT_WATERMARK))) {
+			  pdf_watermark($pdf, $outputlangs, $this->page_hauteur, $this->page_largeur, 'mm', $conf->global->FACTURE_DRAFT_WATERMARK);
 		}
 
 		$pdf->SetTextColor(0, 0, 60);
@@ -454,29 +540,28 @@ class pdf_standard_students extends ModelePDFStudents
 				$pdf->MultiCell($w, 4, $outputlangs->convToOutputCharset($text), 0, 'L');
 			}
 		}
-    /********************************************************************************************************************************************/
-    /*HEAD RIGHT PLACE*/
+
 		$pdf->SetFont('', 'B', $default_font_size + 3);
 		$pdf->SetXY($posx, $posy);
 		$pdf->SetTextColor(0, 0, 60);
-		$title = $outputlangs->transnoentities("pdftitle");
+		$title = $outputlangs->transnoentities("pdftitleassys");
+		if (!empty($conf->global->PDF_USE_ALSO_LANGUAGE_CODE) && is_object($outputlangsbis)) {
+			$title .= ' - ';
+			$title .= $outputlangsbis->transnoentities("pdftitleassys");
+		}
 		$pdf->MultiCell($w, 3, $title, '', 'R');
+
 		$pdf->SetFont('', 'B', $default_font_size);
-  
+
 		$posy += 5;
 		$pdf->SetXY($posx, $posy);
 		$pdf->SetTextColor(0, 0, 60);
-		$textref = $outputlangs->transnoentities("pdftitlename")." : ".$outputlangs->convToOutputCharset($object->label);
-		$pdf->SetTextColor(128, 0, 0);
+		$textref = $outputlangs->transnoentities("Ref")." : ".$outputlangs->convToOutputCharset($object->ref);
+		if ($object->statut == $object::STATUS_DRAFT) {
+			$pdf->SetTextColor(128, 0, 0);
+			$textref .= ' - '.$outputlangs->transnoentities("NotValidated");
+		}
 		$pdf->MultiCell($w, 4, $textref, '', 'R');
-    
-    $posy += 5;
-		$pdf->SetXY($posx, $posy);
-		$pdf->SetTextColor(0, 0, 60);
-		$textref = $outputlangs->transnoentities("pdftitlecicle")." : ".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO;
-		$pdf->SetTextColor(128, 0, 0);
-		$pdf->MultiCell($w, 4, $textref, '', 'R');
-    
 
 		$posy += 1;
 		$pdf->SetFont('', '', $default_font_size - 2);
@@ -484,119 +569,35 @@ class pdf_standard_students extends ModelePDFStudents
 		$posy += 4;
 		$pdf->SetXY($posx, $posy);
 		$pdf->SetTextColor(0, 0, 60);
+    $pdf->SetFont('', 'B', 12);
+		$title = $outputlangs->transnoentities("Date");
+		if (!empty($conf->global->PDF_USE_ALSO_LANGUAGE_CODE) && is_object($outputlangsbis)) {
+			$title .= ' - '.$outputlangsbis->transnoentities("Date");
+		}
+		$pdf->MultiCell($w, 3, $title." : ".dol_print_date($object->date_creation, "day", false, $outputlangs), '', 'R');
 
 		$posy += 1;
 
 		$top_shift = 0;
+		// Show list of linked objects
+		$current_y = $pdf->getY();
+		$posy = pdf_writeLinkedObjects($pdf, $object, $outputlangs, $posx, $posy, $w, 3, 'R', $default_font_size);
+		if ($current_y < $pdf->getY()) {
+			$top_shift = $pdf->getY() - $current_y;
+		}
 
+    $aula = new Classrooms($db);
+    $aula->fetch($object->fk_class);
+    $pdf->SetFont('', 'B', 12);
+    $pdf->MultiCell(0, 0, $aula->label , $border=0, $align='R', $fill=false, $ln=1, $x='', $y='', $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='M', $fitcell=false);
+    
 		$pdf->SetTextColor(0, 0, 0);
 		return $top_shift;
 	}
-  
-  public function _titlehead(&$pdf){
-    global $conf, $langs, $db;
-    $pdf->SetTextColor(0, 0, 60);
-    $pdf->SetFont('helvetica', '', 14);
-    $pdf->SetFillColor(233, 234, 237);
-    $pdf->Cell(0, 10, $langs->transnoentities("pdfcabecera"), 0, 1, 'L', 1,'',1,1,'','M');
-    $pdf->MultiCell(0, 3, ''); // Set interline to 3
-    /*Encabezado de tabla*/
-    $periodos = new Periods($this->db);
-    $pdf->SetFont('', 'B', 10);
-    $pdf->setCellPaddings(1, 1, 1, 1);
-    $pdf->setCellMargins(1, 1, 1, 1);
-    $pdf->SetFillColor(236, 232, 237);
-   
-    $pdf->MultiCell(50, 5, $langs->transnoentities("pdfheadtablecols1"), 0, 'L', 1, 0, '', '', true);
-    for($i=1;$i<=$periodos->getCountRecord();$i++){
-      $pdf->MultiCell(15, 5,$langs->transnoentities("pdfheadtablecolsloop")." ".$i, 0, 'C', 1, 0, '', '', true);
-    }
-    $pdf->MultiCell(15, 5, $langs->transnoentities("pdfheadprom1"), 0, 'C', 1, 0, '', '', true);
-    $pdf->MultiCell(15, 5, $langs->transnoentities("pdfheadprom2"), 0, 'C', 1, 0, '', '', true);
-    $pdf->MultiCell(15, 5, $langs->transnoentities("pdfheadprom3"), 0, 'C', 1, 0, '', '', true);
-    $pdf->MultiCell(0, 3, ''); // Set interline to 3 
-  }
-  
-  public function _notasbody(&$pdf, $object){
-    global $conf, $langs, $db, $user;
-    $asignatura = new Subject($db);
-    $periodos = new Periods($this->db);
-    $rownotas=array();
-    $year=$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO;
-    
-    $sql = "SELECT fk_student, fk_subject,`status`,";
-    
-    for($i=1;$i<=$periodos->getCountRecord();$i++){
-      $sql .= "SUM(CASE WHEN trimestre = ".$i." THEN nota ELSE 0 END) AS nota".$i.",";
-      $rownotas[]="nota".$i;
-    }
-    
-    $sql.= " CAST(AVG(nota) AS DECIMAL(11,2)) AS `prom1`,";
-    
-    //for($j=1;$j<=$periodos->getCountRecord();$j++){
-      //$sql.= "SUM(CASE WHEN trimestre = ".$j." THEN notarecover ELSE 0 END) AS `trr".$j."`,";
-      
-    //}
-    
-    $sql.= " CAST(AVG(NULLIF(notarecover,0)) AS DECIMAL(11,2)) AS `prom2`";
-    $sql.= " FROM ".MAIN_DB_PREFIX."college_notes";
-    $sql.= " GROUP BY fk_student, fk_subject, school_year";
-    $sql.= " HAVING fk_student=".(int)$object->id." AND school_year =".(int)$year." AND `status`=1";
-    
-    $resql = $db->query($sql);
-	  if ($resql)
-	  {
-      $num = $db->num_rows($resql);
-     	$i = 0;
-    	if ($num > 0)
-    	{
-    		while ($i < $num)
-    		{
-    			$obj = $db->fetch_object($resql);
-		      $array = array($obj->prom1,$obj->prom2);
-          //$c = array_filter($array, fn($v) => (
-          //    ($v > 0)
-          //));
-          $asignatura->fetch((int)$obj->fk_subject);
-          $pdf->SetFont('', 'B', 10);
-          $pdf->SetTextColor(244, 244, 244);
-          $pdf->setCellPaddings(1, 1, 1, 1);
-          $pdf->setCellMargins(1, 1, 1, 1);
-          $pdf->SetFillColor(155, 117, 166);
-          $pdf->MultiCell(50, 5, $asignatura->label, 0, 'L', 1, 0, '', '', true);
-          foreach($rownotas as $row) {//for($i=1;$i<=$periodos->getCountRecord();$i++){
-            $pdf->MultiCell(15, 5,number_format($obj->$row,2), 0, 'C', 1, 0, '', '', true);
-          }
-          $pdf->MultiCell(15, 5, number_format($obj->prom1,2), 0, 'R', 1, 0, '', '', true);
-          $pdf->MultiCell(15, 5, number_format($obj->prom2,2), 0, 'R', 1, 0, '', '', true);
-          //$avg = array_sum([number_format($obj->prom1,2),number_format($obj->prom2,2)]) / count($c);
-          $pdf->MultiCell(15, 5, max($array) , 0, 'R', 1, 0, '', '', true);
-          $pdf->Ln();
-          
-          //$pdf->Cell(0, 10,$asignatura->label.' '.(float)$obj->prom1.' '.(float)$obj->prom2  , 0, 1, 'L', 1,'',1,1,'','M');
-          //$pdf->Cell($w, 10, '' , 0, 1, 'L', 1,'',1,1,'','M');
-          
-    			$i++;
-    		}
-        $db->free($resql);
-    	}else{
-        $pdf->SetFont('', 'B', 8);
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->setCellPaddings(1, 1, 1, 1);
-        $pdf->setCellMargins(1, 1, 1, 1);
-        $pdf->SetFillColor(255, 255, 255);
-        $pdf->Cell(0, 10, $langs->transnoentities("pdftablerownodata") , 0, 1, 'L', 1,'',1,1,'','M');
-    	}
-    }
-    else
-   	{
-  	 $pdf->Cell(0, 10,'Error' , 0, 1, 'L', 1,'',1,1,'','M');
-     dol_print_error($db);
-   	}
-  }
+
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 	/**
-	 *   	Show footer of page. Need this->emetteur object $conf->global->MAIN_INFO_SOCIETE_NOTE
+	 *   	Show footer of page. Need this->emetteur object
 	 *
 	 *   	@param	TCPDF		$pdf     			PDF
 	 * 		@param	Object		$object				Object to show
@@ -608,8 +609,8 @@ class pdf_standard_students extends ModelePDFStudents
 	{
 		global $conf;
 		$showdetails = empty($conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS) ? 0 : $conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS;
-		return pdf_pagefoot($pdf, $outputlangs, 'INVOICE_FREE_TEXT', '$this->emetteur' , $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
- }
+		return pdf_pagefoot($pdf, $outputlangs, '', '$this->emetteur', $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
+	}
 
 	/**
 	 *  Define Array Column Field

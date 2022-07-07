@@ -1,4 +1,6 @@
 <?php
+//date_default_timezone_set('America/Argentina/Buenos_Aires');
+
 /* Copyright (C) 2017  Laurent Destailleur <eldy@users.sourceforge.net>
  * Copyright (C) ---Put here your own copyright and developer email---
  *
@@ -17,9 +19,9 @@
  */
 
 /**
- * \file        class/subject.class.php
+ * \file        class/assys.class.php
  * \ingroup     college
- * \brief       This file is a CRUD class file for Subject (Create/Read/Update/Delete)
+ * \brief       This file is a CRUD class file for Assys (Create/Read/Update/Delete)
  */
 
 // Put here all includes required by your class file
@@ -28,9 +30,9 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
 /**
- * Class for Subject
+ * Class for Assys
  */
-class Subject extends CommonObject
+class Assys extends CommonObject
 {
 	/**
 	 * @var string ID of module.
@@ -40,12 +42,12 @@ class Subject extends CommonObject
 	/**
 	 * @var string ID to identify managed object.
 	 */
-	public $element = 'subject';
+	public $element = 'assys';
 
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $table_element = 'college_subject';
+	public $table_element = 'college_assys';
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -59,9 +61,9 @@ class Subject extends CommonObject
 	public $isextrafieldmanaged = 1;
 
 	/**
-	 * @var string String with name of icon for subject. Must be the part after the 'object_' into object_subject.png
+	 * @var string String with name of icon for assys. Must be the part after the 'object_' into object_assys.png
 	 */
-	public $picto = 'subject@college';
+	public $picto = 'assys@college';
 
 
 	const STATUS_DRAFT = 0;
@@ -103,30 +105,26 @@ class Subject extends CommonObject
 	 */
 	public $fields=array(
 		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'css'=>'left', 'comment'=>"Id"),
-		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"HelpRef", 'validate'=>'1', 'comment'=>"Reference of object"),
-		'label' => array('type'=>'varchar(255)', 'label'=>'Asignatura', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'cssview'=>'wordbreak', 'help'=>"HelpSubject", 'showoncombobox'=>'2', 'validate'=>'1',),
-		'fk_soc' => array('type'=>'integer:Societe:societe/class/societe.class.php:1:status=1 AND entity IN (__SHARED_ENTITIES__)', 'label'=>'ThirdParty', 'enabled'=>'1', 'position'=>50, 'notnull'=>-1, 'visible'=>0, 'index'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"LinkToThirparty", 'validate'=>'1',),
-		'fk_project' => array('type'=>'integer:Project:projet/class/project.class.php:1', 'label'=>'Project', 'enabled'=>'1', 'position'=>52, 'notnull'=>-1, 'visible'=>0, 'index'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'validate'=>'1',),
-		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>3, 'validate'=>'1',),
+		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>2, 'notnull'=>1, 'visible'=>4, 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'validate'=>'1', 'comment'=>"Reference of object"),
+		'school_year' => array('type'=>'varchar(255)', 'label'=>'SchoolYear', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>4, 'noteditable'=>'1', 'default'=>'2022', 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"School_Year", 'validate'=>'1',),
+		'fk_class' => array('type'=>'integer:Classrooms:custom/college/class/classrooms.class.php:1:status=1', 'label'=>'Classroom', 'enabled'=>'1', 'position'=>22, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"LinkClass", 'validate'=>'1',),
+		'description' => array('type'=>'varchar(255)', 'label'=>'Description', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>3, 'css'=>'maxwidth500 widthcentpercentminusxx', 'validate'=>'1',),
 		'note_public' => array('type'=>'html', 'label'=>'NotePublic', 'enabled'=>'1', 'position'=>61, 'notnull'=>0, 'visible'=>0, 'cssview'=>'wordbreak', 'validate'=>'1',),
 		'note_private' => array('type'=>'html', 'label'=>'NotePrivate', 'enabled'=>'1', 'position'=>62, 'notnull'=>0, 'visible'=>0, 'cssview'=>'wordbreak', 'validate'=>'1',),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>500, 'notnull'=>1, 'visible'=>-2,),
+		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>11, 'notnull'=>1, 'visible'=>-2,),
 		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>501, 'notnull'=>0, 'visible'=>-2,),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>510, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>511, 'notnull'=>-1, 'visible'=>-2,),
 		'last_main_doc' => array('type'=>'varchar(255)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>600, 'notnull'=>0, 'visible'=>0,),
 		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
 		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1010, 'notnull'=>-1, 'visible'=>0,),
-		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'Borrador', '1'=>'Validado', '9'=>'Cancelado'), 'validate'=>'1',),
-		'fk_class' => array('type'=>'integer:Classrooms:custom/college/class/classrooms.class.php:1:status=1', 'label'=>'Classroom', 'enabled'=>'1', 'position'=>21, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"LinkClass", 'validate'=>'1',),
-		'fk_user' => array('type'=>'integer:User:user/class/user.class.php:1', 'label'=>'Teacher', 'enabled'=>'1', 'position'=>31, 'notnull'=>0, 'visible'=>1, 'index'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"HelpToTeacher", 'showoncombobox'=>'1', 'validate'=>'1',),
-		'school_year' => array('type'=>'varchar(255)', 'label'=>'SchoolYear', 'enabled'=>'1', 'position'=>19, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'2022', 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'cssview'=>'wordbreak', 'help'=>"School_Year", 'validate'=>'1',),
+		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>1, 'default'=>'1', 'index'=>1, 'arrayofkeyval'=>array('0'=>'Borrador', '1'=>'Validado', '9'=>'Cancelado'), 'validate'=>'1',),
+		'students' => array('type'=>'text', 'label'=>'students', 'enabled'=>'1', 'position'=>63, 'notnull'=>1, 'visible'=>0, 'validate'=>'1',),
 	);
 	public $rowid;
 	public $ref;
-	public $label;
-	public $fk_soc;
-	public $fk_project;
+	public $school_year;
+	public $fk_class;
 	public $description;
 	public $note_public;
 	public $note_private;
@@ -138,9 +136,7 @@ class Subject extends CommonObject
 	public $import_key;
 	public $model_pdf;
 	public $status;
-	public $fk_class;
-	public $fk_user;
-	public $school_year;
+	public $students;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -149,17 +145,17 @@ class Subject extends CommonObject
 	// /**
 	//  * @var string    Name of subtable line
 	//  */
-	// public $table_element_line = 'college_subjectline';
+	// public $table_element_line = 'college_assysline';
 
 	// /**
 	//  * @var string    Field with ID of parent key if this object has a parent
 	//  */
-	// public $fk_element = 'fk_subject';
+	// public $fk_element = 'fk_assys';
 
 	// /**
 	//  * @var string    Name of subtable class that manage subtable lines
 	//  */
-	// public $class_element_line = 'Subjectline';
+	// public $class_element_line = 'Assysline';
 
 	// /**
 	//  * @var array	List of child tables. To test if we can delete object.
@@ -171,10 +167,10 @@ class Subject extends CommonObject
 	//  *               If name matches '@ClassNAme:FilePathClass;ParentFkFieldName' it will
 	//  *               call method deleteByParentField(parentId, ParentFkFieldName) to fetch and delete child object
 	//  */
-	// protected $childtablesoncascade = array('college_subjectdet');
+	// protected $childtablesoncascade = array('college_assysdet');
 
 	// /**
-	//  * @var SubjectLine[]     Array of subtable lines
+	//  * @var AssysLine[]     Array of subtable lines
 	//  */
 	// public $lines = array();
 
@@ -188,6 +184,7 @@ class Subject extends CommonObject
 	public function __construct(DoliDB $db)
 	{
 		global $conf, $langs;
+   
 
 		$this->db = $db;
 
@@ -197,10 +194,11 @@ class Subject extends CommonObject
 		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) {
 			$this->fields['entity']['enabled'] = 0;
 		}
-
-        $this->fields['school_year']['default'] = $conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO;
+    
+    $this->fields['school_year']['default'] = $conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO;
+    
 		// Example to show how to set values of fields definition dynamically
-		/*if ($user->rights->college->subject->read) {
+		/*if ($user->rights->college->assys->read) {
 			$this->fields['myfield']['visible'] = 1;
 			$this->fields['myfield']['noteditable'] = 0;
 		}*/
@@ -514,8 +512,8 @@ class Subject extends CommonObject
 			return 0;
 		}
 
-		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->college->subject->write))
-		 || (! empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->college->subject->subject_advance->validate))))
+		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->college->assys->write))
+		 || (! empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->college->assys->assys_advance->validate))))
 		 {
 		 $this->error='NotEnoughPermissions';
 		 dol_syslog(get_class($this)."::valid ".$this->error, LOG_ERR);
@@ -557,7 +555,7 @@ class Subject extends CommonObject
 
 			if (!$error && !$notrigger) {
 				// Call trigger
-				$result = $this->call_trigger('SUBJECT_VALIDATE', $user);
+				$result = $this->call_trigger('ASSYS_VALIDATE', $user);
 				if ($result < 0) {
 					$error++;
 				}
@@ -571,8 +569,8 @@ class Subject extends CommonObject
 			// Rename directory if dir was a temporary ref
 			if (preg_match('/^[\(]?PROV/i', $this->ref)) {
 				// Now we rename also files into index
-				$sql = 'UPDATE '.MAIN_DB_PREFIX."ecm_files set filename = CONCAT('".$this->db->escape($this->newref)."', SUBSTR(filename, ".(strlen($this->ref) + 1).")), filepath = 'subject/".$this->db->escape($this->newref)."'";
-				$sql .= " WHERE filename LIKE '".$this->db->escape($this->ref)."%' AND filepath = 'subject/".$this->db->escape($this->ref)."' and entity = ".$conf->entity;
+				$sql = 'UPDATE '.MAIN_DB_PREFIX."ecm_files set filename = CONCAT('".$this->db->escape($this->newref)."', SUBSTR(filename, ".(strlen($this->ref) + 1).")), filepath = 'assys/".$this->db->escape($this->newref)."'";
+				$sql .= " WHERE filename LIKE '".$this->db->escape($this->ref)."%' AND filepath = 'assys/".$this->db->escape($this->ref)."' and entity = ".$conf->entity;
 				$resql = $this->db->query($sql);
 				if (!$resql) {
 					$error++; $this->error = $this->db->lasterror();
@@ -581,15 +579,15 @@ class Subject extends CommonObject
 				// We rename directory ($this->ref = old ref, $num = new ref) in order not to lose the attachments
 				$oldref = dol_sanitizeFileName($this->ref);
 				$newref = dol_sanitizeFileName($num);
-				$dirsource = $conf->college->dir_output.'/subject/'.$oldref;
-				$dirdest = $conf->college->dir_output.'/subject/'.$newref;
+				$dirsource = $conf->college->dir_output.'/assys/'.$oldref;
+				$dirdest = $conf->college->dir_output.'/assys/'.$newref;
 				if (!$error && file_exists($dirsource)) {
 					dol_syslog(get_class($this)."::validate() rename dir ".$dirsource." into ".$dirdest);
 
 					if (@rename($dirsource, $dirdest)) {
 						dol_syslog("Rename ok");
 						// Rename docs starting with $oldref with $newref
-						$listoffiles = dol_dir_list($conf->college->dir_output.'/subject/'.$newref, 'files', 1, '^'.preg_quote($oldref, '/'));
+						$listoffiles = dol_dir_list($conf->college->dir_output.'/assys/'.$newref, 'files', 1, '^'.preg_quote($oldref, '/'));
 						foreach ($listoffiles as $fileentry) {
 							$dirsource = $fileentry['name'];
 							$dirdest = preg_replace('/^'.preg_quote($oldref, '/').'/', $newref, $dirsource);
@@ -639,7 +637,7 @@ class Subject extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'SUBJECT_UNVALIDATE');
+		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'ASSYS_UNVALIDATE');
 	}
 
 	/**
@@ -663,7 +661,7 @@ class Subject extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'SUBJECT_CANCEL');
+		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'ASSYS_CANCEL');
 	}
 
 	/**
@@ -687,7 +685,7 @@ class Subject extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'SUBJECT_REOPEN');
+		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'ASSYS_REOPEN');
 	}
 
 	/**
@@ -710,14 +708,14 @@ class Subject extends CommonObject
 
 		$result = '';
 
-		$label = img_picto('', $this->picto).' <u>'.$langs->trans("Subject").'</u>';
+		$label = img_picto('', $this->picto).' <u>'.$langs->trans("Assys").'</u>';
 		if (isset($this->status)) {
 			$label .= ' '.$this->getLibStatut(5);
 		}
 		$label .= '<br>';
 		$label .= '<b>'.$langs->trans('Ref').':</b> '.$this->ref;
 
-		$url = dol_buildpath('/college/subject_card.php', 1).'?id='.$this->id;
+		$url = dol_buildpath('/college/assys_card.php', 1).'?id='.$this->id;
 
 		if ($option != 'nolink') {
 			// Add param to save lastsearch_values or not
@@ -733,7 +731,7 @@ class Subject extends CommonObject
 		$linkclose = '';
 		if (empty($notooltip)) {
 			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-				$label = $langs->trans("ShowSubject");
+				$label = $langs->trans("ShowAssys");
 				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
 			}
 			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
@@ -793,7 +791,7 @@ class Subject extends CommonObject
 		//if ($withpicto != 2) $result.=(($addlabel && $this->label) ? $sep . dol_trunc($this->label, ($addlabel > 1 ? $addlabel : 0)) : '');
 
 		global $action, $hookmanager;
-		$hookmanager->initHooks(array('subjectdao'));
+		$hookmanager->initHooks(array('assysdao'));
 		$parameters = array('id'=>$this->id, 'getnomurl'=>$result);
 		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 		if ($reshook > 0) {
@@ -929,8 +927,8 @@ class Subject extends CommonObject
 	{
 		$this->lines = array();
 
-		$objectline = new SubjectLine($this->db);
-		$result = $objectline->fetchAll('ASC', 'position', 0, 0, array('customsql'=>'fk_subject = '.((int) $this->id)));
+		$objectline = new AssysLine($this->db);
+		$result = $objectline->fetchAll('ASC', 'position', 0, 0, array('customsql'=>'fk_assys = '.((int) $this->id)));
 
 		if (is_numeric($result)) {
 			$this->error = $objectline->error;
@@ -952,15 +950,15 @@ class Subject extends CommonObject
 		global $langs, $conf;
 		$langs->load("college@college");
 
-		if (empty($conf->global->COLLEGE_SUBJECT_ADDON)) {
-			$conf->global->COLLEGE_SUBJECT_ADDON = 'mod_subject_standard';
+		if (empty($conf->global->COLLEGE_ASSYS_ADDON)) {
+			$conf->global->COLLEGE_ASSYS_ADDON = 'mod_assys_standard';
 		}
 
-		if (!empty($conf->global->COLLEGE_SUBJECT_ADDON)) {
+		if (!empty($conf->global->COLLEGE_ASSYS_ADDON)) {
 			$mybool = false;
 
-			$file = $conf->global->COLLEGE_SUBJECT_ADDON.".php";
-			$classname = $conf->global->COLLEGE_SUBJECT_ADDON;
+			$file = $conf->global->COLLEGE_ASSYS_ADDON.".php";
+			$classname = $conf->global->COLLEGE_ASSYS_ADDON;
 
 			// Include file with class
 			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
@@ -1013,21 +1011,21 @@ class Subject extends CommonObject
 		global $conf, $langs;
 
 		$result = 0;
-		$includedocgeneration = 0;
+		$includedocgeneration = 1;
 
 		$langs->load("college@college");
 
 		if (!dol_strlen($modele)) {
-			$modele = 'standard_subject';
+			$modele = 'standard_assys';
 
 			if (!empty($this->model_pdf)) {
 				$modele = $this->model_pdf;
-			} elseif (!empty($conf->global->SUBJECT_ADDON_PDF)) {
-				$modele = $conf->global->SUBJECT_ADDON_PDF;
+			} elseif (!empty($conf->global->ASSYS_ADDON_PDF)) {
+				$modele = $conf->global->ASSYS_ADDON_PDF;
 			}
 		}
 
-		$modelpath = "core/modules/college/doc/";
+		$modelpath = "core/modules/college/doc/assys/";
 
 		if ($includedocgeneration && !empty($modele)) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
@@ -1065,78 +1063,18 @@ class Subject extends CommonObject
 
 		return $error;
 	}
-  
-  
-  public function getAllClass(){ 
-    global $conf, $langs, $user, $db;
-    $rows = array();
-    $resql = $db->query("Select rowid, label from ".MAIN_DB_PREFIX."college_classrooms ");
-    if($resql) {
-      $num = $db->num_rows($resql);
-         $i = 0;
-         if ($num)
-         {
-           while ($i < $num)
-           {
-             $obj = $db->fetch_object($resql);
-             if ($obj)
-             {
-              $rows[$obj->rowid] = $obj->label;
-             }
-             $i++;
-           }
-         }
-      return $rows;
-    }else{
-        return 0;
-        exit;
-    }
-  }
-  
-  public function getAllTeacher(){
-    global $conf, $langs, $user, $db;
-    $rows = array();
-    $resql = $db->query("SELECT rowid, lastname, firstname FROM ".MAIN_DB_PREFIX."user WHERE entity=1 AND employee=1 ");
-    if($resql) {
-      $num = $db->num_rows($resql);
-         $i = 0;
-         if ($num)
-         {
-           while ($i < $num)
-           {
-             $obj = $db->fetch_object($resql);
-             if ($obj)
-             {
-              $rows[$obj->rowid] = $obj->lastname.', '.$obj->firstname;
-             }
-             $i++;
-           }
-         }
-      return $rows;
-    }else{
-        return 0;
-        exit;
-    }
-  }
-  
-  
-  
-  
-  
-  
-  
 }
 
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobjectline.class.php';
 
 /**
- * Class SubjectLine. You can also remove this and generate a CRUD class for lines objects.
+ * Class AssysLine. You can also remove this and generate a CRUD class for lines objects.
  */
-class SubjectLine extends CommonObjectLine
+class AssysLine extends CommonObjectLine
 {
-	// To complete with content of an object SubjectLine
-	// We should have a field rowid, fk_subject and position
+	// To complete with content of an object AssysLine
+	// We should have a field rowid, fk_assys and position
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes

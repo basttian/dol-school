@@ -72,7 +72,7 @@ class modCollege extends DolibarrModules
 		$this->editor_url = '';
 
 		// Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-		$this->version = '1.0.2';
+		$this->version = '1.1.0';
 		// Url to the file with your last numberversion of this module
 		//$this->url_last_version = 'http://www.example.com/versionmodule.txt';
 
@@ -145,7 +145,12 @@ class modCollege extends DolibarrModules
 		// A condition to hide module
 		$this->hidden = false;
 		// List of module class names as string that must be enabled if this module is enabled. Example: array('always1'=>'modModuleToEnable1','always2'=>'modModuleToEnable2', 'FR1'=>'modModuleToEnableFR'...)
-		$this->depends = array('always1'=>'modSociete','always2'=>'modFacture');
+		$this->depends = array(
+    'always1'=>'modSociete',
+    'always2'=>'modFacture',
+    'always3'=>'modImport',
+    'always4'=>'modExport',
+    ); 
 		$this->requiredby = array(); // List of module class names as string to disable if this one is disabled. Example: array('modModuleToDisable1', ...)
 		$this->conflictwith = array(); // List of module class names as string this module is in conflict with. Example: array('modModuleToDisable1', ...)
 
@@ -378,7 +383,24 @@ class modCollege extends DolibarrModules
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->college->periods->delete)
 		$r++;
     
-		
+    //ASSYS
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Read objects of Assys'; // Permission label
+		$this->rights[$r][4] = 'assys';
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->college->assys->read)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Create/Update objects of Assys'; // Permission label
+		$this->rights[$r][4] = 'assys';
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->college->assys->write)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Delete objects of Assys'; // Permission label
+		$this->rights[$r][4] = 'assys';
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->college->assys->delete)
+		$r++;
+    
+    
 		/* END MODULEBUILDER PERMISSIONS */
     
 		// Main menu entries to add
@@ -757,11 +779,52 @@ class modCollege extends DolibarrModules
             'user'=>2
         );
 
+      /*ASSYS MENU*/
+        $this->menu[$r++]=array(
+            // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'fk_menu'=>'fk_mainmenu=college',
+            // This is a Left menu entry
+            'type'=>'left',
+            'titre'=>'ListAssys',
+            'prefix' => img_picto('', 'object_assys@college', 'class="paddingright mrl-10 pictofixedwidth valignmiddle"'),
+            'mainmenu'=>'college',
+            'leftmenu'=>'college_assys',
+            'url'=>'/college/assys_list.php',
+            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+            'langs'=>'college@college',
+            'position'=>1100+$r,
+            // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled'=>'$conf->college->enabled',
+            // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
+            'perms'=>'$user->rights->college->assys->read',
+            'target'=>'',
+            // 0=Menu for internal users, 1=external users, 2=both
+            'user'=>2,
+        );
+        $this->menu[$r++]=array(
+            // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'fk_menu'=>'fk_mainmenu=college,fk_leftmenu=college_assys',
+            // This is a Left menu entry
+            'type'=>'left',
+            'titre'=>'NewAssys',
+            //'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
+            'mainmenu'=>'college',
+            'leftmenu'=>'college_assys',
+            'url'=>'/college/assys_card.php?action=create',
+            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+            'langs'=>'college@college',
+            'position'=>1100+$r,
+            // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled'=>'$conf->college->enabled',
+            // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
+            'perms'=>'$user->rights->college->assys->write',
+            'target'=>'',
+            // 0=Menu for internal users, 1=external users, 2=both
+            'user'=>2
+        );
+
 
 		/* END MODULEBUILDER LEFTMENU STUDENT */
-    
-    
-    
 		// Exports profiles provided by this module
 		$r = 1;
 		/* BEGIN MODULEBUILDER EXPORT STUDENT */
