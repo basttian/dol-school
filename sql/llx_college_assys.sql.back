@@ -17,7 +17,7 @@
 CREATE TABLE llx_college_assys(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
-	ref varchar(255) DEFAULT '(PROV)', 
+	ref varchar(128) DEFAULT '(PROV)' NOT NULL, 
 	school_year varchar(255) DEFAULT '2022' NOT NULL, 
 	fk_class integer NOT NULL, 
 	description varchar(255), 

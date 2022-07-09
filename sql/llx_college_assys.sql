@@ -30,7 +30,7 @@ CREATE TABLE llx_college_assys(
 	last_main_doc varchar(255), 
 	import_key varchar(14), 
 	model_pdf varchar(255), 
-	status integer DEFAULT 1 NOT NULL, 
+	status integer NOT NULL, 
 	students text NOT NULL
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

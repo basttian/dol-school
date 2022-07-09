@@ -16,10 +16,14 @@
 #
 # Generic
 #
-
+MyDashboard=Escritorio
 Teacher=Profesor
 CollegeDescription=Administrar instituciones educativas.
 StudentLines=Importar / Exportar estudiantes.
+helpmessagge=Escribir un mensaje a los usuarios, este se vera reflejado en su escritorio cuando ingresen al sistema.Todos los usuarios leeran el mismo mensaje.
+SaveConstMainMotd=Guardar / Actualizar mensaje
+avisoMsjMainMotd=Solo usuarios administradores pueden redactar mensajes.
+
 
 #
 # other
@@ -225,6 +229,7 @@ card-header-a-assys=ASISTENCIAS
 card-header-b-assys=Agregar nuevas asistencias.
 card-body-assys=Area de ingreso de asistencias.
 ListAssys=Asistencias
+SendAssysRef=Adjunto listado asistencias.
 NewAssys=Nuevo registro
 students=Estudiante/s
 present=Presente
