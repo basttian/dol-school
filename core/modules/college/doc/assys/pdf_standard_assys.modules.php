@@ -397,8 +397,8 @@ class pdf_standard_assys extends ModelePDFAssys
     global $conf, $langs, $db; 
     $aula = new Classrooms($db);
     $aula->fetch($obj->fk_class);
-    $pdf->SetTextColor(0, 0, 60);
-    $pdf->SetFont('helvetica', '', 14);
+    $pdf->SetTextColor(128, 0, 0);
+    $pdf->SetFont('helvetica', 'B', 14);
     $pdf->SetFillColor(233, 234, 237);
     $pdf->Cell(0, 10,$langs->transnoentities("pdfcabeceraassys").' '.dol_print_date($obj->date_creation, "day", false).' - '.$aula->label, 0, 1, 'L', 1,'',1,1,'','M');
     $pdf->MultiCell(0, 3, ''); // Set interline to 3
@@ -407,6 +407,7 @@ class pdf_standard_assys extends ModelePDFAssys
     $assysal = array_column($arrData, 'val');
     
     /*Encabezado de tabla*/
+    $pdf->SetTextColor(0, 0, 60);
     $estudiante = new Students($db);
     $pdf->SetFont('', 'B', 11);
     $pdf->setCellPaddings(1, 1, 1, 1);
@@ -417,17 +418,18 @@ class pdf_standard_assys extends ModelePDFAssys
     $pdf->MultiCell(20, 5, $langs->transnoentities("pdfheadassys2"), 0, 'C', 1, 0, '', '', true);
     $pdf->MultiCell(0, 3, ''); // Set interline to 3 
     
-    
     $pdf->SetFont('', 'B', 9);
     $pdf->setCellPaddings(1, 1, 1, 1);
     $pdf->setCellMargins(1, 1, 1, 1);
-    $pdf->SetFillColor(236, 232, 237);
-    
+    $pdf->SetFillColor(250, 250, 250);
+    $html = "<hr>\n";
     for($i=0;$i<count($idal);$i++){
-      $pdf->MultiCell(160, 5, $estudiante->fetch($idal[$i])?$estudiante->label:'-' , 0, 'L', 1, 0, '', '', true);
-      $pdf->MultiCell(20, 5, $assysal[$i] , 0, 'C', 1, 0, '', '', true);
-      $pdf->Ln();
+      $pdf->MultiCell(160, 7, $estudiante->fetch($idal[$i])?$estudiante->label:'-' , 0, 'L', 1, 0, '', '', true);
+      $pdf->MultiCell(20, 7, $assysal[$i] , 0, 'C', 1, 0, '', '', true);
+      //$pdf->Ln();
+      $pdf->writeHTML($html, true, false, false, false, '');
     }
+    $pdf->writeHTML($html, true, false, false, false, '');
     
     $pdf->MultiCell(0, 3, ''); 
     $pdf->SetFont('', 'B', 10);
@@ -559,7 +561,7 @@ class pdf_standard_assys extends ModelePDFAssys
 		$textref = $outputlangs->transnoentities("Ref")." : ".$outputlangs->convToOutputCharset($object->ref);
 		if ($object->statut == $object::STATUS_DRAFT) {
 			$pdf->SetTextColor(128, 0, 0);
-			$textref .= ' - '.$outputlangs->transnoentities("NotValidated");
+			//$textref .= ' - '.$outputlangs->transnoentities("NotValidated");
 		}
 		$pdf->MultiCell($w, 4, $textref, '', 'R');
 

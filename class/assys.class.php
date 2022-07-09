@@ -118,7 +118,7 @@ class Assys extends CommonObject
 		'last_main_doc' => array('type'=>'varchar(255)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>600, 'notnull'=>0, 'visible'=>0,),
 		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
 		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1010, 'notnull'=>-1, 'visible'=>0,),
-		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>1, 'default'=>'1', 'index'=>1, 'arrayofkeyval'=>array('0'=>'Borrador', '1'=>'Validado', '9'=>'Cancelado'), 'validate'=>'1',),
+		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>4, 'default'=>'0', 'index'=>1, 'arrayofkeyval'=>array('0'=>'Borrador', '1'=>'Validado', '9'=>'Cancelado'), 'validate'=>'1',),
 		'students' => array('type'=>'text', 'label'=>'students', 'enabled'=>'1', 'position'=>63, 'notnull'=>1, 'visible'=>0, 'validate'=>'1',),
 	);
 	public $rowid;

@@ -400,6 +400,12 @@ class modCollege extends DolibarrModules
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->college->assys->delete)
 		$r++;
     
+    //MSJPRINCIPALPAGE
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Write messaje in dashboard'; // Permission label
+		$this->rights[$r][4] = 'msjpagetop';
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->college->msjpagetop->write)
+		$r++;
     
 		/* END MODULEBUILDER PERMISSIONS */
     
