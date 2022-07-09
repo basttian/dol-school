@@ -55,6 +55,9 @@ if (!$res) {
 	die("Include of main fails");
 }
 
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 
 if (! ((GETPOST('testmenuhider','int') || ! empty($conf->global->MAIN_TESTMENUHIDER)) && empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)))
 {
@@ -62,7 +65,7 @@ if (! ((GETPOST('testmenuhider','int') || ! empty($conf->global->MAIN_TESTMENUHI
 }
 
 $action = GETPOST('action', 'aZ09');
-
+$form = new Form($db);
 // Load translation files required by the page
 $langs->loadLangs(array("college@college"));
 llxHeader("
@@ -71,9 +74,24 @@ llxHeader("
 <link rel='stylesheet' type='text/css' href='./css/spectrecss/dist/spectre-icons.css'>
 ", $langs->trans("ModuleCollegeName"));
 print load_fiche_titre($langs->trans(''), $morehtmlright = '', $picto = '', $pictoisfullpath = 0, $id = '', $morecssontable = '', $morehtmlcenter = '');
-
+if($user->rights->college->msjpagetop->write){
+  print '<button id="msj" class="btn btn-action btn-sm s-circle maa-10"><i class="fa fa-bullhorn" aria-hidden="true"></i></i></button>';
+  print $form->textwithpicto(
+    '',
+    $langs->trans("helpmessagge"), 
+    $direction = 1, 
+    $type = 'help', 
+    $extracss = '', 
+    $noencodehtmltext = 0, 
+    $notabs = 3, 
+    $tooltiptrigger = '', 
+    $forcenowrap = 0
+  );
+}
 ?>
-
+<script type="text/javascript">
+$('#msj').colorbox({innerWidth:"80%",innerHeight:"50%", href:"ajaxmsj.php"});
+</script>
 <div class="section section-updates bg-gray" style="box-sizing: border-box;">
 <div class="container grid-xl">
 <div class="columns">

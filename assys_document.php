@@ -249,7 +249,7 @@ if ($object->id) {
 	$param = '&id='.$object->id;
 
 	//$relativepathwithnofile='assys/' . dol_sanitizeFileName($object->id).'/';
-	$relativepathwithnofile = 'assys/'.dol_sanitizeFileName($object->ref).'/';
+	//$relativepathwithnofile = 'assys/'.dol_sanitizeFileName($object->ref).'/';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/document_actions_post_headers.tpl.php';
 } else {

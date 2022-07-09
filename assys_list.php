@@ -242,7 +242,7 @@ if (empty($reshook)) {
 	// Mass actions
 	$objectclass = 'Assys';
 	$objectlabel = 'Assys';
-	$uploaddir = $conf->college->dir_output;
+	$uploaddir = $conf->college->dir_output.'/assys/';
 	include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
 }
 
