@@ -270,6 +270,19 @@ class pdf_standard_inscriptions extends ModelePDFInscriptions
 
 			if (file_exists($dir)) {
 
+				// Add pdfgeneration hook
+				if (!is_object($hookmanager)) {
+					include_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
+					$hookmanager = new HookManager($this->db);
+				}
+				$hookmanager->initHooks(array('pdfgeneration'));
+				$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs);
+				global $action;
+				$reshook = $hookmanager->executeHooks('beforePDFCreation', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+
+				// Set nblines with the new facture lines content after hook
+				$nblines = (is_array($object->lines) ? count($object->lines) : 0);
+
 				// Create pdf instance
 				$pdf = pdf_getInstance($this->format);
 				$default_font_size = pdf_getPDFFontSize($outputlangs); // Must be after pdf_getInstance
@@ -296,10 +309,10 @@ class pdf_standard_inscriptions extends ModelePDFInscriptions
 				$pdf->SetDrawColor(128, 128, 128);
 
 				$pdf->SetTitle($outputlangs->convToOutputCharset($object->ref));
-				$pdf->SetSubject($outputlangs->transnoentities("PdfTitle"));
+				$pdf->SetSubject($outputlangs->transnoentities("pdftitleinscriptions"));
 				$pdf->SetCreator("Dolibarr ".DOL_VERSION);
 				$pdf->SetAuthor($outputlangs->convToOutputCharset($user->getFullName($outputlangs)));
-				$pdf->SetKeyWords($outputlangs->convToOutputCharset($object->ref)." ".$outputlangs->transnoentities("PdfTitle")." ".$outputlangs->convToOutputCharset($object->thirdparty->name));
+				$pdf->SetKeyWords($outputlangs->convToOutputCharset($object->ref)." ".$outputlangs->transnoentities("pdftitleinscriptions")." ".$outputlangs->convToOutputCharset($object->thirdparty->name));
 				if (!empty($conf->global->MAIN_DISABLE_PDF_COMPRESSION)) {
 					$pdf->SetCompression(false);
 				}
@@ -343,32 +356,98 @@ class pdf_standard_inscriptions extends ModelePDFInscriptions
 					$tab_height_newpage -= $top_shift;
 				}
                 
-                /****************************************************************************************************/
-				$pdf->SetTextColor(0,0,200); // fixe la couleur du texte
-				$pdf->MultiCell(60, 8, $object->school_year , 0, 'L');
-				
+    /****************************************************************************************************/
+				/*CABECERA*/
+        $pdf->SetTextColor(128, 0, 0);
+        $pdf->SetFont('times', 'B', 16);
+        $pdf->SetFillColor(233, 234, 237);
+        $pdf->Cell(0, 10,$langs->transnoentities("pdfcabecerainscriptions"), 0, 1, 'C', 1,'',1,1,'','M');
+        $pdf->MultiCell(0, 3, ''); // Set interline to 3
+        /*LINE - LYRICS*/
+        $pdf->SetFont('times', 'BI', 16);
+        $pdf->setCellPaddings(1, 1, 1, 1);
+        $pdf->setCellMargins(1, 1, 1, 1);
+        $pdf->SetFillColor(255, 255, 255);
+        $pdf->SetTextColor(38, 60, 92);
+        $pdf->SetLineStyle(array('width' => 0.2, 'cap' => 'butt', 'join' => 'miter', 'dash' => 2, 'color' => array(38, 60, 92)));
+        /*DATE*/
+	      $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionsdate"), 0, 'L', 1, 0, '', '', true);
+    		$pdf->MultiCell(82, 5, dol_print_date($object->date_creation, "day", false, ''), '', 'R', 1, 0, '', '', true);
+        $pdf->Ln();
+        $html = "<hr>\n";
+        $pdf->writeHTML($html, true, false, false, false, '');
+        /*ANIO*/
+        $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionsyear"), 0, 'L', 1, 0, '', '', true);
+        $pdf->MultiCell(82, 5, $object->school_year, 0, 'R', 1, 0, '', '', true);
+				$pdf->Ln();
+        $html = "<hr>\n";
+        $pdf->writeHTML($html, true, false, false, false, '');
+        /*CURSO*/
 				$clase = new Classrooms($db);
 				$clase->fetch($object->fk_class);
-				$pdf->SetTextColor(0,0,200); // fixe la couleur du texte
-                $pdf->MultiCell(60, 8, $clase->label , 0, 'L');
-                
-                $estudiante = new Students($db);
-                $estudiante->fetch($object->fk_student);
-                $pdf->SetTextColor(0,0,200); // fixe la couleur du texte
-                $pdf->MultiCell(60, 8, $estudiante->label , 0, 'L');
-                
-                $tutor = new Societe($db);
-                $tutor->fetch($object->fk_tutor);
-                $pdf->SetTextColor(0,0,200); // fixe la couleur du texte
-                $pdf->MultiCell(60, 8, $tutor->name , 0, 'L');
-                
-                $pdf->SetTextColor(0,0,200); // fixe la couleur du texte
-                $pdf->MultiCell(60, 8, $object->description , 0, 'L');
-                
-                
-
+        $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionscurso"), 0, 'L', 1, 0, '', '', true);
+        $pdf->MultiCell(82, 5,  $clase->label, 0, 'R', 1, 0, '', '', true);
+        $pdf->Ln();
+        $html = "<hr>\n";
+        $pdf->writeHTML($html, true, false, false, false, '');
+        
+        /*DATOS ALUMNO O ESTUDIANTE*/
+        $pdf->SetFont('times', 'BI', 16);
+        $pdf->Write(0, $langs->transnoentities("pdftitlealumno"), '', 0, 'L', true, 0, false, false, 0);
+        
+        $pdf->SetLineStyle(array('width' => 0, 'cap' => '', 'join' => '', 'dash' => 0, 'color' => array(255, 255, 255))); 
+         /*ALUMNO*/
+        $pdf->SetFont('times', 'B', 12);
+        $estudiante = new Students($db);
+        $estudiante->fetch($object->fk_student);
+        $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionsalumnodni"), 1, 'L', 1, 0, '', '', true);
+        $pdf->MultiCell(82, 5,  !empty($estudiante->dni)?$estudiante->dni:'-', 1, 'R', 1, 0, '', '', true);
+        $pdf->Ln();
+        $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionsalumnonombre"), 1, 'L', 1, 0, '', '', true);
+        $pdf->MultiCell(82, 5,  !empty($estudiante->label)?$estudiante->label:'-', 1, 'R', 1, 0, '', '', true);
+        $pdf->Ln();
+        $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionsalumnodireccion"), 1, 'L', 1, 0, '', '', true);
+        $pdf->MultiCell(82, 5,  !empty($estudiante->direccion)?$estudiante->direccion:'-', 1, 'R', 1, 0, '', '', true);
+        $pdf->Ln();
+        $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionsalumnotelefono"), 1, 'L', 1, 0, '', '', true);
+        $pdf->MultiCell(82, 5,  !empty($estudiante->telefono)?$estudiante->telefono:'-', 1, 'R', 1, 0, '', '', true);
+        $pdf->Ln();
+        $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionsalumnoemail"), 1, 'L', 1, 0, '', '', true);
+        $pdf->MultiCell(82, 5,  !empty($estudiante->email)?$estudiante->email:'-', 1, 'R', 1, 0, '', '', true);
+        $pdf->Ln();
+        
+        /*TUTOR O RESPONSABLE*/
+        $pdf->SetFont('times', 'BI', 16);
+        $pdf->Write(0, $langs->transnoentities("pdftitletutor"), '', 0, 'L', true, 0, false, false, 0);
+        /*TUTOR*/
+        $pdf->SetFont('times', 'B', 12);
+        $tutor = new Societe($db);
+        $tutor->fetch($object->fk_tutor);
+        $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionstutornombre"), 1, 'L', 1, 0, '', '', true);
+        $pdf->MultiCell(82, 5,  !empty($tutor->nom)?$tutor->nom:'-', 1, 'R', 1, 0, '', '', true);
+        $pdf->Ln();
+        $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionstutordireccion"), 1, 'L', 1, 0, '', '', true);
+        $pdf->MultiCell(82, 5,  !empty($tutor->address)?$tutor->address:'-', 1, 'R', 1, 0, '', '', true);
+        $pdf->Ln();
+        $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionstutorciudadcp"), 1, 'L', 1, 0, '', '', true);
+        $pdf->MultiCell(82, 5,  !empty($tutor->town)?$tutor->town:'-'.' / '.$tutor->zip, 1, 'R', 1, 0, '', '', true);
+        $pdf->Ln();
+        $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionstutorphone"), 1, 'L', 1, 0, '', '', true);
+        $pdf->MultiCell(82, 5,  !empty($tutor->phone)?$tutor->phone:'-', 1, 'R', 1, 0, '', '', true);
+        $pdf->Ln();
+        $pdf->MultiCell(102, 5, $langs->transnoentities("pdfinscriptionstutoremail"), 1, 'L', 1, 0, '', '', true);
+        $pdf->MultiCell(82, 5,  !empty($tutor->email)?$tutor->email:'-', 1, 'R', 1, 0, '', '', true);
+        $pdf->Ln();
+        
+/*************************************************************************************************************/
+              
+        $pdf->SetXY(5, 250);
+		    $pdf->SetTextColor(0, 0, 60); 
+        $pdf->Write(0, '....................................................................', '', 0, 'R', true, 0, false, false, 0);
+        $pdf->Ln();   
+              
+/*************************************************************************************************************/
 				$nexY = $tab_top - 1;
-
 				$pagenb = $pdf->getPage();
 				
 				// Pagefoot
@@ -444,7 +523,95 @@ class pdf_standard_inscriptions extends ModelePDFInscriptions
 	 */
 	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs, $outputlangsbis = null)
 	{
+		global $conf, $langs, $db;
+    
+		// Load traductions files required by page
+		$outputlangs->loadLangs(array("main", "bills", "propal", "companies", "college"));
+
+		$default_font_size = pdf_getPDFFontSize($outputlangs);
+
+		pdf_pagehead($pdf, $outputlangs, $this->page_hauteur);
+
+		// Show Draft Watermark
+		if ($object->statut == $object::STATUS_DRAFT && (!empty($conf->global->FACTURE_DRAFT_WATERMARK))) {
+			  pdf_watermark($pdf, $outputlangs, $this->page_hauteur, $this->page_largeur, 'mm', $conf->global->FACTURE_DRAFT_WATERMARK);
+		}
+
+		$pdf->SetTextColor(0, 0, 60);
+		$pdf->SetFont('', 'B', $default_font_size + 3);
+
+		$w = 110;
+
+		$posy = $this->marge_haute;
+		$posx = $this->page_largeur - $this->marge_droite - $w;
+
+		$pdf->SetXY($this->marge_gauche, $posy);
+
+		// Logo
+		if (empty($conf->global->PDF_DISABLE_MYCOMPANY_LOGO)) {
+			if ($this->emetteur->logo) {
+				$logodir = $conf->mycompany->dir_output;
+				if (!empty($conf->mycompany->multidir_output[$object->entity])) {
+					$logodir = $conf->mycompany->multidir_output[$object->entity];
+				}
+				if (empty($conf->global->MAIN_PDF_USE_LARGE_LOGO)) {
+					$logo = $logodir.'/logos/thumbs/'.$this->emetteur->logo_small;
+				} else {
+					$logo = $logodir.'/logos/'.$this->emetteur->logo;
+				}
+				if (is_readable($logo)) {
+					$height = pdf_getHeightForLogo($logo);
+					$pdf->Image($logo, $this->marge_gauche, $posy, 0, $height); // width=0 (auto)
+				} else {
+					$pdf->SetTextColor(200, 0, 0);
+					$pdf->SetFont('', 'B', $default_font_size - 2);
+					$pdf->MultiCell($w, 3, $outputlangs->transnoentities("ErrorLogoFileNotFound", $logo), 0, 'L');
+					$pdf->MultiCell($w, 3, $outputlangs->transnoentities("ErrorGoToGlobalSetup"), 0, 'L');
+				}
+			} else {
+				$text = $this->emetteur->name;
+				$pdf->MultiCell($w, 4, $outputlangs->convToOutputCharset($text), 0, 'L');
+			}
+		}
+
+    /*CENTRE INFO */
+    $pdf->SetTextColor(0, 0, 60);
+    $pdf->SetFont('', 'BI', 8);
+		$pdf->MultiCell(0, 3, $conf->global->MAIN_APPLICATION_TITLE, '', 'C');
+    $pdf->MultiCell(0, 3, $conf->global->MAIN_INFO_SOCIETE_ADDRESS, '', 'C');
+    $pdf->MultiCell(0, 3, $conf->global->MAIN_INFO_SOCIETE_TOWN .' '.$conf->global->MAIN_INFO_SOCIETE_ZIP , '', 'C');
+    $pdf->MultiCell(0, 3, $conf->global->MAIN_INFO_SOCIETE_TEL, '', 'C');
+    $pdf->MultiCell(0, 3, $conf->global->MAIN_INFO_SOCIETE_MAIL, '', 'C');
+
+
+		$pdf->SetFont('', 'B', $default_font_size + 3);
+		$pdf->SetXY($posx, $posy);
+		$pdf->SetTextColor(0, 0, 60);
+		$title = $outputlangs->transnoentities("pdftitleinscriptions");
+		if (!empty($conf->global->PDF_USE_ALSO_LANGUAGE_CODE) && is_object($outputlangsbis)) {
+			$title .= ' - ';
+			$title .= $outputlangsbis->transnoentities("pdftitleinscriptions");
+		}
+		$pdf->MultiCell($w, 3, $title, '', 'R');
+
+		$pdf->SetFont('', 'B', $default_font_size);
+
+		$posy += 5;
+		$pdf->SetXY($posx, $posy);
+		$pdf->SetTextColor(0, 0, 60);
+		$textref = $outputlangs->transnoentities("Ref")." : ".$outputlangs->convToOutputCharset($object->ref);
+		if ($object->statut == $object::STATUS_DRAFT) {
+			$pdf->SetTextColor(128, 0, 0);
+			//$textref .= ' - '.$outputlangs->transnoentities("NotValidated");
+		}
+		$pdf->MultiCell($w, 4, $textref, '', 'R');
+    $pdf->MultiCell(0, 8, ''); // Set interline to 8
+		$posy += 1;
+
+		$pdf->SetTextColor(0, 0, 0);
+		return $top_shift;
 	}
+	
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 	/**
@@ -458,6 +625,9 @@ class pdf_standard_inscriptions extends ModelePDFInscriptions
 	 */
 	protected function _pagefoot(&$pdf, $object, $outputlangs, $hidefreetext = 0)
 	{
+		global $conf;
+		$showdetails = empty($conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS) ? 0 : $conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS;
+		return pdf_pagefoot($pdf, $outputlangs, '', '$this->emetteur', $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
 	}
 
 	/**
