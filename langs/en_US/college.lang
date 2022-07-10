@@ -200,7 +200,7 @@ tablenotesheader3Tooltip=Promedio de recuperatorio.
 #
 # PDF STUDENT
 #
-btnpdfstudentcard=pdf
+btnpdfstudentcard=pdf Notas
 pdftitle=Boletin de calificaciones
 pdftitlename=Alumno
 pdftitlecicle=Ciclo lectivo
@@ -235,6 +235,27 @@ students=Estudiante/s
 present=Presente
 absent=Ausente
 justified=Justificado
+
+#
+# PDF INSCRIPTIONS
+#
+pdftitleinscriptions=Registro de inscripcion.
+pdfcabecerainscriptions= Nueva inscripcion
+pdfinscriptionsdate=Fecha de inscripcion
+pdfinscriptionsyear=Ciclo lectivo
+pdfinscriptionscurso=Curso / Aula
+pdftitlealumno=Datos de estudiante
+pdftitletutor=Datos tutor o responsable
+pdfinscriptionsalumnodni=DNI
+pdfinscriptionsalumnonombre=Apellido y nombre
+pdfinscriptionsalumnodireccion=Direccion
+pdfinscriptionsalumnotelefono=Telefono
+pdfinscriptionsalumnoemail=Email
+pdfinscriptionstutornombre=Apellido y nombre
+pdfinscriptionstutordireccion=Direccion
+pdfinscriptionstutorciudadcp=Ciudad / CP
+pdfinscriptionstutorphone=Telefono
+pdfinscriptionstutoremail=email
 
 
 #
