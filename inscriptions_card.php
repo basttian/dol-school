@@ -273,11 +273,13 @@ jQuery(document).ready(function() {
 
     
     jQuery('.btn-print').on("click",function() {
+      $('#loader').show();
      	$.ajax({
  	    	type: "POST",
  	    	url: "<?php echo DOL_URL_ROOT.'/custom/college/inscriptions_card.php'; ?>",
  	    	data: { action: 'builddoc' , id:'<?php echo $object->id; ?>' , token: '<?php echo currentToken(); ?>' }	
  		}).done(function( msg ) {
+ 		         //$('#loader').hide();
              window.location.href='inscriptions_card.php?id=<?php echo $object->id; ?>';
 	   });
     });
@@ -575,6 +577,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		    /*print '<a class="butAction"
                       href="'.$_SERVER["PHP_SELF"].'?inscrid='.$object->id.'&action=printinscr"
                       title="'.$langs->trans("print").'"><span class="fa fa-file-pdf-o" style="color: white"></span></a>';*/
+        print '<img style="display: none;" id="loader" class="valignmiddle" src="../../custom/college/img/spinner.gif" height="20px">';
 		    print '<span class="butAction btn-print" title="'.$langs->transcountrynoentities("PDF","AR").'" ><span class="fa fa-file-pdf-o" style="color: white"></span></span>';
 
 
@@ -656,8 +659,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		}
 
 		// Show links to link elements
-		$linktoelem = $form->showLinkToObjectBlock($object, null, array('inscriptions'));
-		$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
+		//$linktoelem = $form->showLinkToObjectBlock($object, null, array('inscriptions'));
+		//$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
 
 
 		print '</div><div class="fichehalfright">';
