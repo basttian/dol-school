@@ -113,7 +113,7 @@ $('#msj').colorbox({innerWidth:"80%",innerHeight:"50%", href:"ajaxmsj.php"});
         
         <?php if ($user->rights->college->notes->write){ ;?>
         <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_card.php?action=create"; ?>" class="mrl-10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_list_add.php?action=createlist"; ?>" class="float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i><i class="fa fa-bars" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_card.php?action=createlist"; ?>" class="float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i><i class="fa fa-bars" aria-hidden="true"></i></a>
         <?php } ;?>
       </div>
     </div>

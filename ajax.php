@@ -17,8 +17,8 @@ if (!defined('NOREQUIREAJAX')) {
 }
 if (!defined('NOBROWSERNOTIF')) {
 	define('NOBROWSERNOTIF', '1');
-}
-
+} 
+ 
 require '../../main.inc.php'; 
 // load college libraries
 require_once __DIR__.'/class/notes.class.php';

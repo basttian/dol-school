@@ -370,8 +370,149 @@ llxHeader('', $title, $help_url);
     
  });
 </script>
-<?php 
 
+<script type="text/javascript">
+jQuery(document).ready(function() {
+  
+  
+  
+  $('.btn_create').attr('disabled','disabled');
+  function init_btn_button(){
+    if($('#select_class').val() != -1 && $('#select_subject').val() != -1 ){
+      $('.btn_create').removeAttr("disabled");
+    }else{
+      $('.btn_create').prop('disabled',true);
+    }
+  }
+  
+  /*ONLY ORDER*/
+  var selectedValuesClass;
+  var selectedValuesSubject;
+  
+  $('#select_class').on('change', function(e) {
+    $('#loader').show();
+    init_btn_button();
+    var optionSelected = $('option:selected', this);
+    selectedValuesClass = optionSelected.val();
+    $('[data-select2-id="select_subject"]').find('option').not(':first').remove();
+    $('[data-select2-id="select_subject"]').val('-1').trigger("change");
+  });
+  
+   $('#select_subject').on('change', function(e) {
+      $('#loader').show();
+      $('[data-toggle]').val(null);
+      init_btn_button();
+      var optionSelected = $('option:selected', this);
+      selectedValuesSubject = optionSelected.val();
+      //console.log(selectedValuesSubject);
+      $.getJSON( "./ajax.php?action=getnotes",
+        { idClass:selectedValuesClass, idSubjejct:selectedValuesSubject , token:"<?php echo newToken() ;?>" }, function(datanotas) {
+        //console.log(datanotas);
+      }).done(function(datanotas){
+          Object.keys(datanotas).forEach(function(key,index,arr) {
+            $("[data-toggle='"+datanotas[key].data+"']").val(datanotas[key].nota);
+            
+          });
+          $('#loader').hide();
+      }).fail(function(){$('#loader').hide();});
+  });
+  
+  
+  
+  /*Get note from data-toggle*/
+  $('#select_subject').on('change', function(e) {
+    e.stopPropagation();
+    $('input[data-toggle]').on('change', function(e){
+      e.stopPropagation();
+      var arrayAlumnoPeriodo = $(this).data('toggle');
+      //console.log(arrayAlumnoPeriodo);
+      updateOrInsertNote(arrayAlumnoPeriodo);
+    });
+  });//fin change select_subject
+
+
+  function updateOrInsertNote(arr){
+    $('#loader').show();
+    var datavalue = $("[data-toggle='"+arr+"']").val();
+    //console.log(datavalue)
+    $.post( "./ajax.php?action=senddata&token=<?php echo newToken() ;?>" , 
+    { 
+      //idNota: datanotas[key].rowid,
+      idClass: selectedValuesClass,
+      idSubjejct: selectedValuesSubject,
+      arralumnoperiodo: arr,
+      notavalue: datavalue, 
+    }).done(function(response){
+      if(response==1 ){
+        //console.log(response);
+        $('#loader').hide();
+      }else{
+        console.log("ERROR:NO INSERT OR UPDATE RECORD");
+        $('#loader').hide()
+      }
+    }).fail(function(){$('#loader').hide();});
+  }
+
+
+  
+  $('#select_class').on('change',function(){
+    var option = $(this).find("option:selected");
+    var idclass = option.val();
+    $.getJSON( "./ajax.php?action=getsubject",{idClass:idclass, token:"<?php echo newToken() ;?>"}, function(dataobj) {
+    }).done(function(dataobj){
+      $('[data-select2-id="select_subject"]').select2({
+        placeholder: {
+            id: '-1',
+            text: 'Select an option'
+        },
+        allowClear: true,
+    	  data: dataobj
+      })
+    }).always(function(){
+      $.getJSON( "./ajax.php?action=getstudent",{idClass:idclass, token:"<?php echo newToken() ;?>"}, function(datastudent) {
+        //console.log(datastudent);
+        $("#tableDataNotes>thead").find("tr").remove();
+        $("#tableDataNotes>tbody").find("tr").remove();
+      }).done(function(datastudent){
+        if(datastudent.length===0){
+          $("#tableDataNotes>tbody").append("<tr class='liste_titre'><th><?php echo $langs->trans("nodatafound") ;?></th></tr>");
+        }else{
+          $.getJSON( "./ajax.php?action=getperiods",{ token:"<?php echo newToken() ;?>" }, function(dataperiods) {
+          $("#tableDataNotes>thead").append("<tr class='liste_titre'><th>ID</th><th>Name</th></tr>");
+          Object.keys(dataperiods).forEach(function(key,index,arr) { 
+            $("#tableDataNotes>thead").find("tr:eq(0)").append("<th>"+dataperiods[key].label+"</th>");
+          });
+          Object.keys(datastudent).forEach(function(key,index,arr) {  
+            $("#tableDataNotes>tbody").append("<tr class='pair'><td>"+datastudent[key].fk_student+"</td><td>"+datastudent[key].label+"</td></tr>") 
+            
+            Object.keys(dataperiods).forEach(function(k,i,a){
+              $("#tableDataNotes>tbody").find("tr:eq(\'"+key+"'\)").append("<td><input data-toggle=\'"+datastudent[key].fk_student+","+dataperiods[k].rowid+"\' step='0.5' min='1' max='10' type='number' /></td>");
+            });
+          });
+          });
+          $('#loader').hide();
+        }
+      });
+    });
+    
+  }); 
+
+
+  
+
+  /*CREATE LIST OF STUDENT SIN USO*/
+  $('#formucreate').on('submit',function(e){
+    e.preventDefault();
+    //console.log(selectedValuesClass);
+    //console.log(selectedValuesSubject);
+  });
+
+});
+</script>
+
+
+<?php 
+  
 // Part to create
 if ($action == 'create') {
 	if (empty($permissiontoadd)) {
@@ -452,7 +593,132 @@ if (($id || $ref) && $action == 'edit') {
 
 	print '</form>';
 }
+/*CREATELIST VERIFICAR ACTION*/
+require_once __DIR__.'/class/classrooms.class.php';
 
+if($action == 'createlist') {
+  if (empty($permissiontoadd)) {
+		accessforbidden($langs->trans('NotEnoughPermissions'), 0, 1);
+		exit;
+	}
+  print load_fiche_titre($langs->trans("CollegeAreaTitle_a"), '', 'object_notes@college');
+  print '<span>'.$langs->trans("CollegeAreaTitle_b").', '.$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO.'</span>';
+  print dol_get_fiche_head(array(), '');
+  // Initialize technical objects
+  $object = new Notes($db);
+  $objectClass = new ClassroomsLine($db);
+  
+  print '<div class="div-table-responsive-no-min">';
+	print '<table class="centpercent">'."\n";
+
+  /*
+  print $form->selectArrayFilter(
+    'select_class', 
+    $objectClass->getClass(),
+    $id = 'id',
+  	$moreparam = '',
+  	$disableFiltering = 0,
+  	$disabled = 0,
+  	$minimumInputLength = 1,
+  	$morecss = 'flat maxwidth500 widthcentpercentminusxx',
+  	$callurlonselect = 0,
+  	$placeholder = 'Search option class',
+  	$acceptdelayedhtml = 0 
+  );
+  print '<p></p>';
+  print $form->selectArrayAjax(
+    'select_subject', 
+    $url = DOL_URL_ROOT.'/custom/college/ajax.php?action=getsubject', 
+    $id = '', 
+    $moreparam = '', 
+    $moreparamtourl = '', 
+    $disabled = 0, 
+    $minimumInputLength = 1, 
+    $morecss = 'flat maxwidth500 widthcentpercentminusxx', 
+    $callurlonselect = 0, 
+    $placeholder = 'Search option subjects', 
+    $acceptdelayedhtml = 0
+ 	);
+  */
+ 
+  print '<tr>';
+  print '<td>';
+  print $form->textwithpicto($langs->trans("CollegeSelect_Class"),$langs->trans("CollegeSelect_ClassInfo"));
+  print '</td><td>';
+  print $form->selectarray(
+    'select_class',
+    $objectClass->getClass(),
+    $id = '-1',
+  	$show_empty = 1,
+  	$key_in_label = 0,
+  	$value_as_key = 0,
+  	$moreparam = '',
+  	$translate = 0,
+  	$maxlen = 0,
+  	$disabled = 0,
+  	$sort = '',
+  	$morecss = 'flat maxwidth500 widthcentpercentminusxx',
+  	$addjscombo = 1,
+  	$moreparamonempty = '',
+  	$disablebademail = 0,
+  	$nohtmlescape = 0 
+  );
+  print '</td><td rowspan="2">';
+    /*Loading*/
+  print '<img style="display: none;" id="loader" class="m-10" src="../../custom/college/img/spinner.gif" height="20px">';
+  print '</td>';
+  print '</tr><tr><td>';
+  print $form->textwithpicto($langs->trans("CollegeSelect_Subject"),$langs->trans("CollegeSelect_SubjectInfo"));
+  print '</td><td>';
+  print $form->selectarray(
+    'select_subject', 
+    '',
+    $id = '',
+  	$show_empty = 1,
+  	$key_in_label = 0,
+  	$value_as_key = 0,
+  	$moreparam = '',
+  	$translate = 0,
+  	$maxlen = 0,
+  	$disabled = 0,
+  	$sort = 'ASC',
+  	$morecss = 'flat maxwidth500 widthcentpercentminusxx',
+  	$addjscombo = 1,
+  	$moreparamonempty = '',
+  	$disablebademail = 0,
+  	$nohtmlescape = 0 
+  );
+  print '</td>';
+  print '</tr>';
+  /*print $form->buttonsSaveCancel(
+    $save_label = 'Create List',
+    $cancel_label = '',
+    $morebuttons = array(),
+    $withoutdiv = 1,
+    $morecss = 'flat maxwidth500 widthcentpercentminusxx btn_create',
+    $dol_openinpopup = ''
+  );*/
+	
+  print '</table>'."\n";
+  print '</div>';
+  print '<p></p>';
+  ?>
+    <div class="div-table-responsive">
+    <table id="tableDataNotes" class="border centpercent tableforfieldcreate tagtable nobottomiftotal liste">
+    <caption></caption>
+      <thead style="background-color: #F8F8F8;">
+        <tr class="liste_titre"><th><?php echo $langs->trans("nodatafound") ;?></th></tr>
+      </thead>
+      <tbody>
+      </tbody>
+      <tfoot>
+        <tr></tr>
+      </tfoot>
+    </table>
+    </div>
+  <?php
+  print dol_get_fiche_end();
+}
 
 // Part to show record
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create'))) {
