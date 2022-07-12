@@ -117,6 +117,7 @@ Classrooms=Clase
 Classroom=Clase
 Studentss=Estudiantes
 Students=Estudiante
+Student=Estudiante
 Inscriptionss=Inscripciones
 Inscriptions=Inscripciones
 Periodss=Periodos
@@ -141,8 +142,9 @@ tableheader3=Nota
 nodatafound=No hay datos para mostrar.
 
 #
-#list_create_tudent
+#list_create_student
 #
+CollegeAreaTitle= Agregar Notas
 CollegeAreaTitle_a=Crear notas desde lista
 CollegeAreaTitle_b=Ciclo lectivo
 CollegeSelect_Class=Clases
