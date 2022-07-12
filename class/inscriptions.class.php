@@ -1117,6 +1117,16 @@ class Inscriptions extends CommonObject
            $i++;
          }
          return $rowarray;
+       }else{
+         return array(array(
+          0 => array(
+                'tr' => 'class="left"',
+      					'td' => '',
+      					'text' => '',
+                'url' => DOL_URL_ROOT.'/custom/college/collegeindex.php',
+      					'target' => '_self',
+                'logo' => 'object_college@college',
+   				)));
        }
      }
     
