@@ -83,7 +83,7 @@ class modCollege extends DolibarrModules
 		// If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
 		// If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
 		// To use a supported fa-xxx css style of font awesome, use this->picto='xxx'
-		$this->picto = 'college_front@college';
+		$this->picto = '';
 
 		// Define some features supported by module (triggers, login, substitutions, menus, css, etc...)
 		$this->module_parts = array(
@@ -150,6 +150,7 @@ class modCollege extends DolibarrModules
     'always2'=>'modFacture',
     'always3'=>'modImport',
     'always4'=>'modExport',
+    'always5'=>'modFckeditor',
     ); 
 		$this->requiredby = array(); // List of module class names as string to disable if this one is disabled. Example: array('modModuleToDisable1', ...)
 		$this->conflictwith = array(); // List of module class names as string this module is in conflict with. Example: array('modModuleToDisable1', ...)
@@ -751,7 +752,7 @@ class modCollege extends DolibarrModules
             //'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
             'mainmenu'=>'college',
             'leftmenu'=>'college_notes_list',
-            'url'=>'/college/notes_list_add.php?action=createlist',
+            'url'=>'/college/notes_card.php?action=createlist',
             // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'langs'=>'college@college',
             'position'=>1100+$r,

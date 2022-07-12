@@ -98,13 +98,15 @@ if (empty($dolibarr_nocache)) {
 //Arriba | Derecha | Abajo | Izquierda
 ?>
 
+div.mainmenu.college::before {
+  content: "\f19d" !important;
+}
+
 .login_table{
   background-color: rgba(255, 255, 255, 0.41) !important;
 }
 
-div.mainmenu.college::before {
-	content: "\f249";
-}
+
 div.mainmenu.college {
 	background-image: none;
 }
