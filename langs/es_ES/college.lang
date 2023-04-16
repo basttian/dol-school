@@ -1,0 +1,311 @@
+# Copyright (C) 2022 SuperAdmin
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see .
+
+#
+# Generic
+#
+MyDashboard=Escritorio
+Teacher=Profesor
+CollegeDescription=Administrar instituciones educativas.
+StudentLines=Importar / Exportar estudiantes.
+helpmessagge=Escribir un mensaje a los usuarios, este se vera reflejado en su escritorio cuando ingresen al sistema.Todos los usuarios leeran el mismo mensaje.
+SaveConstMainMotd=Guardar / Actualizar mensaje
+avisoMsjMainMotd=Solo usuarios administradores pueden redactar mensajes.
+StudentNotes=Exportar notas de estudiantes.
+
+#
+# other
+#
+
+LinkClass=Clase, Catedra.
+LinkStudent=Estudiante, Alumno.
+LinkToTutor=Padre, encargado o tutor del estudiante.
+LinkToThirparty=Padre, encargado o tutor del estudiante.
+SchoolYear=Ciclo Lectivo
+School_Year=Ciclo lectivo del anio en curso.
+HelpRef= Por lo general suele ser el mismo que el nombre o etiqueta.
+HelpSubject= Asignatura, Materia.
+HelpToTeacher= Profesor a cargo de la asignatura.
+HelpPeriods=Periodo: o, trimestre, semestre etc.
+HelpClass=Aulas, Clases, Catedras
+notetextform=Nota final del periodo actual.
+NotaR=Recuperatorio
+recovernote=Utilizada para recuperatorios al final del periodo escolar.
+
+
+#Create Subject form II
+NewObjectSubjects=Agregar una asignatura a diferentes clases.
+subjecttxt1=Selecionar clases.
+helpsubjectxt1=Seleccionar mas de una categoria y asignarle la asignatura.
+subjecttxt2=Asignatura
+helpsubjectxt2= Crear asignatura a las clases seleccionadas
+subjecttxt3=Profesores
+helpsubjectxt3=Seleccionar el educador responsable de la asignatura de las clases seleccionadas.
+btnsave= Agregar nueva asignatura.
+msjsavesubject=Asignatura almacenada con exito.
+subjectrequired=Asignatura
+classrequired=Clase
+
+
+#
+# Menu
+#
+
+ListInscriptions=Incripciones
+NewInscriptions=Nueva Inscripcion
+ListPeriods=Periodos
+NewPeriods=Nuevo Periodo
+ListStudent=Alumnos
+NewStudent=Nuevo Alumno
+ListSubject=Asignaturas
+NewSubject=Nueva Asignatura
+NewAddsSubject=Agregar Asignaturas
+ListClassrooms=Clases
+NewClassrooms=Nueva Clase
+ListNotes=Notas
+NewNotesFromList=Nota desde Rejilla
+NewNote=Nueva Nota
+
+# Module label 'ModuleCollegeName'
+ModuleCollegeName=ADM Colegio
+# Module description 'ModuleCollegeDesc'
+ModuleCollegeDesc = Gestion en dministracion de colegios, escuelas o institutos educativos.
+
+#
+# Admin page
+#
+CollegeSetup = College setup
+Settings = Settings
+CollegeSetupPage = College setup page
+COLLEGE_MYPARAM1 = My param 1
+COLLEGE_MYPARAM1Tooltip = My param 1 tooltip
+COLLEGE_MYPARAM2=My param 2
+COLLEGE_MYPARAM2Tooltip=My param 2 tooltip
+COLLEGE_MYPARAM_CICLO_LECTIVO=School Year
+COLLEGE_MYPARAM_CICLO_LECTIVOTooltip=Current school year
+
+COLLEGE_HIDE_FOOTER_MSJ=Ocultar mensaje.
+COLLEGE_HIDE_FOOTER_MSJTooltip=Ocultar mensaje en pie de pagina en inicio de aplicacion.
+
+
+#
+# About page
+#
+About = About
+CollegeAbout = About College
+CollegeAboutPage = College about page
+
+#
+# pages list/Card
+#
+Subjects=Asignaturas
+Subject=Asignatura
+Classroomss=Clases
+Classrooms=Clase
+Classroom=Clase
+Studentss=Estudiantes
+Students=Estudiante
+Student=Estudiante
+Inscriptionss=Inscripciones
+Inscriptions=Inscripciones
+Periodss=Periodos
+Periods=Periodo
+Notess=Notas
+Notes=Nota
+
+#
+# Sample widget
+#
+MyWidget = My widget
+MyWidgetDescription = My widget description
+
+
+#
+#list_student
+#
+
+tableheader1=Trimestre
+tableheader2=Asignatura 
+tableheader3=Nota
+nodatafound=No hay datos para mostrar.
+
+#
+#list_create_student
+#
+CollegeAreaTitle= Agregar Notas
+CollegeAreaTitle_a=Crear notas desde lista
+CollegeAreaTitle_b=Ciclo lectivo
+CollegeSelect_Class=Clases
+CollegeSelect_ClassInfo=Seleccionar clase
+CollegeSelect_Subject=Asignaturas
+CollegeSelect_SubjectInfo=Seleccionar asignaturas
+
+#
+#cards_index_college
+#
+card-header-a-notas=NOTAS
+card-header-b-notas=Agregar nuevas nota.
+card-body-notas=Area de ingreso de notas.
+
+card-header-a-inscriptions=INSCRIPCIONES
+card-header-b-inscriptions=Nueva inscripcion.
+card-body-inscriptions=Area de inscriptiones.
+
+card-header-a-students=ALUMNADO
+card-header-b-students=Agregar Alumnos.
+card-body-students=Area de estudiantes.
+
+card-header-a-subject=ASIGNATURAS
+card-header-b-subject=Asignaturas | Materias | Curriculas.
+card-body-subject=Area de asignaturas.
+
+card-header-a-class=AULAS
+card-header-b-class=Aulas | Salon | Catedras.
+card-body-class=Area de aulas.
+
+card-header-a-periods=PERIODOS
+card-header-b-periods=Periodos escolares.
+card-body-periods=Area de periodos.
+
+#
+# TAB
+#
+
+StudentThirdTab=Estudiate/s a cargo
+thirdpartytab= Tutor
+studenttab=Estudiantes
+
+
+#
+# Student Note Page 
+#
+titlenotas=Notas
+inputfilterplaceholder = Filtrar por ciclo lectivo: ####
+tablenotesheader1=Asignatura
+tablenotesheader2=Promedio
+tablenotesheader2Tooltip=Promedio final.
+tablenotesheader3=Recupera
+tablenotesheader3Tooltip=Promedio de recuperatorio.
+
+#
+# PDF STUDENT
+#
+btnpdfstudentcard=pdf Notas
+pdftitle=Boletin de calificaciones
+pdftitlename=Alumno
+pdftitlecicle=Ciclo lectivo
+pdfcabecera=Calificaciones
+pdfheadtablecols1=Asignaturas
+pdfheadtablecolsloop=Tr
+pdfheadprom1=P
+pdfheadprom2=P.R
+pdfheadprom3=P.F
+pdftablerownodata=No se encuentran notas.
+
+
+#
+# boxes
+#
+CollegeMyWidgetA=ADM Colegio
+CollegeMyWidgetBoxADescription=ADM Colegio
+CollegeColsRows=Cant. de estudiantes
+
+#
+# Assys
+#
+Assys=Asistencias
+Assyss=asistencias
+card-header-a-assys=ASISTENCIAS
+card-header-b-assys=Agregar nuevas asistencias.
+card-body-assys=Area de ingreso de asistencias.
+ListAssys=Asistencias
+SendAssysRef=Adjunto listado asistencias.
+NewAssys=Nuevo registro
+students=Estudiante/s
+present=Presente
+absent=Ausente
+justified=Justificado
+
+#
+# PDF INSCRIPTIONS
+#
+pdftitleinscriptions=Registro de inscripcion.
+pdfcabecerainscriptions= Ficha de inscripcion
+pdfinscriptionsdate=Fecha de inscripcion
+pdfinscriptionsyear=Ciclo lectivo
+pdfinscriptionscurso=Curso / Aula
+pdftitlealumno=Datos de estudiante
+pdftitletutor=Datos tutor o responsable
+pdfinscriptionsalumnodni=DNI
+pdfinscriptionsalumnonombre=Apellido y nombre
+pdfinscriptionsalumnodireccion=Direccion
+pdfinscriptionsalumnotelefono=Telefono
+pdfinscriptionsalumnoemail=Email
+pdfinscriptionstutornombre=Apellido y nombre
+pdfinscriptionstutordireccion=Direccion
+pdfinscriptionstutorciudadcp=Ciudad / CP
+pdfinscriptionstutorphone=Telefono
+pdfinscriptionstutoremail=email
+
+
+#
+# PDF ASSYS
+#
+DocumentModelStandardPDF = Documento estandar PDF
+pdftitleassys = Hoja de Asistencia
+pdfcabeceraassys=Dia
+pdfheadassys1=Alumno/a
+pdfheadassys2=Listado
+
+#
+# Notes Card Page
+#
+addothernote=Añadir nueva nota
+create = Agregar nota
+
+#
+# My Notes Page
+#
+MyNotes = Mis Notas
+notestext= Mis Clases.
+noteshelp=Seleccionar una clase<br><b>Al hacer click en una clase, se genera el archivo xlsx de las notas que pertenecen a dicha clase.</b>
+
+#
+# headerrow in file xlsx
+#
+class=Clase
+subjects=Asignatura
+trimestre=Trimestre
+nota=Nota
+tbl1titlehead=Descargar notas por clase.
+tbl2titlehead=Descargar todas mis notas.
+refusedbtntootip=Selecionar clase.<br>Al seleccionar la clase se genera el archivo.<br><b> → Este archivo se sobrescribe, cada vez que es generado.</b>
+lbltodolinkcreate=Crear el archivo xlsx con todas mis notas.
+lbltodolinktootltip=Descargar todas mis notas.
+tooltipmainmenuxlsx=Mis notas en xlsx.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
