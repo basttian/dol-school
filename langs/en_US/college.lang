@@ -28,60 +28,59 @@ StudentNotes=Exporting student grades.
 #
 # other
 #
+LinkClass=Class, Chair.
+LinkStudent=Student, Pupil.
+LinkToTutor=Parent, guardian or tutor of the student.
+LinkToThirparty=Parent, caregiver or guardian of the student.
+SchoolYear=School Year
+School_Year=School year of the current year.
+HelpRef= Usually the same as the name or label.
+HelpSubject= Subject.
+HelpToTeacher= Teacher in charge of the subject.
+HelpPeriods=Period: period, quarter, semester, etc.
+HelpClass=Classrooms, classes, professors.
+notetextform=Final note for the current period.
+NotaR=Recovernote
+recovernote=Used for make-ups at the end of the school period.
 
-LinkClass=Clase, Catedra.
-LinkStudent=Estudiante, Alumno.
-LinkToTutor=Padre, encargado o tutor del estudiante.
-LinkToThirparty=Padre, encargado o tutor del estudiante.
-SchoolYear=Ciclo Lectivo
-School_Year=Ciclo lectivo del anio en curso.
-HelpRef= Por lo general suele ser el mismo que el nombre o etiqueta.
-HelpSubject= Asignatura, Materia.
-HelpToTeacher= Profesor a cargo de la asignatura.
-HelpPeriods=Periodo: o, trimestre, semestre etc.
-HelpClass=Aulas, Clases, Catedras
-notetextform=Nota final del periodo actual.
-NotaR=Recuperatorio
-recovernote=Utilizada para recuperatorios al final del periodo escolar.
-
-
+#
 #Create Subject form II
-NewObjectSubjects=Agregar una asignatura a diferentes clases.
-subjecttxt1=Selecionar clases.
-helpsubjectxt1=Seleccionar mas de una categoria y asignarle la asignatura.
-subjecttxt2=Asignatura
-helpsubjectxt2= Crear asignatura a las clases seleccionadas
-subjecttxt3=Profesores
-helpsubjectxt3=Seleccionar el educador responsable de la asignatura de las clases seleccionadas.
-btnsave= Agregar nueva asignatura.
-msjsavesubject=Asignatura almacenada con exito.
-subjectrequired=Asignatura
-classrequired=Clase
+#
+NewObjectSubjects=Add a subject to different classes.
+subjecttxt1=Select classes.
+helpsubjectxt1=Select more than one category and assign the subject to it.
+subjecttxt2=Subject
+helpsubjectxt2= Create subject to selected classes.
+subjecttxt3=Teachers
+helpsubjectxt3=Select the teacher responsible for the subject of the selected classes.
+btnsave= Add new subject.
+msjsavesubject=Subject successfully saved.
+subjectrequired=Subject
+classrequired=Class
 
 
 #
 # Menu
 #
-
-ListInscriptions=Incripciones
-NewInscriptions=Nueva Inscripcion
-ListPeriods=Periodos
-NewPeriods=Nuevo Periodo
-ListStudent=Alumnos
-NewStudent=Nuevo Alumno
-ListSubject=Asignaturas
-NewSubject=Nueva Asignatura
-NewAddsSubject=Agregar Asignaturas
-ListClassrooms=Clases
-NewClassrooms=Nueva Clase
-ListNotes=Notas
-NewNotesFromList=Nota desde Rejilla
-NewNote=Nueva Nota
+ListInscriptions=Inscriptions
+NewInscriptions=New Inscription
+ListPeriods=Periods
+NewPeriods=New Periods
+ListStudent=Students
+NewStudent=New Student
+ListSubject=Subjects
+NewSubject=New Subject
+NewAddsSubject=Add Subjects
+ListClassrooms=Classes
+NewClassrooms=New Class
+ListNotes=Notes
+NewNotesFromList=Note from Grid
+NewNote=New Note
 
 # Module label 'ModuleCollegeName'
-ModuleCollegeName=ADM Colegio
+ModuleCollegeName=ADM School
 # Module description 'ModuleCollegeDesc'
-ModuleCollegeDesc = Gestion en dministracion de colegios, escuelas o institutos educativos.
+ModuleCollegeDesc = Management in administration of schools, schools or educational institutes.
 
 #
 # Admin page
@@ -96,8 +95,8 @@ COLLEGE_MYPARAM2Tooltip=My param 2 tooltip
 COLLEGE_MYPARAM_CICLO_LECTIVO=School Year
 COLLEGE_MYPARAM_CICLO_LECTIVOTooltip=Current school year
 
-COLLEGE_HIDE_FOOTER_MSJ=Ocultar mensaje.
-COLLEGE_HIDE_FOOTER_MSJTooltip=Ocultar mensaje en pie de pagina en inicio de aplicacion.
+COLLEGE_HIDE_FOOTER_MSJ=Hide message.
+COLLEGE_HIDE_FOOTER_MSJTooltip=Hide footer message on application startup.
 
 
 #
@@ -110,20 +109,20 @@ CollegeAboutPage = College about page
 #
 # pages list/Card
 #
-Subjects=Asignaturas
-Subject=Asignatura
-Classroomss=Clases
-Classrooms=Clase
-Classroom=Clase
-Studentss=Estudiantes
-Students=Estudiante
-Student=Estudiante
-Inscriptionss=Inscripciones
-Inscriptions=Inscripciones
-Periodss=Periodos
-Periods=Periodo
-Notess=Notas
-Notes=Nota
+Subjects=Courses
+Subject=Class
+Classroomss=Classes
+Classrooms=Class
+Classroom=Class
+Studentss=Student
+Students=Study
+Student=Study
+Inscriptionss=Registrations
+Inscriptions=Registrations
+Periodss=Periods
+Periods=Periods
+Notess=Notes
+Notes=Note
 
 #
 # Sample widget
@@ -136,158 +135,162 @@ MyWidgetDescription = My widget description
 #list_student
 #
 
-tableheader1=Trimestre
-tableheader2=Asignatura 
-tableheader3=Nota
-nodatafound=No hay datos para mostrar.
+tableheader1=Term
+tableheader2=Subject  
+tableheader3=Note
+nodatafound=There is no data to display..
 
 #
 #list_create_student
 #
-CollegeAreaTitle= Agregar Notas
-CollegeAreaTitle_a=Crear notas desde lista
-CollegeAreaTitle_b=Ciclo lectivo
-CollegeSelect_Class=Clases
-CollegeSelect_ClassInfo=Seleccionar clase
-CollegeSelect_Subject=Asignaturas
-CollegeSelect_SubjectInfo=Seleccionar asignaturas
+CollegeAreaTitle= Add Notes
+CollegeAreaTitle_a=Create notes from list
+CollegeAreaTitle_b=College Cycle
+CollegeSelect_Class=Classes
+CollegeSelect_ClassInfo=Select class
+CollegeSelect_Subject=Subjects
+CollegeSelect_SubjectInfo=Select Subjects
 
 #
 #cards_index_college
 #
-card-header-a-notas=NOTAS
-card-header-b-notas=Agregar nuevas nota.
-card-body-notas=Area de ingreso de notas.
+card-header-a-notes=NOTES
+card-header-b-notes=Add new notes.
+card-body-notes=Notes input area.
 
-card-header-a-inscriptions=INSCRIPCIONES
-card-header-b-inscriptions=Nueva inscripcion.
-card-body-inscriptions=Area de inscriptiones.
+card-header-a-inscriptions=INSCRIPTIONS
+card-header-b-inscriptions=New inscription.
+card-body-inscriptions=Enrollment area.
 
-card-header-a-students=ALUMNADO
-card-header-b-students=Agregar Alumnos.
-card-body-students=Area de estudiantes.
+card-header-a-students=Students.
+card-header-b-students=Add Students.
+card-body-students=Students area.
 
-card-header-a-subject=ASIGNATURAS
-card-header-b-subject=Asignaturas | Materias | Curriculas.
-card-body-subject=Area de asignaturas.
+card-header-a-subject=SUBJECT=STUDENTS.
+card-header-b-subject=Subjects | Subjects | Curricula.
+card-body-subject=Subject area.
 
-card-header-a-class=AULAS
-card-header-b-class=Aulas | Salon | Catedras.
-card-body-class=Area de aulas.
+card-header-a-class=CLASSROOMS
+card-header-b-class=Classrooms | Classrooms | Lectures.
+card-body-class=Classroom area.
 
-card-header-a-periods=PERIODOS
-card-header-b-periods=Periodos escolares.
-card-body-periods=Area de periodos.
+card-header-a-periods=PERIODS.
+card-header-b-periods=School periods.
+card-body-periods=Periods area.
 
 #
 # TAB
 #
 
-StudentThirdTab=Estudiate/s a cargo
+StudentThirdTab=Student(s) in charge
 thirdpartytab= Tutor
-studenttab=Notas
+studenttab=Notes
 
 
 #
 # Student Note Page 
 #
-titlenotas=Notas
-inputfilterplaceholder = Filtrar por ciclo lectivo: ####
-tablenotesheader1=Asignatura
-tablenotesheader2=Promedio
-tablenotesheader2Tooltip=Promedio final.
-tablenotesheader3=Recupera
-tablenotesheader3Tooltip=Promedio de recuperatorio.
+titlenotas=Notes
+inputfilterplaceholder = Filter by school year: ####
+tablenotesheader1=Subject
+tablenotesheader2=Average
+tablenotesheader2Tooltip=Final average.
+tablenotesheader3=Recover
+tablenotesheader3Tooltip=Recovery average.
 
 #
 # PDF STUDENT
 #
-btnpdfstudentcard=pdf Notas
-pdftitle=Boletin de calificaciones
-pdftitlename=Alumno
-pdftitlecicle=Ciclo lectivo
-pdfcabecera=Calificaciones
-pdfheadtablecols1=Asignaturas
+btnpdfstudentcard=pdf Report Cards
+pdftitle=Bulletin de calificaciones
+pdftitlename=Student
+pdftitlecicle=School cycle
+pdfcabecera=Gratings
+pdfheadtablecols1=Subjects
 pdfheadtablecolsloop=Tr
-pdfheadprom1=P
-pdfheadprom2=P.R
-pdfheadprom3=P.F
-pdftablerownodata=No se encuentran notas.
+pdfheadprom1=A
+pdfheadprom2=A.R
+pdfheadprom3=A.F
+pdftablerownodata=No notes are found.
 
 
 #
 # boxes
 #
-CollegeMyWidgetA=ADM Colegio
-CollegeMyWidgetBoxADescription=ADM Colegio
-CollegeColsRows=Cant. de estudiantes
+CollegeMyWidgetA=ADM School
+CollegeMyWidgetBoxADescription=ADM School
+CollegeColsRows=Number of students
 
 #
 # Assys
 #
-Assys=Asistencias
-Assyss=asistencias
-card-header-a-assys=ASISTENCIAS
-card-header-b-assys=Agregar nuevas asistencias.
-card-body-assys=Area de ingreso de asistencias.
-ListAssys=Asistencias
-SendAssysRef=Adjunto listado asistencias.
-NewAssys=Nuevo registro
-students=Estudiante/s
-present=Presente
-absent=Ausente
-justified=Justificado
+Assys=Assistances
+Assyss=assistances
+card-header-a-assys=ASSISTANCES
+card-header-b-assys=Add new assistances.
+card-body-assys=Assistances input area.
+ListAssys=Assistances
+SendAssysRef=Attach assistance list.
+NewAssys=New record
+students=Student/s
+present=Present
+absent=Absent
+justified=Absent Justified
 
 #
 # PDF INSCRIPTIONS
 #
-pdftitleinscriptions=Registro de inscripcion.
-pdfcabecerainscriptions= Ficha de inscripcion
-pdfinscriptionsdate=Fecha de inscripcion
-pdfinscriptionsyear=Ciclo lectivo
-pdfinscriptionscurso=Curso / Aula
-pdftitlealumno=Datos de estudiante
-pdftitletutor=Datos tutor o responsable
+pdftitleinscriptions=Registration form.
+pdfcabecerainscriptions=Registration form.
+pdfinscriptionsdate=Enrollment date.
+pdfinscriptionsyear=School Year
+pdfinscriptionscurso=Course / Classroom
+pdftitlealumno=Student data
+pdftitletutor=Tutor or responsible data
 pdfinscriptionsalumnodni=DNI
-pdfinscriptionsalumnonombre=Apellido y nombre
-pdfinscriptionsalumnodireccion=Direccion
-pdfinscriptionsalumnotelefono=Telefono
+pdfinscriptionsalumnonombre=Last name and first name
+pdfinscriptionsalumnaddress=Address
+pdfinscriptionsalumnnotelefono=Telephone number
 pdfinscriptionsalumnoemail=Email
-pdfinscriptionstutornombre=Apellido y nombre
-pdfinscriptionstutordireccion=Direccion
-pdfinscriptionstutorciudadcp=Ciudad / CP
-pdfinscriptionstutorphone=Telefono
-pdfinscriptionstutoremail=email
+pdfinscriptionstutorname=Last name and first name
+pdfinscriptionstutoraddress=Address
+pdfinscriptionstutorciudadcp=City / CP
+pdfinscriptionstutorphone=Phone number
+pdfinscriptionstutoremail=email address
 
 
 #
 # PDF ASSYS
 #
-DocumentModelStandardPDF = Documento estandar PDF
-pdftitleassys = Hoja de Asistencia
-pdfcabeceraassys=Dia
-pdfheadassys1=Alumno/a
-pdfheadassys2=Listado
+DocumentModelStandardPDF = Standard PDF Document
+pdftitleassys = Attendance Sheet
+pdfcabeceraassys=Day
+pdfheadassys1=Student
+pdfheadassys2=Listing
 
+#
+# Notes Card Page
+#
+addothernote=Add new note
+create = Add note
 
+#
+# My Notes Page
+#
+MyNotes = My Notes
+notestext= Mis Clases.
+noteshelp=Selecting a class <br><b>Clicking on a class generates the xlsx file of the notes belonging to that class.</b>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#
+# headerrow in file xlsx
+#
+class=Class
+subjects=Subject
+trimestre=Trimester
+nota=Note
+tbl1titlehead=Download notes by class.
+tbl2titlehead=Download all my notes.
+refusedbtntootip=Select class.<br>When the class is selected, the file is generated. <br><b> → This file is overwritten, each time it is generated.</b>
+lbltodolinkcreate=Create the xlsx file with all my notes.
+lbltodolinktootltip=Download all my notes.
+tooltipmainmenuxlsx=My notes in xlsx.
