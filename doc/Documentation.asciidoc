@@ -1,0 +1,56 @@
+= COLLEGE =
+:subtitle: COLLEGE DOCUMENTATION
+:source-highlighter: rouge
+:companyname: Instituto
+:corpname: Instituto
+:orgname: Instituto
+:creator: SuperAdmin
+:title: Documentation of module College
+:subject: This document is the document of module College.
+:keywords: College
+// Date du document :
+:docdate: 2023-02-26
+:toc: manual
+:toc-placement: preamble
+
+
+== TOPIC OF DOCUMENT
+
+This is the documentation of module College
+
+
+*Log of versions of document*
+
+[options="header",format="csv"]
+|=== 
+Author, Date, Version
+--- SuperAdmin   ---, 2023-02-26, Version 1.0
+|===
+
+
+[NOTE]
+==============
+This document was generated using Dolibarr ERP CRM process
+==============
+
+
+:toc: manual
+:toc-placement: preamble
+
+<<<
+
+== INTRODUCTION
+
+//include::README.md[]
+__README__
+
+== DATA SPECIFICATIONS
+
+__DATA_SPECIFICATION__
+
+
+== CHANGELOG
+
+//include::ChangeLog.md[]
+__CHANGELOG__
+
