@@ -704,7 +704,7 @@ if ($action == 'mynotes') {
 			$params = array()
 		);
 	}else{
-		print '<div id="simbolicbtn"><span class="btnTitle refused classfortooltip" title="'.$langs->trans('refusedbtntootip').'"><span class="fa fa-repeat valignmiddle btnTitle-icon"></span></span></div>';
+		print '<div id="simbolicbtn"><span class="btnTitle refused classfortooltip" title="'.$langs->trans('NotEnoughPermissions').'"><span class="fa fa-repeat valignmiddle btnTitle-icon"></span></span></div>';
 	}
 	print '<div style="display: none;" id="donwloadlinkb">';
 	print dolGetButtonTitle(
