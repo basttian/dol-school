@@ -693,15 +693,19 @@ if ($action == 'mynotes') {
 	/*Loading b*/
 	print '<img style="display: none;" id="loaderb" class="m-10" src="../../custom/college/img/loading.gif" height="20px">';
 	/** DOWNLOAD ALL NOTES #563*/
-	print dolGetButtonTitle(
-		"",
-		$helpText = $langs->trans('lbltodolinkcreate'),
-		'fa fa-repeat',
-		$url = !empty($permissiongenerateallxlsx)?$_SERVER["PHP_SELF"]."?action=createxlsx&token=".newToken():'#',
-		$id = 'id_generate_xlsx',
-		$status = $permissiongeneratexlsx && $permissiongenerateallxlsx && $permissiontoread && $permissiontoadd && $total_de_notas > 0 ? 1 : 0,
-		$params = array()
-	);
+	if($permissiongenerateallxlsx){
+		print dolGetButtonTitle(
+			"",
+			$helpText = $langs->trans('lbltodolinkcreate'),
+			'fa fa-repeat',
+			$url = !empty($permissiongenerateallxlsx)?$_SERVER["PHP_SELF"]."?action=createxlsx&token=".newToken():'#',
+			$id = 'id_generate_xlsx',
+			$status = $permissiongeneratexlsx && $permissiongenerateallxlsx && $permissiontoread && $permissiontoadd && $total_de_notas > 0 ? 1 : 0,
+			$params = array()
+		);
+	}else{
+		print '<div id="simbolicbtn"><span class="btnTitle refused classfortooltip" title="'.$langs->trans('refusedbtntootip').'"><span class="fa fa-repeat valignmiddle btnTitle-icon"></span></span></div>';
+	}
 	print '<div style="display: none;" id="donwloadlinkb">';
 	print dolGetButtonTitle(
 		"",
