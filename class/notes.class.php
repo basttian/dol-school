@@ -1192,7 +1192,7 @@ class Notes extends CommonObject
 				$object = new self($this->db);
 				$langs->load("college@college");
 				$sheet1 = "data";
-				$filename = $userid.".xlsx";
+
 				$header = array(
 					$langs->trans('class') =>'string',
 					$langs->trans('subjects') =>'string',
@@ -1201,10 +1201,10 @@ class Notes extends CommonObject
 					$langs->trans('nota') =>'0.00',
 				);
 			
-				$filename = $userid.".xlsx";
-				$path = $conf->college->dir_output.'/'.$object->element;
+				$filename = empty($idClass)? "TODO_".dol_now().".xlsx" : $idClass.'_'.dol_now().".xlsx";
+				$path = $conf->college->dir_output.'/'.$object->element.'/'.$userid;
 				if(!is_dir($path)){
-					dol_mkdir($conf->college->dir_output.'/'.$object->element);
+					dol_mkdir($conf->college->dir_output.'/'.$object->element.'/'.$userid);
 				}
 
 				$writer = new XLSXWriter();
