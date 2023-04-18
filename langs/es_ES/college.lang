@@ -295,8 +295,11 @@ refusedbtntootip=Selecionar clase.<br>Al seleccionar la clase se genera el archi
 lbltodolinkcreate=Crear el archivo xlsx con todas mis notas.
 lbltodolinktootltip=Descargar todas mis notas.
 tooltipmainmenuxlsx=Mis notas en xlsx.
-
-
+lbltodolink=TODAS MIS NOTAS
+mssgcreatexlsx=Archivo generado éxitosamente.
+mssgdeletexlsx=El archivo fue eliminado exitosamente: 
+mssgerrorxlsx=Error!! al eliminar el archivo:
+mssgerrorfilediesnotexistxlsx=Error!! El archivo que intenta eliminar, no se encuentra.
 
 
 
