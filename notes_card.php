@@ -278,6 +278,56 @@ if (empty($reshook)) {
        
         }
     }
+	/** ELIMINAR ARCHIVO XLSX */
+    if($action == 'remove_file_xlsx'){
+		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+		$formfile = new formfile($db);
+        $f = GETPOST('file','alpha');
+
+		$pthfile = $conf->college->dir_output.'/'.$f;
+		if( file_exists($pthfile) ){
+			$solicitudDeEliminacion = dol_delete_file(
+				$conf->college->dir_output.'/'.$f,
+				$disableglob = 0,
+				$nophperrors = 0,
+				$nohook = 0,
+				$object = null,
+				$allowdotdot = false,
+				$indexdatabase = 1,
+				$nolog = 0 
+			);
+
+			if($solicitudDeEliminacion){
+				setEventMessages(
+					$langs->trans('mssgdeletexlsx').' '.basename($f),
+					$mesgs,
+					$style = 'mesgs',
+					$messagekey = '' 
+				);
+				header('Location:'.$_SERVER["PHP_SELF"].'?action=mynotes');	
+				exit;	
+			}else{
+				setEventMessages(
+					$langs->trans('mssgerrorxlsx').' '.basename($f),
+					$mesgs,
+					$style = 'errors',
+					$messagekey = '' 
+				);
+				exit;
+			}
+		}else{
+			setEventMessages(
+				$langs->trans('mssgerrorfilediesnotexistxlsx'),
+				$mesgs,
+				$style = 'errors',
+				$messagekey = '' 
+			);
+			header('Location:'.$_SERVER["PHP_SELF"].'?action=mynotes');	
+			exit;
+		};
+		
+	}
+
 
 /*
  * View
@@ -539,8 +589,8 @@ jQuery(document).ready(function() {
   $("[name=idbtn_generate_xlsx]").on("click",function(e){
 	e.preventDefault();
 	$('#loader').show();
-	$('#donwloadlink').hide();
-	$('#simbolicbtn').hide();
+	//$('#donwloadlink').hide();
+	//$('#simbolicbtn').hide();
 	var a_url = this.href;
 	$.ajax({
 		url: a_url,
@@ -550,7 +600,8 @@ jQuery(document).ready(function() {
 		$('#loader').hide();
 		if(status == 'success'){
 			setTimeout(function () {
-				$('#donwloadlink').show();
+				//$('#donwloadlink').show();
+				window.location.href = '<?php echo $_SERVER["PHP_SELF"]."?action=mynotes&token=".currentToken(); ?>';
 			}, 100);
 		}
 	});
@@ -600,6 +651,13 @@ if($action == 'createxlsx'){
 	/**  Create spreadsheeet in file note.class */
 	$createSheet = $object->createSpreadsheet($user->id, $idClasse);
 	if($createSheet){
+		setEventMessages(
+			$langs->trans('mssgcreatexlsx'),
+			$mesgs,
+			$style = 'mesgs',
+			$messagekey = '' 
+		);
+		header('Location:'.$_SERVER["PHP_SELF"].'?action=mynotes');	
 		exit;
 	}
 }
@@ -637,17 +695,22 @@ if ($action == 'mynotes') {
 	print '<a href="'.$_SERVER["PHP_SELF"]."?idClasse=".$values['idclass']."&action=createxlsx&token=".newToken().' " name="idbtn_generate_xlsx" class="boxstatsindicator thumbstat nobold nounderline">';
 	print '<div class="boxstats">';
 	print '<span class="boxstatstext">'.$values['class'].'</span><br>';
-	print '<span class="boxstatsindicator"><span class="fa fa-graduation-cap inline-block" style=" color: #263C5C;"></span> '.$values['qtynotes'].'</span>';
+	print '<span class="boxstatsindicator"><span class="fa fa-graduation-cap inline-block" style=" color:  #bb7f16;"></span> '.$values['qtynotes'].'</span>';
 	print '</div>';
 	print '</a>';
 	}
-	/**LINK A TODAS MIS NOTAS 
-	print '<a href="'.$_SERVER["PHP_SELF"]."?action=createxlsx&token=".newToken().' " name="idbtn_generate_xlsx" class="boxstatsindicator thumbstat nobold nounderline">';
-	print '<div class="boxstats">';
-	print '<span class="boxstatstext">'.$langs->trans('lbltodolink').'</span><br>';
-	print '<span class="boxstatsindicator"><span class="fa fa-graduation-cap inline-block" style=" color: #2D757A;"></span> '.$total_de_notas.'</span>';
-	print '</div>';
-	print '</a>';*/
+	/**LINK A TODAS MIS NOTAS */
+	if($permissiongenerateallxlsx){
+		print '<a href="'.$_SERVER["PHP_SELF"]."?action=createxlsx&token=".newToken().' " name="idbtn_generate_xlsx" class="boxstatsindicator thumbstat nobold nounderline">';
+		print '<div class="boxstats">';
+		print '<span class="boxstatstext">'.$langs->trans('lbltodolink').'</span><br>';
+		print '<span class="boxstatsindicator">';
+		print '<span class="fa fa-child" style=" color:  #108d49;"></span> '.$total_de_alumnos.'</span>&nbsp;';
+		print '<span class="boxstatsindicator">';
+		print '<span class="fa fa-list-ol" style=" color: #10718d;"></span> '.$total_de_notas.'</span>';
+		print '</div>';
+		print '</a>';
+	};
 	print '</td>';
 	print '</tr>';
 	print '</table>';
@@ -659,41 +722,41 @@ if ($action == 'mynotes') {
 	/************************************************************************************************************************ */
 	print '<div class="fichethirdleft">';
 	
-	print'<table class="noborder boxtable" width="100%"><tbody><tr class="liste_titre box_titre">';
-	print '<th>';
-	print '<div class="tdoverflowmax400 maxwidth250onsmartphone float">'.$langs->trans('tbl1titlehead').'</div>';
-	print '<div class="nocellnopadd boxclose floatright nowraponall"><span class="fa fa-file-excel-o opacitymedium marginleftonly"></span></div>';
-	print'</th></tr><tr><td class="tdoverflowmax150 maxwidth150onsmartphone">';
+	//print'<table class="noborder boxtable" width="100%"><tbody><tr class="liste_titre box_titre">';
+	//print '<th>';
+	//print '<div class="tdoverflowmax400 maxwidth250onsmartphone float">'.$langs->trans('tbl1titlehead').'</div>';
+	//print '<div class="nocellnopadd boxclose floatright nowraponall"><span class="total_de_notas-o opacitymedium marginleftonly"></span></div>';
+	//print'</th></tr><tr><td class="tdoverflowmax150 maxwidth150onsmartphone">';
 	/*Loading*/
 	print '<img style="display: none;" id="loader" class="m-10" src="../../custom/college/img/loading.gif" height="20px">';
-	print '<div style="display: none;" id="donwloadlink">';
+	//print '<div style="display: none;" id="donwloadlink">';
 	/** DOWNLOAD NOTES */
-	print dolGetButtonTitle("", 
+	/*print dolGetButtonTitle("", 
 		$helpText = '', 
 		'fa fa-download', 
 		$url = ''.DOL_URL_ROOT.'/document.php?modulepart=college&file='.$object->element."/".$user->id.'.xlsx&token='.newToken().'', 
 		$id = '',
 		$status = $permissiongeneratexlsx && $permissiontoread && $permissiontoadd,
 		$params = array()
-	);
-	print '</div>';
-	print '<div id="simbolicbtn"><span class="btnTitle refused classfortooltip" title="'.$langs->trans('refusedbtntootip').'"><span class="fa fa-download valignmiddle btnTitle-icon"></span></span></div>';
-	print '</td></tr></tbody></table>';
+	);*/
+	//print '</div>';
+	//print '<div id="simbolicbtn"><span class="btnTitle refused classfortooltip" title="'.$langs->trans('refusedbtntootip').'"><span class="fa fa-download valignmiddle btnTitle-icon"></span></span></div>';
+	//print '</td></tr></tbody></table>';
 	
 	print '</div>';
 	/************************************************************************************************************************ */
 	print '<div class="fichetwothirdright">';
-	print'<table class="noborder boxtable" width="100%"><tbody><tr class="liste_titre box_titre">';
-	print '<th>';
 
-	print '<div class="tdoverflowmax400 maxwidth250onsmartphone float">'.$langs->trans('tbl2titlehead').'</div>';
-	print '<div class="nocellnopadd boxclose floatright nowraponall"><span class="fa fa-check-square-o marginleftonly"></span>&nbsp;('.$total_de_notas.')&nbsp;<i class="fa fa-child" aria-hidden="true"></i>('.$total_de_alumnos.')&nbsp;<span class="fa fa-file-excel-o opacitymedium marginleftonly"></span></div>';
+	//print'<table class="noborder boxtable" width="100%"><tbody><tr class="liste_titre box_titre">';
+	//print '<th>';
+	//print '<div class="tdoverflowmax400 maxwidth250onsmartphone float">'.$langs->trans('tbl2titlehead').'</div>';
+	//print '<div class="nocellnopadd boxclose floatright nowraponall"><span class="fa fa-check-square-o marginleftonly"></span>&nbsp;('.$total_de_notas.')&nbsp;<i class="fa fa-child" aria-hidden="true"></i>('.$total_de_alumnos.')&nbsp;<span class="fa fa-file-excel-o opacitymedium marginleftonly"></span></div>';
 
-	print'</th></tr><tr><td class="tdoverflowmax150 maxwidth150onsmartphone">';
+	//print'</th></tr><tr><td class="tdoverflowmax150 maxwidth150onsmartphone">';
 	/*Loading b*/
 	print '<img style="display: none;" id="loaderb" class="m-10" src="../../custom/college/img/loading.gif" height="20px">';
 	/** DOWNLOAD ALL NOTES #563*/
-	if($permissiongenerateallxlsx){
+	/*if($permissiongenerateallxlsx){
 		print dolGetButtonTitle(
 			"",
 			$helpText = $langs->trans('lbltodolinkcreate'),
@@ -715,14 +778,72 @@ if ($action == 'mynotes') {
 		$id = 'btndownloadallnotes',
 		$status = $permissiongeneratexlsx && $permissiongenerateallxlsx && $permissiontoread && $permissiontoadd && $total_de_notas > 0 ? 1 : 0,
 		$params = array()
-	);
+	);*/
+	//print '</div>';
+	//print '</td></tr></tbody></table>';
+
 	print '</div>';
-	print '</td></tr></tbody></table>';
 	print '</div>';
-	print '</div>';
-	
 	/**DEBBUG */
 	//print dol_syslog('antion mynotes',4);
+
+		/**Test 
+		print $formfile->showdocuments(
+			$modulepart = 'college',
+			$modulesubdir = $object->element.'/'.$user->id,
+			$filedir = $conf->college->dir_output.'/'.$object->element.'/'.$user->id,
+			$urlsource = $_SERVER["PHP_SELF"]."?action=mynotes&token=".newToken(),
+			$genallowed = 0,
+			$delallowed = $permissiongeneratexlsx,
+			$modelselected = '',
+			$allowgenifempty = 1,
+			$forcenomultilang = 0,
+			$iconPDF = 0,
+			$notused = 0,
+			$noform = 0,
+			$param = '',
+			$title = '',
+			$buttonlabel = '',
+			$codelang = '',
+			$morepicto = '',
+			$object,
+			$hideifempty = 0,
+			$removeaction = 'remove_file_xlsx',
+			$tooltipontemplatecombo = '' 
+		);*/ 
+
+		
+		$includedocgeneration = $permissiongeneratexlsx;
+		// Documents
+		if ($includedocgeneration) {
+			$genallowed = $permissiontoread; 
+			$delallowed = $permissiontoadd; 
+			print $formfile->showdocuments(
+				'college:Notes',
+				$object->element.'/'.$user->id,  
+				$conf->college->dir_output.'/'.$object->element.'/'.$user->id, $_SERVER["PHP_SELF"]."?action=mynotes&token=".newToken(), 
+				$genallowed, 
+				$delallowed,
+				'',
+				1,
+				0,
+				0,
+				28,
+				0,
+				'',
+				$langs->trans('tbl1titlehead'),
+				'', 
+				$langs->defaultlang,
+				$morepicto = '',
+				$object,
+				$hideifempty = 0,
+				$removeaction = 'remove_file_xlsx',
+				$tooltipontemplatecombo = '' 
+			);
+		}
+
+
+
 }
   
 // Part to create
