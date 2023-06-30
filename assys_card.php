@@ -238,6 +238,12 @@ llxHeader('', $title, $help_url);
 ?>
 <script type="text/javascript">
 jQuery(document).ready(function() {
+    
+    //Ocultar teclado en telefono
+	$('#fk_class').on('select2:open', function() {
+    	$('.select2-search__field').prop('readonly', true);
+  	});
+    
   var objectid = '<?php echo $object->id ;?>';
   var dataarr = [];
   var claseid = 0;

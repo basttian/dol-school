@@ -63,7 +63,7 @@ classrequired=Clase
 # Menu
 #
 
-ListInscriptions=Incripciones
+ListInscriptions=Inscripciones
 NewInscriptions=Nueva Inscripcion
 ListPeriods=Periodos
 NewPeriods=Nuevo Periodo
@@ -75,6 +75,7 @@ NewAddsSubject=Agregar Asignaturas
 ListClassrooms=Clases
 NewClassrooms=Nueva Clase
 ListNotes=Notas
+ListMenuHomeNotes= ADM Notas
 NewNotesFromList=Nota desde Rejilla
 NewNote=Nueva Nota
 
@@ -94,7 +95,10 @@ COLLEGE_MYPARAM1Tooltip = My param 1 tooltip
 COLLEGE_MYPARAM2=My param 2
 COLLEGE_MYPARAM2Tooltip=My param 2 tooltip
 COLLEGE_MYPARAM_CICLO_LECTIVO=School Year
-COLLEGE_MYPARAM_CICLO_LECTIVOTooltip=Current school year
+COLLEGE_MYPARAM_CICLO_LECTIVOTooltip=Ciclo lectivo
+COLLEGE_WIDGET_NUMBER_PROM=Registros en widget promedios
+COLLEGE_WIDGET_NUMBER_PROMTooltip=Cantidad de registros a mostrar en widget promedios
+
 
 COLLEGE_HIDE_FOOTER_MSJ=Ocultar mensaje.
 COLLEGE_HIDE_FOOTER_MSJTooltip=Ocultar mensaje en pie de pagina en inicio de aplicacion.
@@ -157,27 +161,27 @@ CollegeSelect_SubjectInfo=Seleccionar asignaturas
 #
 card-header-a-notas=NOTAS
 card-header-b-notas=Agregar nuevas nota.
-card-body-notas=Area de ingreso de notas.
+card-body-notas=Área de ingreso de notas.
 
 card-header-a-inscriptions=INSCRIPCIONES
 card-header-b-inscriptions=Nueva inscripcion.
-card-body-inscriptions=Area de inscriptiones.
+card-body-inscriptions=Área de inscripciones.
 
 card-header-a-students=ALUMNADO
-card-header-b-students=Agregar Alumnos.
-card-body-students=Area de estudiantes.
+card-header-b-students=Alumnos | Estudiantes | Nuevo.
+card-body-students=Área de estudiantes.
 
 card-header-a-subject=ASIGNATURAS
 card-header-b-subject=Asignaturas | Materias | Curriculas.
-card-body-subject=Area de asignaturas.
+card-body-subject=Área de asignaturas.
 
 card-header-a-class=AULAS
 card-header-b-class=Aulas | Salon | Catedras.
-card-body-class=Area de aulas.
+card-body-class=Área de aulas.
 
 card-header-a-periods=PERIODOS
 card-header-b-periods=Periodos escolares.
-card-body-periods=Area de periodos.
+card-body-periods=Área de periodos.
 
 #
 # TAB
@@ -186,6 +190,13 @@ card-body-periods=Area de periodos.
 StudentThirdTab=Estudiate/s a cargo
 thirdpartytab= Tutor
 studenttab=Estudiantes
+
+StudentNotesTab=Notas del estudiante
+StudentsNotes=Notas
+StudentFilterNotesYearTab=Filtrar notas por ciclo lectivo
+StudentPerformanceTab=Rendimiento académico
+
+SubjectNotesTab=Notas por Asignatura
 
 
 #
@@ -218,9 +229,12 @@ pdftablerownodata=No se encuentran notas.
 #
 # boxes
 #
-CollegeMyWidgetA=ADM Colegio
-CollegeMyWidgetBoxADescription=ADM Colegio
+CollegeMyWidgetA=ADM Colegio Aulas
+CollegeMyWidgetBoxADescription=ADM Colegio | Aulas.
 CollegeColsRows=Cant. de estudiantes
+
+CollegeMyWidgetB=ADM Colegio Promedios
+CollegeMyWidgetBoxADescriptionB=ADM Colegio | Mejores promedios.
 
 #
 # Assys
@@ -241,9 +255,9 @@ justified=Justificado
 #
 # PDF INSCRIPTIONS
 #
-pdftitleinscriptions=Registro de inscripcion.
-pdfcabecerainscriptions= Ficha de inscripcion
-pdfinscriptionsdate=Fecha de inscripcion
+pdftitleinscriptions=Registro de inscripción.
+pdfcabecerainscriptions= Ficha de inscripción
+pdfinscriptionsdate=Fecha de inscripción
 pdfinscriptionsyear=Ciclo lectivo
 pdfinscriptionscurso=Curso / Aula
 pdftitlealumno=Datos de estudiante
@@ -265,7 +279,7 @@ pdfinscriptionstutoremail=email
 #
 DocumentModelStandardPDF = Documento estandar PDF
 pdftitleassys = Hoja de Asistencia
-pdfcabeceraassys=Dia
+pdfcabeceraassys=Día
 pdfheadassys1=Alumno/a
 pdfheadassys2=Listado
 
@@ -278,7 +292,7 @@ create = Agregar nota
 #
 # My Notes Page
 #
-MyNotes = Mis Notas
+MyNotes = Notas en xlsx
 notestext= Mis Clases.
 noteshelp=Seleccionar una clase<br><b>Al hacer click en una clase, se genera el archivo xlsx de las notas que pertenecen a dicha clase.</b>
 
@@ -294,21 +308,133 @@ tbl2titlehead=Descargar todas mis notas.
 refusedbtntootip=Selecionar clase.<br>Al seleccionar la clase se genera el archivo.<br><b> → Este archivo se sobrescribe, cada vez que es generado.</b>
 lbltodolinkcreate=Crear el archivo xlsx con todas mis notas.
 lbltodolinktootltip=Descargar todas mis notas.
-tooltipmainmenuxlsx=Mis notas en xlsx.
 lbltodolink=TODAS MIS NOTAS
 mssgcreatexlsx=Archivo generado éxitosamente.
 mssgdeletexlsx=El archivo fue eliminado exitosamente: 
 mssgerrorxlsx=Error!! al eliminar el archivo:
 mssgerrorfilediesnotexistxlsx=Error!! El archivo que intenta eliminar, no se encuentra.
 
+#
+# Trad. Tooltip Index Page
+#
+tooltipmainmenunoteslist=Lista de notas.
+tooltipmainmenunotesmesh=Agregar notas desde rejilla.
+tooltipmainmenunotesnew=Añadir nueva nota.
+tooltipmainmenuxlsx=Mis notas en xlsx.
+
+tooltipmainmenuassyslist=Lista de asistencias.
+tooltipmainmenuassysnew=Nuevo registro de asistencia.
+
+tooltipmainmenuinscriptionslist=Lista de inscripciones.
+tooltipmainmenuinscriptions=Agregar nueva inscripción.
+
+tooltipmainmenustudentlist=Lista de estudiantes.
+tooltipmainmenustudentnew=Añadir nuevo estudiante.
+
+tooltipmainmenusubjectlist=Lista de asignaturas.
+tooltipmainmenusubjectnews=Añadir asignaturas en lotes.
+tooltipmainmenusubjectnew=Agregar nueva asignatura.
+
+tooltipmainmenuclasslist=Lista de aulas.
+tooltipmainmenuclassnew=Añadir nueva aula.
+
+tooltipmainmenuperiodslist=Lista de periodos.
+tooltipmainmenuperiodsnew=Nuevo registro de periodo.
 
 
+#
+#Table Subject Card
+#
+tblsubjectfilterTrimestre=(*) Filtrar por trimestre.
+tblsubjectcardEstudiante=Estudiante
+tblsubjectcardTrimestre=Trimestre
+tblsubjectcardNota=Nota
+tblsubjectcardNotaRecover=Recuperatorio
 
 
+#
+#Questions
+#
+Questions=Preguntas
+Questionss=Preguntas
+NewObject=Nueva
+parent_id=Pregunta principal.
+textlavelquestions=¿ Pregunta ? <br>Si selecciono una pregunta principal, esta será una opción.
+questions= Pregunta padre ¿?
+helprefquestions=Se recomienda por ej, PREG A , PREG B ....<br>No colocar nada para las opciones.
+helptype=Tipo de campo.
+
+TxtQuestionsCreateOptions=Lista de opciones
+TblHeaderQuestionsOptions=Opciones 
+
+tooltipmainmenuquestionslist=Lista de Preguntas.
+tooltipmainmenuquestionsnew=Nueva Pregunta.
+
+addotherquestionsbtn=Añadir nueva pregunta
+btnNewOption=Nueva opción
+
+#
+#Report
+#
+card-header-a-report=Informe del estudiante
+card-header-b-report=Informe de estudiante.
+card-body-report= Área de informes estudiantiles.
+tooltipmainmenureportlist=Lista de informes.
+tooltipmainmenureportnew=Nuevo informe del estudiante.
+CreateNewReport=Crear nuevo informe de alumno
+addotherreportbtn=Enviar respuestas
+tbltitleheadtha=Cantidad de preguntas
+tbltitleheadthb=Seleccionar opciones
+tbltitleheadthbtooltip=Se recomienda responder todas las preguntas, para así poder obtener una mejor y mayor representación de la información.<br><b>Esta información nos permite realizar el rendimiento académico del estudiante.</b>
+createtrimestre= Seleccionar trimestre
+tooltipcreatetrimestre=Al seleccionar se crea un informe trimestral que podrá ser filtrado en su rendimiento académico.<br>Si no se selecciona, se crea un informe general del estudiante.
+Reportnew=Nuevo informe de estudiante.
+Reports=Lista de informes.
+pdfheadtitle=Informe escolar
+
+#
+# Survey Type
+#
+HelpSurveytext=Crear tipo de informe.
+surveytype=Tipo de informe.
+survey= Seleccionar el tipo de informe que se va a realizar. Luego los encuestados prodran elegir entre las opciones que se le presenten.<br>Ej, Informe trimestral...
+tooltipmainmenusurveylist=Tipos de informes listados.
+SurveyType=Informe
+surveyTypetooltip=Seleccionar el tipo de informe a realizar.
+Surveytypes=Tipos de informes
+Surveytype=Informe
+createsurvey=Crear nuevo informe
+#
+# Survey Menu
+#
+menuhomesurvey = ADM Informes
+menucreatenewsurvey =Nuevo tipo de informe
+menulistsurvey=Tipos de informes
+menucreatenewquestions =Nueva Pregunta
+menulistquestions=Lista de Preguntas
+menucreatenewreport=Nuevo Informe
+menulistreport=Lista de Informes
+
+#
+# Survey Page
+#
+msjSurveywarninginfo=Solo usuarios con permisos administrativos pueden consultar informes.<br>Si es docente puede ver el rendimiento académico siguiendo este enlace:
+Surveytypeindex=INFORMES
+select_chart_type=Seleccionar iipo de gráfico.
+select_survey_type=Seleccionar tipo de encuesta.
+select_student=Seleccionar estudiante.
+select_subject=Filtrar por asignatura.
+select_periods=Filtrar por periodo.
 
 
-
-
-
+#
+# CHARTJS
+#
+chart_a=Cant. de respuestas agrupadas por asignaturas.
+chart_b=Porcentaje global de respuestas. 
+chart_c=Cant. de respuestas por asignaturas.
+piestudentlabel = Promedio final por asignatura.
+barstudentlabel = Promedio por Trimestre.
+linestudentlabel = Linea - Promedio total.
 
 

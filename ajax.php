@@ -27,17 +27,19 @@ require_once __DIR__.'/class/students.class.php';
 require_once __DIR__.'/class/inscriptions.class.php';
 require_once __DIR__.'/class/subject.class.php';
 require_once __DIR__.'/class/periods.class.php';
+require_once __DIR__.'/class/questions.class.php';
 
 global $db, $user, $langs; 
 
 $action     = GETPOST('action', 'aZ09');
 $idClass    = GETPOST('idClass', 'int');
 $idSubjejct = GETPOST('idSubjejct', 'int');
+$idPeriods = GETPOST('idPeriods', 'int');
+$idStudent = GETPOST('idStudent', 'int');
 
 $arralumnoperiodo = GETPOST('arralumnoperiodo', 'intcomma');
 $notavalue        = GETPOST('notavalue', 'aZ09');
 $idNota           = GETPOST('idNota', 'int');
-
 
 $msj        = GETPOST('msj', 'alphanohtml');
 $arrclases  = GETPOST('arrclases', 'array');
@@ -52,6 +54,18 @@ $periodstab = GETPOST('periodstab', 'int');
 $estudiante = new Students($db);
 $asignatura = new Subject($db);
 $periodos   = new Periods($db);
+$questionsearch = new Questions($db);
+
+/** Questions */
+$idQuestions = GETPOST('idQuestions', 'int');
+$idOption    = GETPOST('idOption', 'int');
+$lblQuestion = GETPOST('lblQuestion', 'alphanohtml');
+$idSurveytype = GETPOST('idSurveytype','int');
+
+/** Response */
+$idResponse    = GETPOST('idResponse', 'int');
+$dataResponse    = GETPOST('dataResponse', 'alphanohtml');
+
 
 if($action == 'getsubject' && !empty($idClass) ){
 //SELECT rowid, label, fk_class FROM llx_college_subject WHERE fk_class = 2 - WHERE fk_class = ".(int)$idClass."  , JSON_UNESCAPED_UNICODE
@@ -218,6 +232,7 @@ if($action == 'senddata' && !empty($idClass)  && $idSubjejct!= -1  && !empty($ar
 if($action == 'savesubjectinlotes'){
   $langs->loadLangs(array("college@college"));
   $error = 0;
+  $dateCreation = dol_print_date(dol_now(), 'standard');
   if (empty($arrclases)) {
     setEventMessages($langs->trans("ErrorFieldRequired", $langs->trans("classrequired")), null, 'warnings');
     $error++;
@@ -230,9 +245,11 @@ if($action == 'savesubjectinlotes'){
     $db->begin();
     for($i = 0; $i < count($arrclases); $i++) {
      for($j=0; $j < count($arrclases[$i]); $j++){
+      $resql=$db->query("SELECT label FROM ".MAIN_DB_PREFIX."college_classrooms WHERE rowid = ".(int)$arrclases[$i][$j]." ");
+      $obj = $db->fetch_object($resql);
       $sql = "INSERT INTO ".MAIN_DB_PREFIX."college_subject";
-      $sql.= "(ref,label,fk_user_creat,status,fk_class,fk_user,school_year)";
-      $sql.= "values('".$subject."','".$subject."','".$user->id."',1,'".$arrclases[$i][$j]."','".$arrteacher."','".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO."'  )";
+      $sql.= "(ref,label,fk_user_creat,status,fk_class,fk_user,school_year,date_creation)";
+      $sql.= "values('".strtoupper($subject)."','".strtoupper($subject).", ".$obj->label."','".$user->id."',1,'".$arrclases[$i][$j]."','".$arrteacher."','".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO."','".$dateCreation."'  )";
       $resql = $db->query($sql);
      }
     }
@@ -298,6 +315,233 @@ if ($action == 'getnotesforstudent') {
   }else{
       $db->rollback();
       dol_print_error($db);
+      exit;
+  }
+}
+
+//filter notes tab ssubject card 
+if ($action == 'filternotesfromsubject') {
+  $rows = array();
+	$query = "SELECT e.label, n.trimestre ,n.nota, notarecover";
+	$query .= " FROM ".MAIN_DB_PREFIX."college_notes AS n";
+	$query .= " INNER JOIN ".MAIN_DB_PREFIX."college_students AS e";
+	$query .= " ON n.fk_student = e.rowid";
+	$query .= " WHERE n.fk_subject=".(int)$idSubjejct." AND n.school_year =".(int)$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO ;
+  if ((int)$idPeriods > 0) {
+    $query .= " AND n.trimestre =".(int)$idPeriods;
+  }
+	$query .= " ORDER BY e.label, n.trimestre ASC";
+
+	$resql=$db->query($query);
+	if ($resql)
+	{
+		$num = $db->num_rows($resql);
+		$i = 0;
+		if ($num)
+		{
+			while ($i < $num)
+			{
+				$obj = $db->fetch_object($resql);
+				if ($obj)
+				{
+					$rows[] = array(
+						'label'=>$obj->label,
+						'trimestre'=>$obj->trimestre,
+						'nota'=>$obj->nota,
+            'notarecover'=>$obj->notarecover>0?number_format($obj->notarecover,2):"-",
+					);
+				}
+				$i++;
+			}
+			echo json_encode($rows, JSON_UNESCAPED_UNICODE);
+      exit;
+		}else{
+      echo json_encode(0);
+      exit;
+     }
+	}
+}
+
+/** QUESTIONS */
+//CREATE ONLY ROW
+if($action == 'newquestion'){
+  global $user, $db;
+  $dateCreation = dol_print_date(dol_now(), 'standard');
+  $sql =  "INSERT INTO ".MAIN_DB_PREFIX."college_questions";
+  $sql .= " (label,date_creation,fk_user_creat,status,parent_id,type,survey_id)";
+  $sql .= " VALUES('-','".$dateCreation."',".$user->id.",1,".(int)$idQuestions.",-1,".(int)$idSurveytype." )";
+  $resql = $db->query($sql);
+  if($resql){
+    $db->commit();
+    echo json_encode(1);
+    exit;
+  }
+  else
+  {
+    $db->rollback();
+    echo json_encode(0);
+    dol_print_error($db);
+    exit;
+  }
+}
+
+//UPDATE
+if($action == 'updatequestion'){
+  global $user, $db;
+  $dateCreation = dol_print_date(dol_now(), 'standard');
+  $sql =  "UPDATE ".MAIN_DB_PREFIX."college_questions";
+  $sql .= " SET label='".$lblQuestion."',date_creation='".$dateCreation."',fk_user_modif=".$user->id."";
+  $sql .= " WHERE rowid=".(int)$idOption." ";
+  $resql = $db->query($sql);
+  if($resql){
+    $db->commit();
+    echo json_encode(1);
+    exit;
+  }
+  else
+  {
+    $db->rollback();
+    echo json_encode(0);
+    dol_print_error($db);
+    exit;
+  }
+}
+
+//DELETE
+if($action == 'deleteOption'){
+  global $db;
+  $sql =  "DELETE FROM ".MAIN_DB_PREFIX."college_questions";
+  $sql .= " WHERE rowid =".(int)$idOption;
+  $resql = $db->query($sql);
+  if($resql){
+    $db->commit();
+    echo json_encode(1);
+    exit;
+  }
+  else
+  {
+    $db->rollback();
+    echo json_encode(0);
+    dol_print_error($db);
+    exit;
+  }
+}
+
+
+/** REPORT */
+//UPDATE //
+if($action == 'updateresponse' && !empty($idResponse) && !empty($dataResponse)){
+  global $user, $db;
+
+  /*$query = "UPDATE ".MAIN_DB_PREFIX."college_report";
+  $query .= " SET data=NULL WHERE rowid=".(int)$idResponse." ";
+  $resql = $db->query($query);
+  if($resql){}*/
+
+    $data = json_encode($dataResponse,JSON_UNESCAPED_UNICODE);
+  
+    $dateCreation = dol_print_date(dol_now(), 'standard');
+    $sql =  "UPDATE ".MAIN_DB_PREFIX."college_report";
+    $sql .= " SET date_creation='".$dateCreation."',fk_user_modif=".$user->id.",data='". $data."' ";
+    $sql .= " WHERE rowid=".(int)$idResponse." ";
+    $resql = $db->query($sql);
+    if($resql){
+      $db->commit();
+      echo json_encode(array('idresponse'=>$idResponse, 'data'=>$dataResponse));
+      exit;
+    }
+    else
+    {
+      $db->rollback();
+      echo json_encode(0);
+      dol_print_error($db);
+      exit;
+    }
+  
+}
+
+/** STUDENT FROM TYPE SURVEY */ //ancla
+if($action=='getstudentsperreport' && !empty($idSurveytype) || $idStudent == null || $idSubjejct == null || $idPeriods == null ){
+  global $user, $db;
+  $rows = array();
+
+  $sql = "SELECT r.rowid, r.fk_student, stu.label AS `studentname`, r.data, r.fk_subject, sub.label AS `subjectname`, r.trimestre AS `trimestre` ";
+  $sql .= " FROM ".MAIN_DB_PREFIX."college_report AS r";
+  $sql .= " INNER JOIN ".MAIN_DB_PREFIX."college_students AS stu";
+  $sql .= " ON r.fk_student = stu.rowid";
+  $sql .= " INNER JOIN ".MAIN_DB_PREFIX."college_subject AS sub";
+  $sql .= " ON r.fk_subject = sub.rowid";
+  $sql .= " WHERE r.fk_surveytype = ".(int)$idSurveytype."";
+  $sql .= " AND r.status = 1";
+  $sql .= " AND r.school_year = ".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO."";
+  if(!empty($idPeriods)){
+    $sql .= " AND r.trimestre = ".(int)$idPeriods."";
+  }
+  if(!empty($idSubjejct)){
+    $sql .= " AND r.fk_subject = ".(int)$idSubjejct."";
+  }
+  if(!empty($idStudent)){
+    $sql .= " AND r.fk_student = ".(int)$idStudent."";
+    //$sql .= " GROUP BY r.fk_student";
+  }
+  $sql .= " ORDER BY stu.label ASC";
+
+  $resql = $db->query($sql);
+  if ($resql) {
+      $num = $db->num_rows($resql);
+         $i = 0;
+         if ($num)
+         {
+           while ($i < $num)
+           {
+             $obj = $db->fetch_object($resql);
+             if ($obj)
+             {
+              $rows[] = array(
+                'rowid_report'  => $obj->rowid,
+                'fk_student'    => $obj->fk_student,
+                'label_student' => $obj->studentname,
+                'data'          => $obj->data,
+                'fk_subject'    => $obj->fk_subject,
+                'label_subject' => $obj->subjectname,
+                'fk_trimestre'  => $obj->trimestre,
+              );
+             }
+             $i++;
+           }
+         }
+      echo json_encode($rows, JSON_UNESCAPED_UNICODE);
+      exit;
+  }else{
+      echo json_encode(0);
+      exit;
+  }
+}
+
+
+if($action =='getPeriodForSelect'){
+  $rows = array();
+  $resql=$db->query("SELECT rowid, label FROM ".MAIN_DB_PREFIX."college_periods  WHERE `status` = 1 ");
+  if ($resql)
+  {
+    $num = $db->num_rows($resql);
+    $i = 0;
+    if ($num)
+    {
+      while ($i < $num)
+      {
+        $obj = $db->fetch_object($resql);
+        if ($obj)
+        {
+          $rows[] = array('id'=>$obj->rowid, 'text'=>$obj->label);
+        }
+        $i++;
+      }
+    }
+    echo json_encode($rows, JSON_UNESCAPED_UNICODE);
+    exit;
+  }else{
+      echo json_encode(0);
       exit;
   }
 }
