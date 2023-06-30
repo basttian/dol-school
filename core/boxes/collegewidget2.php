@@ -33,7 +33,7 @@ include_once DOL_DOCUMENT_ROOT."/core/boxes/modules_boxes.php";
  * Warning: for the box to be detected correctly by dolibarr,
  * the filename should be the lowercase classname
  */
-class collegewidget1 extends ModeleBoxes
+class collegewidget2 extends ModeleBoxes
 {
 	/**
 	 * @var string Alphanumeric ID. Populated by the constructor.
@@ -99,7 +99,7 @@ class collegewidget1 extends ModeleBoxes
 
 		parent::__construct($db, $param);
 
-		$this->boxlabel = $langs->transnoentitiesnoconv("CollegeMyWidgetA");
+		$this->boxlabel = $langs->transnoentitiesnoconv("CollegeMyWidgetB");
 
 		$this->param = $param;
 
@@ -116,24 +116,26 @@ class collegewidget1 extends ModeleBoxes
 	 */
 	public function loadBox($max = 5)
 	{
-		global $db,$langs;
+		global $conf,$db,$langs;
 
 		// Use configuration value for max lines count
 		$this->max = $max;
 
 		//dol_include_once("/college/class/college.class.php");
 		dol_include_once("/college/class/inscriptions.class.php");
+		dol_include_once("/college/class/students.class.php");
 		$objectinscriptions = new Inscriptions($db);
+		$objectstudents = new Students($db);
 
 		// Populate the head at runtime
-		$text = $langs->trans("CollegeMyWidgetBoxADescription", $max);
+		$text = $langs->trans("CollegeMyWidgetBoxADescriptionB", $max);
 		$this->info_box_head = array(
 			// Title text
 			'text' => $text,
 			// Add a link
-			'sublink' => DOL_URL_ROOT.'/custom/college/subject_list.php?token='.currentToken().'',
+			'sublink' => DOL_URL_ROOT.'/custom/college/students_list.php?token='.currentToken().'',
 			// Sublink icon placed after the text
-			'subpicto' => 'fa-cube',
+			'subpicto' => 'fa-child',
 			// Sublink icon HTML alt text
 			'subtext' => '',
 			// Sublink HTML target
@@ -216,15 +218,25 @@ class collegewidget1 extends ModeleBoxes
 				$this->contents_rows[] = array(
 					0 => array( // TR
 						'tr' => 'class="left pair"',
-						'text' => '  '.$this->getDataWidgets()[$i]['clase'],
-						'url' => DOL_URL_ROOT.'/custom/college/inscriptions_list.php?action=list&token='.currentToken().'&search_fk_class='.$this->getDataWidgets()[$i]['idclase'].' ',
+						'text' => ' '.$this->getDataWidgets()[$i]['student'],
+						'url' => DOL_URL_ROOT.'/custom/college/students_notes.php?id='.$this->getDataWidgets()[$i]['idstudent'].'&token='.currentToken(). '',
 						'target' => '_blank',
-						'logo' => 'object_classrooms@college',
+						'logo' => 'object_students@college',
 					),
 					1 => array( // TR
 						'tr' => 'class="left"',
-						'text' => $langs->transnoentitiesnoconv("CollegeColsRows").'('.$this->getDataWidgets()[$i]['cantalumnosporclase'].')',
-					)
+						'text' => ' '.$this->getDataWidgets()[$i]['class'],
+						'url' => DOL_URL_ROOT.'/custom/college/subject_list.php?action=list&token='.currentToken().'&search_fk_class='.$this->getDataWidgets()[$i]['idclass'].' ',
+						'target' => '_blank',
+						'logo' => 'object_classrooms@college',
+					),
+					2 => array( // TR
+						'tr' => 'class="left"',
+						'text' => '  '.$this->getDataWidgets()[$i]['prom'],
+						'url' => DOL_URL_ROOT.'/custom/college/students_performance.php?id='.$this->getDataWidgets()[$i]['idstudent'].'&token='.currentToken(). '',
+						'target' => '_blank',
+						'logo' => 'fa-star',
+					),
 				);
 				$i++;   
 			}
@@ -239,7 +251,7 @@ class collegewidget1 extends ModeleBoxes
 						'tr' => 'class="left"',
 						'td' => '',
 						'text' => ' '.$langs->trans("NoRecordFound"),
-						'url' => DOL_URL_ROOT.'/custom/college/subject_list.php?token='.currentToken().'',
+						'url' => DOL_URL_ROOT.'/custom/college/students_list.php?token='.currentToken().'',
 						'target' => '_self',
 						'logo' => 'fa-exclamation-triangle',
 						)
@@ -253,15 +265,21 @@ class collegewidget1 extends ModeleBoxes
 	public function getDataWidgets(){
 	    global $db, $conf;
 		$rowarray = array();
-        $sql = "SELECT c.fk_class AS idclass, c.school_year , d.label AS labelclass, COUNT(c.fk_student) AS cant ";
-        $sql.= " FROM ".MAIN_DB_PREFIX."college_inscriptions c";
-        $sql.= " INNER JOIN ".MAIN_DB_PREFIX."college_classrooms d";
-        $sql.= " ON d.rowid = c.fk_class";
-    	if(empty($conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO)){
-    		$sql.= " GROUP BY c.fk_class HAVING c.school_year = ".date("Y")." ";
-    	}else{
-    		$sql.= " GROUP BY c.fk_class HAVING c.school_year = ".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO." ";
-    	}
+        $sql = "SELECT n.fk_student, n.fk_class, n.school_year, stu.label AS student, c.label AS class,";
+        $sql.= " CAST(AVG(n.nota) AS DECIMAL(11,2)) AS prom";
+		$sql.= " FROM ".MAIN_DB_PREFIX."college_notes AS n";
+        $sql.= " INNER JOIN ".MAIN_DB_PREFIX."college_subject AS sub";
+        $sql.= " ON sub.rowid = n.fk_subject";
+		$sql.= " INNER JOIN ".MAIN_DB_PREFIX."college_students AS stu";
+		$sql.= " ON stu.rowid = n.fk_student";
+		$sql.= " INNER JOIN ".MAIN_DB_PREFIX."college_classrooms AS c";
+		$sql.= " ON c.rowid = n.fk_class";
+		$sql.= " WHERE stu.`status` = 1 AND n.`status` = 1";
+		$sql.= " GROUP BY n.fk_student, n.school_year";
+		$sql.= " AND n.school_year = ".date("Y")." ";
+		$sql.= " ORDER BY prom DESC";
+		$sql.= " LIMIT ".$conf->global->COLLEGE_WIDGET_NUMBER_PROM."";
+
     	$resql= $db->query($sql);
     	if ($resql){
     	    $num = $db->num_rows($resql);
@@ -273,7 +291,7 @@ class collegewidget1 extends ModeleBoxes
 					$obj = $db->fetch_object($resql);
 					if ($obj)
 					{
-						$rowarray[] = array('clase'=>$obj->labelclass,'idclase'=>$obj->idclass,'cantalumnosporclase'=>$obj->cant );
+						$rowarray[] = array('idstudent'=>$obj->fk_student,'idclass'=>$obj->fk_class ,'year'=>$obj->school_year,'student'=>$obj->student,'class'=>$obj->class,'prom'=>$obj->prom );
 					}
 					$i++;
 				}

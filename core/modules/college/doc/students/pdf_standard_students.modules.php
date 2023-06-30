@@ -507,7 +507,7 @@ class pdf_standard_students extends ModelePDFStudents
     $pdf->setCellMargins(1, 1, 1, 1);
     $pdf->SetFillColor(236, 232, 237);
    
-    $pdf->MultiCell(50, 5, $langs->transnoentities("pdfheadtablecols1"), 0, 'L', 1, 0, '', '', true);
+    $pdf->MultiCell(75, 5, $langs->transnoentities("pdfheadtablecols1"), 0, 'L', 1, 0, '', '', true);
     for($i=1;$i<=$periodos->getCountRecord();$i++){
       $pdf->MultiCell(15, 5,$langs->transnoentities("pdfheadtablecolsloop")." ".$i, 0, 'C', 1, 0, '', '', true);
     }
@@ -563,7 +563,7 @@ class pdf_standard_students extends ModelePDFStudents
           $pdf->setCellPaddings(1, 1, 1, 1);
           $pdf->setCellMargins(1, 1, 1, 1);
           $pdf->SetFillColor(155, 117, 166);
-          $pdf->MultiCell(50, 5, $asignatura->label, 0, 'L', 1, 0, '', '', true);
+          $pdf->MultiCell(75, 5, $asignatura->label, 0, 'L', 1, 0, '', '', true);
           foreach($rownotas as $row) {//for($i=1;$i<=$periodos->getCountRecord();$i++){
             $pdf->MultiCell(15, 5,number_format($obj->$row,2), 0, 'C', 1, 0, '', '', true);
           }

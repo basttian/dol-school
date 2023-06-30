@@ -81,6 +81,7 @@ $type = 'myobject';
 $arrayofparameters = array(
   'COLLEGE_HIDE_FOOTER_MSJ'=>array('type'=>'yesno', 'enabled'=>1),
 	'COLLEGE_MYPARAM_CICLO_LECTIVO'=>array('type'=>'string', 'css'=>'minwidth500' ,'enabled'=>1),
+	'COLLEGE_WIDGET_NUMBER_PROM'=>array('type'=>'string', 'css'=>'minwidth500' ,'enabled'=>1),
     //'COLLEGE_MYPARAM1'=>array('type'=>'string','enabled'=>1),
 	//'COLLEGE_MYPARAM2'=>array('type'=>'textarea','enabled'=>1),
 	//'COLLEGE_MYPARAM3'=>array('type'=>'category:'.Categorie::TYPE_CUSTOMER, 'enabled'=>1),

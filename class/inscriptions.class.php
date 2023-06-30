@@ -61,7 +61,7 @@ class Inscriptions extends CommonObject
 	/**
 	 * @var string String with name of icon for inscriptions. Must be the part after the 'object_' into object_inscriptions.png
 	 */
-	public $picto = 'inscriptions@college';
+	public $picto = 'fa-id-card-o';//inscriptions@college
 
 
 	const STATUS_DRAFT = 0;

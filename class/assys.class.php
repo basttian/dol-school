@@ -63,7 +63,7 @@ class Assys extends CommonObject
 	/**
 	 * @var string String with name of icon for assys. Must be the part after the 'object_' into object_assys.png
 	 */
-	public $picto = 'assys@college';
+	public $picto = 'fa-file-text-o';//assys@college
 
 
 	const STATUS_DRAFT = 0;

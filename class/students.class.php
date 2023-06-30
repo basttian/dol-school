@@ -61,7 +61,7 @@ class Students extends CommonObject
 	/**
 	 * @var string String with name of icon for students. Must be the part after the 'object_' into object_students.png
 	 */
-	public $picto = 'students@college';
+	public $picto = 'fa-graduation-cap';//students@college
 
 
 	const STATUS_DRAFT = 0;

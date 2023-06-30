@@ -61,7 +61,7 @@ class Classrooms extends CommonObject
 	/**
 	 * @var string String with name of icon for classrooms. Must be the part after the 'object_' into object_classrooms.png
 	 */
-	public $picto = 'classrooms@college';
+	public $picto = 'fa-cube';//classrooms@college
 
 
 	const STATUS_DRAFT = 0;
@@ -1102,7 +1102,7 @@ class ClassroomsLine extends CommonObjectLine
          $obj = $this->db->fetch_object($resql); 
          if ($obj)
          {
-           $row[$obj->rowid] = $obj->ref.' --- '.$obj->label ;
+           $row[$obj->rowid] = $obj->label ;
          }
          $i++;
        };

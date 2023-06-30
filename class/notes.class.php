@@ -63,7 +63,7 @@ class Notes extends CommonObject
 	/**
 	 * @var string String with name of icon for notes. Must be the part after the 'object_' into object_notes.png
 	 */
-	public $picto = 'notes@college';
+	public $picto = 'fa-address-book-o';//notes@college
 
 
 	const STATUS_DRAFT = 0;
@@ -110,7 +110,7 @@ class Notes extends CommonObject
 	public $fields=array(
 		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'css'=>'left', 'comment'=>"Id"),
 		'school_year' => array('type'=>'varchar(255)', 'label'=>'SchoolYear', 'enabled'=>'1', 'position'=>4, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'2023', 'searchall'=>1, 'help'=>"School_Year", 'validate'=>'1',),
-		'ref' => array('type'=>'integer:Students:custom/college/class/students.class.php', 'label'=>'Ref', 'enabled'=>'1', 'position'=>3, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'', 'index'=>1, 'searchall'=>1, 'validate'=>'1', 'comment'=>"Reference of object"),
+		'ref' => array('type'=>'integer:Students:custom/college/class/students.class.php', 'label'=>'Ref', 'enabled'=>'1', 'position'=>3, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx disabledselect2', 'validate'=>'1', 'comment'=>"Reference of object"),
 		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>3, 'validate'=>'1',),
 		'note_public' => array('type'=>'html', 'label'=>'NotePublic', 'enabled'=>'1', 'position'=>61, 'notnull'=>0, 'visible'=>0, 'cssview'=>'wordbreak', 'validate'=>'1',),
 		'note_private' => array('type'=>'html', 'label'=>'NotePrivate', 'enabled'=>'1', 'position'=>62, 'notnull'=>0, 'visible'=>0, 'cssview'=>'wordbreak', 'validate'=>'1',),
@@ -121,14 +121,14 @@ class Notes extends CommonObject
 		'last_main_doc' => array('type'=>'varchar(255)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>600, 'notnull'=>0, 'visible'=>0,),
 		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
 		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1010, 'notnull'=>-1, 'visible'=>0,),
-		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>1, 'default'=>'1', 'index'=>1, 'arrayofkeyval'=>array('0'=>'Borrador', '1'=>'Validado', '9'=>'Cancelado'), 'validate'=>'1',),
+		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>1, 'default'=>'1', 'index'=>1, 'arrayofkeyval'=>array('0'=>'Borrador', '1'=>'Validado', '9'=>'Cancelado'), 'validate'=>'1','css'=>'maxwidth500 widthcentpercentminusxx',),
 		'fk_class' => array('type'=>'integer:Classrooms:custom/college/class/classrooms.class.php:1', 'label'=>'Classroom', 'enabled'=>'1', 'position'=>21, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"LinkClass", 'validate'=>'1',),
-		'fk_user' => array('type'=>'integer:User:user/class/user.class.php:0', 'label'=>'Teacher', 'enabled'=>'1', 'position'=>3, 'notnull'=>1, 'visible'=>3, 'noteditable'=>'1', 'default'=>'1', 'index'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx disabledselect2', 'help'=>"HelpToTeacher", 'showoncombobox'=>'1', 'validate'=>'1',),
+		'fk_user' => array('type'=>'integer:User:user/class/user.class.php:0', 'label'=>'Teacher', 'enabled'=>'1', 'position'=>3, 'notnull'=>1, 'visible'=>3, 'noteditable'=>'1', 'default'=>'3', 'index'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx disabledselect2', 'help'=>"HelpToTeacher", 'validate'=>'1',),
 		'fk_subject' => array('type'=>'integer:Subject:custom/college/class/subject.class.php:1:(fk_user:=:__USER_ID__)', 'label'=>'Subject', 'enabled'=>'1', 'position'=>23, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"HelpSubject", 'validate'=>'1',),
 		'trimestre' => array('type'=>'integer:Periods:custom/college/class/periods.class.php:1', 'label'=>'Trimestre', 'enabled'=>'1', 'position'=>4, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"HelpPeriods", 'validate'=>'1',),
-		'fk_student' => array('type'=>'integer:Students:custom/college/class/students.class.php:1', 'label'=>'Student', 'enabled'=>'1', 'position'=>25, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"LinkStudent", 'validate'=>'1',),
-		'nota' => array('type'=>'real', 'label'=>'Nota', 'enabled'=>'1', 'position'=>26, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'css'=>'maxwidth50 widthcentpercentminusxx', 'help'=>"notetextform", 'validate'=>'1',),
-		'notarecover' => array('type'=>'real', 'label'=>'NotaR', 'enabled'=>'1', 'position'=>27, 'notnull'=>1, 'visible'=>4, 'css'=>'maxwidth50 widthcentpercentminusxx', 'help'=>"recovernote",),
+		'fk_student' => array('type'=>'integer:Students:custom/college/class/students.class.php:1', 'label'=>'Student', 'enabled'=>'1', 'position'=>25, 'notnull'=>1, 'visible'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"LinkStudent", 'validate'=>'1',),
+		'nota' => array('type'=>'real', 'label'=>'Nota', 'enabled'=>'1', 'position'=>26, 'notnull'=>1, 'visible'=>1, 'css'=>'maxwidth50', 'help'=>"notetextform", 'validate'=>'1',),
+		'notarecover' => array('type'=>'real', 'label'=>'NotaR', 'enabled'=>'1', 'position'=>27, 'notnull'=>1, 'visible'=>4, 'css'=>'maxwidth50', 'help'=>"recovernote",),
 	);
 	public $rowid;
 	public $school_year;

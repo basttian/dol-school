@@ -1,6 +1,6 @@
 <?php
 /* Copyright (C) 2017  Laurent Destailleur <eldy@users.sourceforge.net>
- * Copyright (C) ---Put here your own copyright and developer email---
+ * Copyright (C) 2023 SuperAdmin
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
  */
 
 /**
- * \file        class/periods.class.php
+ * \file        class/report.class.php
  * \ingroup     college
- * \brief       This file is a CRUD class file for Periods (Create/Read/Update/Delete)
+ * \brief       This file is a CRUD class file for Report (Create/Read/Update/Delete)
  */
 
 // Put here all includes required by your class file
@@ -28,9 +28,9 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
 /**
- * Class for Periods
+ * Class for Report
  */
-class Periods extends CommonObject
+class Report extends CommonObject
 {
 	/**
 	 * @var string ID of module.
@@ -40,12 +40,12 @@ class Periods extends CommonObject
 	/**
 	 * @var string ID to identify managed object.
 	 */
-	public $element = 'periods';
+	public $element = 'report';
 
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $table_element = 'college_periods';
+	public $table_element = 'college_report';
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -59,9 +59,9 @@ class Periods extends CommonObject
 	public $isextrafieldmanaged = 1;
 
 	/**
-	 * @var string String with name of icon for periods. Must be the part after the 'object_' into object_periods.png
+	 * @var string String with name of icon for report. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'report@college' if picto is file 'img/object_report.png'.
 	 */
-	public $picto = 'fa-calendar-check-o';//periods@college
+	public $picto = 'fa-address-card-o';
 
 
 	const STATUS_DRAFT = 0;
@@ -70,15 +70,26 @@ class Periods extends CommonObject
 
 
 	/**
-	 *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter[:Sortfield]]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter[:Sortfield]]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
-	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
+	 *  'type' field format:
+	 *  	'integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter[:Sortfield]]]',
+	 *  	'select' (list of values are in 'options'),
+	 *  	'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter[:Sortfield]]]]',
+	 *  	'chkbxlst:...',
+	 *  	'varchar(x)',
+	 *  	'text', 'text:none', 'html',
+	 *   	'double(24,8)', 'real', 'price',
+	 *  	'date', 'datetime', 'timestamp', 'duration',
+	 *  	'boolean', 'checkbox', 'radio', 'array',
+	 *  	'mail', 'phone', 'url', 'password', 'ip'
+	 *		Note: Filter must be a Dolibarr filter syntax string. Example: "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.status:!=:0) or (t.nature:is:NULL)"
 	 *  'label' the translation key.
 	 *  'picto' is code of a picto to show before value in forms
-	 *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
+	 *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM' or 'isModEnabled("multicurrency")' ...)
 	 *  'position' is the sort order of field.
 	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
 	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
 	 *  'noteditable' says if field is not editable (1 or 0)
+	 *  'alwayseditable' says if field can be modified also when status is not draft ('1' or '0')
 	 *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
 	 *  'index' if we want an index in database.
 	 *  'foreignkey'=>'tablename.field' if the field is a foreign key (it is recommanded to name the field fk_...).
@@ -103,23 +114,32 @@ class Periods extends CommonObject
 	 */
 	public $fields=array(
 		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'css'=>'left', 'comment'=>"Id"),
-		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'validate'=>'1', 'comment'=>"Reference of object", 'help'=>"HelpRef" ),
-		'label' => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth300', 'cssview'=>'wordbreak', 'help'=>"HelpPeriods", 'showoncombobox'=>'2', 'validate'=>'1',),
-		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>3, 'validate'=>'1',),
+		'school_year' => array('type'=>'varchar(255)', 'label'=>'SchoolYear', 'enabled'=>'1', 'position'=>2, 'notnull'=>1, 'visible'=>-2, 'noteditable'=>'1', 'default'=>'2023', 'searchall'=>1, 'help'=>"School_Year", 'validate'=>'1',),
+		'fk_user' => array('type'=>'integer:User:user/class/user.class.php:0', 'label'=>'Teacher', 'enabled'=>'1', 'position'=>3, 'notnull'=>1, 'visible'=>-2, 'noteditable'=>'1', 'default'=>'1', 'index'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx disabledselect2', 'help'=>"HelpToTeacher", 'validate'=>'1',),
+		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>4, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'validate'=>'1', 'comment'=>"Reference of object"),
+		'fk_student' => array('type'=>'integer:Students:custom/college/class/students.class.php:1', 'label'=>'Student', 'enabled'=>'1', 'position'=>31, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"LinkStudent", 'validate'=>'1',),
+		'description' => array('type'=>'varchar(255)', 'label'=>'Description', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>4, 'alwayseditable'=>'1', 'validate'=>'1',),
 		'note_public' => array('type'=>'html', 'label'=>'NotePublic', 'enabled'=>'1', 'position'=>61, 'notnull'=>0, 'visible'=>0, 'cssview'=>'wordbreak', 'validate'=>'1',),
 		'note_private' => array('type'=>'html', 'label'=>'NotePrivate', 'enabled'=>'1', 'position'=>62, 'notnull'=>0, 'visible'=>0, 'cssview'=>'wordbreak', 'validate'=>'1',),
 		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>500, 'notnull'=>1, 'visible'=>-2,),
 		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>501, 'notnull'=>0, 'visible'=>-2,),
-		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>510, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>511, 'notnull'=>-1, 'visible'=>-2,),
+		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'picto'=>'user', 'enabled'=>'1', 'position'=>510, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid', 'csslist'=>'tdoverflowmax150',),
+		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'picto'=>'user', 'enabled'=>'1', 'position'=>511, 'notnull'=>-1, 'visible'=>-2, 'csslist'=>'tdoverflowmax150',),
 		'last_main_doc' => array('type'=>'varchar(255)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>600, 'notnull'=>0, 'visible'=>0,),
 		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
 		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1010, 'notnull'=>-1, 'visible'=>0,),
-		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'Borrador', '1'=>'Validado', '9'=>'Cancelado'), 'validate'=>'1',),
+		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>2000, 'notnull'=>1, 'visible'=>4, 'default'=>'0', 'index'=>1, 'arrayofkeyval'=>array('0'=>'Borrador', '1'=>'Validado', '9'=>'Cancelado'),),
+		'fk_class' => array('type'=>'integer:Classrooms:custom/college/class/classrooms.class.php:1', 'label'=>'Classroom', 'enabled'=>'1', 'position'=>21, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"LinkClass", 'validate'=>'1',),
+		'fk_subject' => array('type'=>'integer:Subject:custom/college/class/subject.class.php:1:(fk_user:=:__USER_ID__)', 'label'=>'Subject', 'enabled'=>'1', 'position'=>23, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 maxwidth500', 'help'=>"HelpSubject", 'validate'=>'1',),
+		'trimestre' => array('type'=>'integer:Periods:custom/college/class/periods.class.php:1', 'label'=>'Trimestre', 'enabled'=>'1', 'position'=>32, 'notnull'=>-1, 'visible'=>5, 'noteditable'=>'1', 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'help'=>"HelpPeriods",),
+		'data' => array('type'=>'text', 'label'=>'data', 'enabled'=>'1', 'position'=>3000, 'notnull'=>0, 'visible'=>0,),
+		'fk_surveytype' => array('type'=>'integer:Surveytype:custom/college/class/surveytype.class.php:1:(status:=:1)', 'label'=>'SurveyType', 'enabled'=>'1', 'position'=>4, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'css'=>'maxwidth500', 'help'=>"surveyTypetooltip", 'validate'=>'1',),
 	);
 	public $rowid;
+	public $school_year;
+	public $fk_user;
 	public $ref;
-	public $label;
+	public $fk_student;
 	public $description;
 	public $note_public;
 	public $note_private;
@@ -131,6 +151,11 @@ class Periods extends CommonObject
 	public $import_key;
 	public $model_pdf;
 	public $status;
+	public $fk_class;
+	public $fk_subject;
+	public $trimestre;
+	public $data;
+	public $fk_surveytype;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -139,17 +164,17 @@ class Periods extends CommonObject
 	// /**
 	//  * @var string    Name of subtable line
 	//  */
-	// public $table_element_line = 'college_periodsline';
+	// public $table_element_line = 'college_reportline';
 
 	// /**
 	//  * @var string    Field with ID of parent key if this object has a parent
 	//  */
-	// public $fk_element = 'fk_periods';
+	// public $fk_element = 'fk_report';
 
 	// /**
 	//  * @var string    Name of subtable class that manage subtable lines
 	//  */
-	// public $class_element_line = 'Periodsline';
+	// public $class_element_line = 'Reportline';
 
 	// /**
 	//  * @var array	List of child tables. To test if we can delete object.
@@ -161,10 +186,10 @@ class Periods extends CommonObject
 	//  *               If name matches '@ClassNAme:FilePathClass;ParentFkFieldName' it will
 	//  *               call method deleteByParentField(parentId, ParentFkFieldName) to fetch and delete child object
 	//  */
-	// protected $childtablesoncascade = array('college_periodsdet');
+	// protected $childtablesoncascade = array('college_reportdet');
 
 	// /**
-	//  * @var PeriodsLine[]     Array of subtable lines
+	//  * @var ReportLine[]     Array of subtable lines
 	//  */
 	// public $lines = array();
 
@@ -177,22 +202,23 @@ class Periods extends CommonObject
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf, $langs;
+		global $conf, $langs, $user;
 
 		$this->db = $db;
 
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) {
+		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid']) && !empty($this->fields['ref'])) {
 			$this->fields['rowid']['visible'] = 0;
 		}
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) {
+		if (!isModEnabled('multicompany') && isset($this->fields['entity'])) {
 			$this->fields['entity']['enabled'] = 0;
 		}
 
 		// Example to show how to set values of fields definition dynamically
-		/*if ($user->rights->college->periods->read) {
-			$this->fields['myfield']['visible'] = 1;
-			$this->fields['myfield']['noteditable'] = 0;
-		}*/
+		if ($user->rights->college->report->read) {
+			$this->fields['fk_user']['default'] = $user->id;
+			$this->fields['school_year']['default'] = $conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO;
+        	$this->fields['status']['default'] = '0';
+		}
 
 		// Unset fields that are disabled
 		foreach ($this->fields as $key => $val) {
@@ -285,7 +311,8 @@ class Periods extends CommonObject
 			foreach ($object->array_options as $key => $option) {
 				$shortkey = preg_replace('/options_/', '', $key);
 				if (!empty($extrafields->attributes[$this->table_element]['unique'][$shortkey])) {
-					//var_dump($key); var_dump($clonedObj->array_options[$key]); exit;
+					//var_dump($key);
+					//var_dump($clonedObj->array_options[$key]); exit;
 					unset($object->array_options[$key]);
 				}
 			}
@@ -379,9 +406,9 @@ class Periods extends CommonObject
 
 		$sql = "SELECT ";
 		$sql .= $this->getFieldList('t');
-		$sql .= " FROM ".MAIN_DB_PREFIX.$this->table_element." as t";
+		$sql .= " FROM ".$this->db->prefix().$this->table_element." as t";
 		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) {
-			$sql .= " WHERE t.entity IN (".getEntity($this->table_element).")";
+			$sql .= " WHERE t.entity IN (".getEntity($this->element).")";
 		} else {
 			$sql .= " WHERE 1 = 1";
 		}
@@ -454,7 +481,7 @@ class Periods extends CommonObject
 	 * Delete object in database
 	 *
 	 * @param User $user       User that deletes
-	 * @param bool $notrigger  false=launch triggers after, true=disable triggers
+	 * @param bool $notrigger  false=launch triggers, true=disable triggers
 	 * @return int             <0 if KO, >0 if OK
 	 */
 	public function delete(User $user, $notrigger = false)
@@ -503,8 +530,8 @@ class Periods extends CommonObject
 			return 0;
 		}
 
-		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->college->periods->write))
-		 || (! empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->college->periods->periods_advance->validate))))
+		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->college->report->write))
+		 || (!empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->college->report->report_advance->validate))))
 		 {
 		 $this->error='NotEnoughPermissions';
 		 dol_syslog(get_class($this)."::valid ".$this->error, LOG_ERR);
@@ -546,7 +573,7 @@ class Periods extends CommonObject
 
 			if (!$error && !$notrigger) {
 				// Call trigger
-				$result = $this->call_trigger('PERIODS_VALIDATE', $user);
+				$result = $this->call_trigger('REPORT_VALIDATE', $user);
 				if ($result < 0) {
 					$error++;
 				}
@@ -560,8 +587,8 @@ class Periods extends CommonObject
 			// Rename directory if dir was a temporary ref
 			if (preg_match('/^[\(]?PROV/i', $this->ref)) {
 				// Now we rename also files into index
-				$sql = 'UPDATE '.MAIN_DB_PREFIX."ecm_files set filename = CONCAT('".$this->db->escape($this->newref)."', SUBSTR(filename, ".(strlen($this->ref) + 1).")), filepath = 'periods/".$this->db->escape($this->newref)."'";
-				$sql .= " WHERE filename LIKE '".$this->db->escape($this->ref)."%' AND filepath = 'periods/".$this->db->escape($this->ref)."' and entity = ".$conf->entity;
+				$sql = 'UPDATE '.MAIN_DB_PREFIX."ecm_files set filename = CONCAT('".$this->db->escape($this->newref)."', SUBSTR(filename, ".(strlen($this->ref) + 1).")), filepath = 'report/".$this->db->escape($this->newref)."'";
+				$sql .= " WHERE filename LIKE '".$this->db->escape($this->ref)."%' AND filepath = 'report/".$this->db->escape($this->ref)."' and entity = ".$conf->entity;
 				$resql = $this->db->query($sql);
 				if (!$resql) {
 					$error++; $this->error = $this->db->lasterror();
@@ -570,15 +597,15 @@ class Periods extends CommonObject
 				// We rename directory ($this->ref = old ref, $num = new ref) in order not to lose the attachments
 				$oldref = dol_sanitizeFileName($this->ref);
 				$newref = dol_sanitizeFileName($num);
-				$dirsource = $conf->college->dir_output.'/periods/'.$oldref;
-				$dirdest = $conf->college->dir_output.'/periods/'.$newref;
+				$dirsource = $conf->college->dir_output.'/report/'.$oldref;
+				$dirdest = $conf->college->dir_output.'/report/'.$newref;
 				if (!$error && file_exists($dirsource)) {
 					dol_syslog(get_class($this)."::validate() rename dir ".$dirsource." into ".$dirdest);
 
 					if (@rename($dirsource, $dirdest)) {
 						dol_syslog("Rename ok");
 						// Rename docs starting with $oldref with $newref
-						$listoffiles = dol_dir_list($conf->college->dir_output.'/periods/'.$newref, 'files', 1, '^'.preg_quote($oldref, '/'));
+						$listoffiles = dol_dir_list($conf->college->dir_output.'/report/'.$newref, 'files', 1, '^'.preg_quote($oldref, '/'));
 						foreach ($listoffiles as $fileentry) {
 							$dirsource = $fileentry['name'];
 							$dirdest = preg_replace('/^'.preg_quote($oldref, '/').'/', $newref, $dirsource);
@@ -621,14 +648,14 @@ class Periods extends CommonObject
 			return 0;
 		}
 
-		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->college->write))
-		 || (! empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->college->college_advance->validate))))
+		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->college->write))
+		 || (!empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->college->college_advance->validate))))
 		 {
 		 $this->error='Permission denied';
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'PERIODS_UNVALIDATE');
+		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'REPORT_UNVALIDATE');
 	}
 
 	/**
@@ -645,14 +672,14 @@ class Periods extends CommonObject
 			return 0;
 		}
 
-		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->college->write))
-		 || (! empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->college->college_advance->validate))))
+		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->college->write))
+		 || (!empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->college->college_advance->validate))))
 		 {
 		 $this->error='Permission denied';
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'PERIODS_CANCEL');
+		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'REPORT_CANCEL');
 	}
 
 	/**
@@ -665,18 +692,18 @@ class Periods extends CommonObject
 	public function reopen($user, $notrigger = 0)
 	{
 		// Protection
-		if ($this->status != self::STATUS_CANCELED) {
+		if ($this->status == self::STATUS_VALIDATED) {
 			return 0;
 		}
 
-		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->college->write))
-		 || (! empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->college->college_advance->validate))))
+		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->college->write))
+		 || (!empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->college->college_advance->validate))))
 		 {
 		 $this->error='Permission denied';
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'PERIODS_REOPEN');
+		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'REPORT_REOPEN');
 	}
 
 	/**
@@ -699,14 +726,14 @@ class Periods extends CommonObject
 
 		$result = '';
 
-		$label = img_picto('', $this->picto).' <u>'.$langs->trans("Periods").'</u>';
+		$label = img_picto('', $this->picto).' <u>'.$langs->trans("Report").'</u>';
 		if (isset($this->status)) {
 			$label .= ' '.$this->getLibStatut(5);
 		}
 		$label .= '<br>';
 		$label .= '<b>'.$langs->trans('Ref').':</b> '.$this->ref;
 
-		$url = dol_buildpath('/college/periods_card.php', 1).'?id='.$this->id;
+		$url = dol_buildpath('/college/report_card.php', 1).'?id='.$this->id;
 
 		if ($option != 'nolink') {
 			// Add param to save lastsearch_values or not
@@ -722,7 +749,7 @@ class Periods extends CommonObject
 		$linkclose = '';
 		if (empty($notooltip)) {
 			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-				$label = $langs->trans("ShowPeriods");
+				$label = $langs->trans("ShowReport");
 				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
 			}
 			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
@@ -782,8 +809,8 @@ class Periods extends CommonObject
 		//if ($withpicto != 2) $result.=(($addlabel && $this->label) ? $sep . dol_trunc($this->label, ($addlabel > 1 ? $addlabel : 0)) : '');
 
 		global $action, $hookmanager;
-		$hookmanager->initHooks(array('periodsdao'));
-		$parameters = array('id'=>$this->id, 'getnomurl'=>$result);
+		$hookmanager->initHooks(array($this->element.'dao'));
+		$parameters = array('id'=>$this->id, 'getnomurl' => &$result);
 		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 		if ($reshook > 0) {
 			$result = $hookmanager->resPrint;
@@ -793,6 +820,36 @@ class Periods extends CommonObject
 
 		return $result;
 	}
+
+	/**
+	 *	Return a thumb for kanban views
+	 *
+	 *	@param      string	    $option                 Where point the link (0=> main card, 1,2 => shipment, 'nolink'=>No link)
+	 *  @return		string								HTML Code for Kanban thumb.
+	 */
+	/*
+	public function getKanbanView($option = '')
+	{
+		$return = '<div class="box-flex-item box-flex-grow-zero">';
+		$return .= '<div class="info-box info-box-sm">';
+		$return .= '<span class="info-box-icon bg-infobox-action">';
+		$return .= img_picto('', $this->picto);
+		$return .= '</span>';
+		$return .= '<div class="info-box-content">';
+		$return .= '<span class="info-box-ref">'.(method_exists($this, 'getNomUrl') ? $this->getNomUrl() : $this->ref).'</span>';
+		if (property_exists($this, 'label')) {
+			$return .= '<br><span class="info-box-label opacitymedium">'.$this->label.'</span>';
+		}
+		if (method_exists($this, 'getLibStatut')) {
+			$return .= '<br><div class="info-box-status margintoponly">'.$this->getLibStatut(5).'</div>';
+		}
+		$return .= '</div>';
+		$return .= '</div>';
+		$return .= '</div>';
+
+		return $return;
+	}
+	*/
 
 	/**
 	 *  Return the label of the status
@@ -855,7 +912,8 @@ class Periods extends CommonObject
 	 */
 	public function info($id)
 	{
-		$sql = "SELECT rowid, date_creation as datec, tms as datem,";
+		$sql = "SELECT rowid,";
+		$sql .= " date_creation as datec, tms as datem,";
 		$sql .= " fk_user_creat, fk_user_modif";
 		$sql .= " FROM ".MAIN_DB_PREFIX.$this->table_element." as t";
 		$sql .= " WHERE t.rowid = ".((int) $id);
@@ -864,28 +922,19 @@ class Periods extends CommonObject
 		if ($result) {
 			if ($this->db->num_rows($result)) {
 				$obj = $this->db->fetch_object($result);
+
 				$this->id = $obj->rowid;
-				if (!empty($obj->fk_user_author)) {
-					$cuser = new User($this->db);
-					$cuser->fetch($obj->fk_user_author);
-					$this->user_creation = $cuser;
-				}
 
+				$this->user_creation_id = $obj->fk_user_creat;
+				$this->user_modification_id = $obj->fk_user_modif;
 				if (!empty($obj->fk_user_valid)) {
-					$vuser = new User($this->db);
-					$vuser->fetch($obj->fk_user_valid);
-					$this->user_validation = $vuser;
+					$this->user_validation_id = $obj->fk_user_valid;
 				}
-
-				if (!empty($obj->fk_user_cloture)) {
-					$cluser = new User($this->db);
-					$cluser->fetch($obj->fk_user_cloture);
-					$this->user_cloture = $cluser;
-				}
-
 				$this->date_creation     = $this->db->jdate($obj->datec);
-				$this->date_modification = $this->db->jdate($obj->datem);
-				$this->date_validation   = $this->db->jdate($obj->datev);
+				$this->date_modification = empty($obj->datem) ? '' : $this->db->jdate($obj->datem);
+				if (!empty($obj->datev)) {
+					$this->date_validation   = empty($obj->datev) ? '' : $this->db->jdate($obj->datev);
+				}
 			}
 
 			$this->db->free($result);
@@ -918,8 +967,8 @@ class Periods extends CommonObject
 	{
 		$this->lines = array();
 
-		$objectline = new PeriodsLine($this->db);
-		$result = $objectline->fetchAll('ASC', 'position', 0, 0, array('customsql'=>'fk_periods = '.((int) $this->id)));
+		$objectline = new ReportLine($this->db);
+		$result = $objectline->fetchAll('ASC', 'position', 0, 0, array('customsql'=>'fk_report = '.((int) $this->id)));
 
 		if (is_numeric($result)) {
 			$this->error = $objectline->error;
@@ -941,15 +990,15 @@ class Periods extends CommonObject
 		global $langs, $conf;
 		$langs->load("college@college");
 
-		if (empty($conf->global->COLLEGE_PERIODS_ADDON)) {
-			$conf->global->COLLEGE_PERIODS_ADDON = 'mod_periods_standard';
+		if (empty($conf->global->COLLEGE_REPORT_ADDON)) {
+			$conf->global->COLLEGE_REPORT_ADDON = 'mod_report_standard';
 		}
 
-		if (!empty($conf->global->COLLEGE_PERIODS_ADDON)) {
+		if (!empty($conf->global->COLLEGE_REPORT_ADDON)) {
 			$mybool = false;
 
-			$file = $conf->global->COLLEGE_PERIODS_ADDON.".php";
-			$classname = $conf->global->COLLEGE_PERIODS_ADDON;
+			$file = $conf->global->COLLEGE_REPORT_ADDON.".php";
+			$classname = $conf->global->COLLEGE_REPORT_ADDON;
 
 			// Include file with class
 			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
@@ -1002,21 +1051,21 @@ class Periods extends CommonObject
 		global $conf, $langs;
 
 		$result = 0;
-		$includedocgeneration = 0;
+		$includedocgeneration = 1;
 
 		$langs->load("college@college");
 
 		if (!dol_strlen($modele)) {
-			$modele = 'standard_periods';
+			$modele = 'standard_report';
 
 			if (!empty($this->model_pdf)) {
 				$modele = $this->model_pdf;
-			} elseif (!empty($conf->global->PERIODS_ADDON_PDF)) {
-				$modele = $conf->global->PERIODS_ADDON_PDF;
+			} elseif (!empty($conf->global->REPORT_ADDON_PDF)) {
+				$modele = $conf->global->REPORT_ADDON_PDF;
 			}
 		}
 
-		$modelpath = "core/modules/college/doc/";
+		$modelpath = "core/modules/college/doc/report/";
 
 		if ($includedocgeneration && !empty($modele)) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
@@ -1054,89 +1103,113 @@ class Periods extends CommonObject
 
 		return $error;
 	}
-  
-  /**
-   * 
-   * return count number of records
-   * 
-   * */
-  public function getCountRecord(){
-    $resql=$this->db->query("SELECT * FROM ".MAIN_DB_PREFIX."college_periods where `status` = 1 ");
-    if ($resql)
-    {
-      $num = $this->db->num_rows($resql);
-      return $num;       
-    }else{
-      return 0;
-    }
-  }
 
-  /**
-   * return row rfor select in subjectcard
-   */
-  public function getAllPeriods(){
-	$rows = array();
-    $resql=$this->db->query("SELECT * FROM ".MAIN_DB_PREFIX."college_periods where `status` = 1 ");
-    if ($resql)
-    {
-      $num = $this->db->num_rows($resql);
-	  $i = 0;
-	  if ($num)
-	  {
-		  while ($i < $num)
-		  {
-			  $obj = $this->db->fetch_object($resql);
-			  if ($obj)
-			  {
-				$rows[$obj->rowid]=array(
-					'label'=>$obj->label
-				);
-			  }
-			  $i++;
-		  }
-		  return $rows;
-	  }
-         
-    }else{
-      return 0;
-    }
-  }
-  
-  public function getPeriodForSelect(){
-	$rows = array();
-	$resql= $this->db->query("SELECT rowid, label FROM ".MAIN_DB_PREFIX."college_periods WHERE `status` = 1 ");
-	if ($resql)
+	
+	/**
+	 * Metodo para crear los input
+	 * // Generar una etiqueta input de tipo text
+	 *	$input = Report::generateInput('text', 'username', 'john_doe', array('class' => 'form-control', 'placeholder' => 'Ingrese su nombre de usuario'));
+	 *
+	 */
+	public static function generateInput($type, $name, $value = '', $attributes = array()) 
 	{
-	  $num = $this->db->num_rows($resql);
-	  $i = 0;
-	  if ($num)
-	  {
-		while ($i < $num)
-		{
-		  $obj = $this->db->fetch_object($resql);
-		  if ($obj)
-		  {
-			$rows[$obj->rowid] = array('text'=>$obj->label);
-		  }
-		  $i++;
+		$input = '<input type="' . htmlspecialchars($type) . '" name="' . htmlspecialchars($name) . '" value="' . htmlspecialchars($value) . '"';
+		
+		foreach ($attributes as $key => $value) {
+		  $input .= ' ' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '"';
 		}
+		
+		$input .= '>';
+		
+		return $input;
 	  }
-	 return $rows;
+
+	  /**
+	   * Metodo para crear los select
+	   * 
+	   *  // Definir las opciones para el select
+	   * $options = array('option1' => 'Opción 1','option2' => 'Opción 2',);
+	   *  // Generar una etiqueta select
+	   * $select = Report::generateInput('select', 'mySelect', $options, array('class' => 'form-control')); 
+	   * 
+	   */
+	public static function generateSelect($name, $value = '', $attributes = array()) 
+	{
+		$select = '<select name="' . htmlspecialchars($name) . '"';
+      
+		foreach ($attributes as $key => $value) {
+		  $select .= ' ' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '"';
+		}
+		
+		$select .= '>';
+		$select .= '<option value="-1">---</option>';
+		
+		foreach ($value as $optionValue => $optionLabel) {
+		  $select .= '<option value="' . htmlspecialchars($optionValue) . '">' . htmlspecialchars($optionLabel) . '</option>';
+		}
+		
+		$select .= '</select>';
+		
+		return $select;
+	  
 	}
-  }
-  
+
+	/**
+	 * Textarea
+	 * // Generar una etiqueta textarea
+	 *	$textarea = Report::generateInput('textarea', 'myTextarea', 'Texto inicial', array('rows' => 4, 'cols' => 40, 'class' => 'form-control'));
+	 */
+	public static function generateTextArea($type, $name, $value = '', $attributes = array()) {
+		$input = '';
+		
+		if ($type === 'textarea') {
+		  $input .= '<textarea name="' . htmlspecialchars($name) . '"';
+		  
+		  foreach ($attributes as $key => $value) {
+			$input .= ' ' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '"';
+		  }
+		  
+		  $input .= '>' . htmlspecialchars($value) . '</textarea>';
+		} else if ($type === 'select') {
+		  $input .= '<select name="' . htmlspecialchars($name) . '"';
+		  
+		  foreach ($attributes as $key => $value) {
+			$input .= ' ' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '"';
+		  }
+		  
+		  $input .= '>';
+		  
+		  foreach ($value as $optionValue => $optionLabel) {
+			$input .= '<option value="' . htmlspecialchars($optionValue) . '">' . htmlspecialchars($optionLabel) . '</option>';
+		  }
+		  
+		  $input .= '</select>';
+		} else {
+		  $input .= '<input type="' . htmlspecialchars($type) . '" name="' . htmlspecialchars($name) . '" value="' . htmlspecialchars($value) . '"';
+		  
+		  foreach ($attributes as $key => $value) {
+			$input .= ' ' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '"';
+		  }
+		  
+		  $input .= '>';
+		}
+		
+		return $input;
+	  }
+
+
 }
 
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobjectline.class.php';
 
 /**
- * Class PeriodsLine. You can also remove this and generate a CRUD class for lines objects.
+ * Class ReportLine. You can also remove this and generate a CRUD class for lines objects.
  */
-class PeriodsLine extends CommonObjectLine
+class ReportLine extends CommonObjectLine
 {
-	// To complete with content of an object PeriodsLine
-	// We should have a field rowid, fk_periods and position
+	// To complete with content of an object ReportLine
+	// We should have a field rowid, fk_report and position
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes

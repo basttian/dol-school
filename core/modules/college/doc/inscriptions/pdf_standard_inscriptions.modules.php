@@ -578,7 +578,7 @@ class pdf_standard_inscriptions extends ModelePDFInscriptions
     $pdf->SetXY($posx, $posy);
     $pdf->SetTextColor(0, 0, 60);
     $pdf->SetFont('', 'BI', 8);
-	  $pdf->MultiCell(0, 3, $conf->global->MAIN_APPLICATION_TITLE, '', 'C');
+	$pdf->MultiCell(0, 3, '', '', 'C');//$conf->global->MAIN_APPLICATION_TITLE
     $pdf->MultiCell(0, 3, $conf->global->MAIN_INFO_SOCIETE_ADDRESS, '', 'C');
     $pdf->MultiCell(0, 3, $conf->global->MAIN_INFO_SOCIETE_TOWN .' '.$conf->global->MAIN_INFO_SOCIETE_ZIP , '', 'C');
     $pdf->MultiCell(0, 3, $conf->global->MAIN_INFO_SOCIETE_TEL, '', 'C');

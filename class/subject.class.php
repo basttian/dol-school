@@ -27,6 +27,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
+require_once DOL_DOCUMENT_ROOT .'/custom/college/class/periods.class.php';
+
 /**
  * Class for Subject
  */
@@ -61,7 +63,7 @@ class Subject extends CommonObject
 	/**
 	 * @var string String with name of icon for subject. Must be the part after the 'object_' into object_subject.png
 	 */
-	public $picto = 'subject@college';
+	public $picto = 'fa-flask';//subject@college
 
 
 	const STATUS_DRAFT = 0;
@@ -1118,8 +1120,106 @@ class Subject extends CommonObject
         exit;
     }
   }
+
+  /**
+   * Search notes from subject list one
+   */
+  public function searchNotesFromSubject($idSubject)
+  {
+	global $conf, $langs, $user, $db;
+	$rows = array();
+	$query = "SELECT e.label, n.trimestre ,n.nota, notarecover";
+	$query .= " FROM ".MAIN_DB_PREFIX."college_notes AS n";
+	$query .= " INNER JOIN ".MAIN_DB_PREFIX."college_students AS e";
+	$query .= " ON n.fk_student = e.rowid";
+	$query .= " WHERE n.fk_subject=".(int)$idSubject." AND n.school_year =".(int)$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO ;
+	$query .= " ORDER BY e.label, n.trimestre ASC";
+
+	$resql=$db->query($query);
+	if ($resql)
+	{
+		$num = $db->num_rows($resql);
+		$i = 0;
+		if ($num)
+		{
+			while ($i < $num)
+			{
+				$obj = $db->fetch_object($resql);
+				if ($obj)
+				{
+					$rows[] = array(
+						'label'=>$obj->label,
+						'trimestre'=>$obj->trimestre,
+						'nota'=>$obj->nota,
+						'notarecover'=>$obj->notarecover
+					);
+				}
+				$i++;
+			}
+			return $rows;
+		}
+	}
+  }
   
-  
+    /**
+   * Search notes from subject
+   */
+  public function listNotesFromSubject($idSubject)
+  {
+	global $conf, $langs, $user, $db;
+
+	$periodos = new Periods($db);
+	$periodos->getCountRecord();
+	$arrnotas=array();
+	$rownotas=array();
+
+	$rows = array();
+	$query = "SELECT s.label,";
+		for($i=0;$i<=$periodos->getCountRecord();$i++){
+			$query .= " SUM(CASE WHEN trimestre = ".$i." THEN nota ELSE 0 END) AS nota".$i.",";
+			$arrnotas[]="nota".$i;
+		}
+	$query .= " CAST(AVG(n.nota) AS DECIMAL(11,2)) AS `promg`,";
+	$query .= " CAST(AVG(NULLIF(n.notarecover,0)) AS DECIMAL(11,2)) AS `promr`";
+	$query .= " FROM ".MAIN_DB_PREFIX."college_notes AS n";
+	$query .= " INNER JOIN ".MAIN_DB_PREFIX."college_students AS s";
+	$query .= " ON n.fk_student = s.rowid";
+	$query .= " WHERE n.fk_subject=".(int)$idSubject." AND n.school_year =".(int)$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO." AND n.status=1 ";
+	$query .= " GROUP BY n.fk_student, n.fk_subject, n.school_year";
+	$query .= " ORDER BY s.label ASC";
+
+	$resql=$db->query($query);
+	if ($resql)
+	{
+		$num = $db->num_rows($resql);
+		$i = 0;
+		if ($num)
+		{
+			while ($i < $num)
+			{
+				$obj = $db->fetch_object($resql);
+				if ($obj){
+
+					foreach($arrnotas as $k => $row) {
+						$rownotas[$k] = number_format($obj->$row,2);
+					}
+					$array = array($obj->promg,$obj->promr);
+
+					$rows[] = array(
+						'label'=>$obj->label,
+						'n'=>$rownotas,
+						'promg'=>$obj->promg,
+						'promr'=>$obj->promr,
+						'promf'=>max($array)
+					);
+				}
+				
+				$i++;
+			}
+			return $rows;
+		}
+	}
+  }
   
   
   

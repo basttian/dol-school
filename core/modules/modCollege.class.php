@@ -72,7 +72,7 @@ class modCollege extends DolibarrModules
 		$this->editor_url = '';
 
 		// Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-		$this->version = '1.1.3';
+		$this->version = '1.1.5';
 		// Url to the file with your last numberversion of this module
 		//$this->url_last_version = 'http://www.example.com/versionmodule.txt';
 
@@ -189,12 +189,16 @@ class modCollege extends DolibarrModules
 
 		// Array to add new pages in new tabs
 		$this->tabs = array();
-        $this->tabs[] = array('data'=>'thirdparty:+tabname:StudentThirdTab:college@college:1:/college/students_notes_list.php?id=__ID__');  					// To add a new tab identified by code tabname1
-		
+        $this->tabs[] = array('data'=>'thirdparty:+tabname:StudentThirdTab:college@college:1:/college/students_notes_list.php?id=__ID__'); 
+		$this->tabs[] = array('data'=>'students@college:+tabname:StudentNotesTab:college@college:1:/college/students_notes.php?id=__ID__');
+		$this->tabs[] = array('data'=>'students@college:+tabname:StudentFilterNotesYearTab:college@college:1:/college/students_filter_notes_year.php?id=__ID__');
+		$this->tabs[] = array('data'=>'students@college:+tabname:StudentPerformanceTab:college@college:1:/college/students_performance.php?id=__ID__');
+		$this->tabs[] = array('data'=>'subject@college:+tabname:SubjectNotesTab:college@college:1:/college/subject_notes.php?id=__ID__');
+
 		// Example:
-		// $this->tabs[] = array('data'=>'objecttype:+tabname1:Title1:mylangfile@college:$user->rights->college->read:/college/mynewtab1.php?id=__ID__');  					// To add a new tab identified by code tabname1
+		// $this->tabs[] = array('data'=>'objecttype:+tabname1:Title1:mylangfile@college:$user->rights->college->read:/college/mynewtab1.php?id=__ID__'); // To add a new tab identified by code tabname1
 		// $this->tabs[] = array('data'=>'objecttype:+tabname2:SUBSTITUTION_Title2:mylangfile@college:$user->rights->othermodule->read:/college/mynewtab2.php?id=__ID__',  	// To add another new tab identified by code tabname2. Label will be result of calling all substitution functions on 'Title2' key.
-		// $this->tabs[] = array('data'=>'objecttype:-tabname:NU:conditiontoremove');                                                     										// To remove an existing tab identified by code tabname
+		// $this->tabs[] = array('data'=>'objecttype:-tabname:NU:conditiontoremove');// To remove an existing tab identified by code tabname
 		//
 		// Where objecttype can be
 		// 'categories_x'	  to add a tab in category view (replace 'x' by type of category (0=product, 1=supplier, 2=customer, 3=member)
@@ -246,11 +250,16 @@ class modCollege extends DolibarrModules
 		// Boxes/Widgets
 		// Add here list of php file(s) stored in college/core/boxes that contains a class to show a widget.
 		$this->boxes = array(
-			  0 => array(
-			      'file' => 'collegewidget1.php@college',
-			      'note' => 'Widget provided by College',
-			      'enabledbydefaulton' => 'Home',
-			  ),
+			0 => array(
+			    'file' => 'collegewidget1.php@college',
+			    'note' => 'Widget provided by College',
+			    'enabledbydefaulton' => 'Home',
+			),
+			1 => array(
+				'file' => 'collegewidget2.php@college',
+				'note' => 'Widget provided by College',
+				'enabledbydefaulton' => 'Home',
+			),
 			//  ...
 		);
 
@@ -411,13 +420,79 @@ class modCollege extends DolibarrModules
 		$this->rights[$r][4] = 'assys';
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->college->assys->delete)
 		$r++;
-    
-    //MSJPRINCIPALPAGE
+        //SHOW WIDGET
+        $this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Show widget objects'; // Permission label
+		$this->rights[$r][4] = 'inscriptions';
+		$this->rights[$r][5] = 'widget'; // In php code, permission will be checked by test if ($user->rights->college->inscriptions->widget)
+		$r++;
+        //MSJPRINCIPALPAGE
 		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = 'Write messaje in dashboard'; // Permission label
 		$this->rights[$r][4] = 'msjpagetop';
 		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->college->msjpagetop->write)
 		$r++;
+		//ALL LISTS
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'View all data in all lists'; // Permission label
+		$this->rights[$r][4] = 'readalllist';
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->college->readalllist->read)
+		$r++;
+		//UPLOAD FILE
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'File upload permission'; // Permission label
+		$this->rights[$r][4] = 'uploadfile';
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->college->uploadfile->write)
+		$r++;
+		//QUESTIONS questions
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Read objects of Questions'; // Permission label
+		$this->rights[$r][4] = 'questions';
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->college->questions->read)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Write objects of Questions'; // Permission label
+		$this->rights[$r][4] = 'questions';
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->college->questions->write)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Delete objects of Questions'; // Permission label
+		$this->rights[$r][4] = 'questions';
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->college->questions->delete)
+		$r++;
+		//REPORT questions
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Read objects of Report'; // Permission label
+		$this->rights[$r][4] = 'report';
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->college->report->read)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Write objects of Report'; // Permission label
+		$this->rights[$r][4] = 'report';
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->college->report->write)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Delete objects of Report'; // Permission label
+		$this->rights[$r][4] = 'report';
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->college->report->delete)
+		$r++;
+		//SURVEY TYPE
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Read objects of Survey Type'; // Permission label
+		$this->rights[$r][4] = 'survey';
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->college->survey->read)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Create/Update objects of Survey Type'; // Permission label
+		$this->rights[$r][4] = 'survey';
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->college->survey->write)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Delete objects of Survey Type'; // Permission label
+		$this->rights[$r][4] = 'survey';
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->college->survey->delete)
+		$r++;
+
     
 		/* END MODULEBUILDER PERMISSIONS */
     
@@ -488,7 +563,51 @@ class modCollege extends DolibarrModules
 			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 		*/
-    
+
+	/*HOME MENU*/
+	$this->menu[$r++]=array(
+		'fk_menu'=>'fk_mainmenu=home',
+		'type'=>'left',
+		'titre'=>'ModuleCollegeName',
+	    'prefix' => img_picto('', 'fa-th-large', 'class="paddingright pictofixedwidth valignmiddle"'),
+		'mainmenu'=>'college',
+		'leftmenu'=>'ModuleCollegeName',
+		'url'=>'/college/collegeindex.php',
+		'langs'=>'college@college',
+		'position'=>1100+$r,
+		'enabled'=>'$conf->college->enabled',
+		'user'=>0,
+	);
+	$this->menu[$r++]=array(
+		'fk_menu'=>'fk_mainmenu=home',
+		'type'=>'left',
+		'titre'=>'ListMenuHomeNotes',
+		'prefix' => img_picto('', 'fa-table', 'class="paddingright pictofixedwidth valignmiddle"'),
+		'mainmenu'=>'college',
+		'leftmenu'=>'college_notes',
+		'url'=>'/college/notes_list.php',
+		'langs'=>'college@college',
+		'position'=>1100+$r,
+		'enabled'=>'$conf->college->enabled',
+		'perms'=>'$user->rights->college->notes->read',
+		'user'=>0,
+	);
+	$this->menu[$r++]=array(
+		'fk_menu'=>'fk_mainmenu=home',
+		'type'=>'left',
+		'titre'=>'menuhomesurvey',
+		'prefix' => img_picto('', 'fa-signal', 'class="paddingright pictofixedwidth valignmiddle"'),
+		'mainmenu'=>'college',
+		'leftmenu'=>'college_survey',
+		'url'=>'/college/collegesurvey.php',
+		'langs'=>'college@college',
+		'position'=>1100+$r,
+		'enabled'=>'$conf->college->enabled',
+		'perms'=>'$user->rights->college->survey->write || $user->rights->college->survey->read || $user->rights->college->questions->write || $user->rights->college->questions->read || $user->rights->college->report->write || $user->rights->college->report->read',
+		'user'=>0,
+	);
+	
+	
     /*INSCRIPTION MENU*/
 		$this->menu[$r++]=array(
 		    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
@@ -496,7 +615,7 @@ class modCollege extends DolibarrModules
 		    // This is a Left menu entry
 		    'type'=>'left',
 		    'titre'=>'ListInscriptions',
-        'prefix' => img_picto('', 'object_inscriptions@college', 'class="paddingright mrl-10 pictofixedwidth valignmiddle"'),
+        	'prefix' => img_picto('', 'object_inscriptions@college', 'class="paddingright mrl-10 pictofixedwidth valignmiddle"'),
 		    'mainmenu'=>'college',
 		    'leftmenu'=>'college_inscriptions',
 		    'url'=>'/college/inscriptions_list.php',
@@ -517,7 +636,7 @@ class modCollege extends DolibarrModules
 		    // This is a Left menu entry
 		    'type'=>'left',
 		    'titre'=>'NewInscriptions',
-        //'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
+        	//'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
 		    'mainmenu'=>'college',
 		    'leftmenu'=>'college_inscriptions',
 		    'url'=>'/college/inscriptions_card.php?action=create',
@@ -682,7 +801,7 @@ class modCollege extends DolibarrModules
             // Define condition to show or hide menu entry. Use '$conf->college->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'enabled'=>'$conf->college->enabled',
             // Use 'perms'=>'$user->rights->college->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
+            'perms'=>'$user->rights->college->subject->write',
             'target'=>'',
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2
@@ -863,6 +982,118 @@ class modCollege extends DolibarrModules
             // 0=Menu for internal users, 1=external users, 2=both
             'user'=>2
         );
+
+		/*INFORME MENU*/
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=college',
+			'type'=>'left',
+			'titre'=>'menuhomesurvey',
+			'prefix' => img_picto('', 'fa-signal', 'class="paddingright mrl-10 pictofixedwidth valignmiddle"'),
+			'mainmenu'=>'college',
+			'leftmenu'=>'college_survey',
+			'url'=>'/college/collegesurvey.php',
+			'langs'=>'college@college',
+			'position'=>1100+$r,
+			'enabled'=>'$conf->college->enabled',
+			'perms'=>'$user->rights->college->survey->write || $user->rights->college->survey->read || $user->rights->college->questions->write || $user->rights->college->questions->read || $user->rights->college->report->write || $user->rights->college->report->read',
+			'user'=>0,
+		);
+		/** REPORT CREATE 
+		$this->menu[$r++]=array(
+            'fk_menu'=>'fk_mainmenu=college,fk_leftmenu=college_survey',
+            'type'=>'left',
+            'titre'=>'menucreatenewreport',
+            //'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
+            'mainmenu'=>'college',
+            'leftmenu'=>'college_report_create',
+            'url'=>'/college/report_card.php?action=create',
+            'langs'=>'college@college',
+            'position'=>1100+$r,
+            'enabled'=>'$conf->college->enabled',
+            'perms'=>'$user->rights->college->report->write',
+            'target'=>'',
+            'user'=>0
+        );*/
+		/** REPORT LIST */
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=college,fk_leftmenu=college_survey',
+			'type'=>'left',
+			'titre'=>'menulistreport',
+			//'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
+			'mainmenu'=>'college',
+			'leftmenu'=>'college_report_list',
+			'url'=>'/college/report_list.php',
+			'langs'=>'college@college',
+			'position'=>1100+$r,
+			'enabled'=>'$conf->college->enabled',
+			'perms'=>'$user->rights->college->report->read',
+			'target'=>'',
+			'user'=>0
+		);
+		/** SURVEY CREATE 
+		$this->menu[$r++]=array(
+            'fk_menu'=>'fk_mainmenu=college,fk_leftmenu=college_survey',
+            'type'=>'left',
+            'titre'=>'menucreatenewsurvey',
+            //'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
+            'mainmenu'=>'college',
+            'leftmenu'=>'college_survey_create',
+            'url'=>'/college/surveytype_card.php?action=create',
+            'langs'=>'college@college',
+            'position'=>1100+$r,
+            'enabled'=>'$conf->college->enabled',
+            'perms'=>'$user->rights->college->survey->write',
+            'target'=>'',
+            'user'=>0
+        );*/
+		/** SURVEY LIST */
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=college,fk_leftmenu=college_survey',
+			'type'=>'left',
+			'titre'=>'menulistsurvey',
+			//'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
+			'mainmenu'=>'college',
+			'leftmenu'=>'college_survey_list',
+			'url'=>'/college/surveytype_list.php',
+			'langs'=>'college@college',
+			'position'=>1100+$r,
+			'enabled'=>'$conf->college->enabled',
+			'perms'=>'$user->rights->college->survey->read',
+			'target'=>'',
+			'user'=>0
+		);
+		/** QUESTION CREATE
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=college,fk_leftmenu=college_survey',
+			'type'=>'left',
+			'titre'=>'menucreatenewquestions',
+			//'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
+			'mainmenu'=>'college',
+			'leftmenu'=>'college_survey_question_create',
+			'url'=>'/college/questions_card.php?action=create',
+			'langs'=>'college@college',
+			'position'=>1100+$r,
+			'enabled'=>'$conf->college->enabled',
+			'perms'=>'$user->rights->college->questions->write',
+			'target'=>'',
+			'user'=>0
+		); */
+		/** QUESTION LIST */
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=college,fk_leftmenu=college_survey',
+			'type'=>'left',
+			'titre'=>'menulistquestions',
+			//'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
+			'mainmenu'=>'college',
+			'leftmenu'=>'college_survey_questions_list',
+			'url'=>'/college/questions_list.php',
+			'langs'=>'college@college',
+			'position'=>1100+$r,
+			'enabled'=>'$conf->college->enabled',
+			'perms'=>'$user->rights->college->questions->read',
+			'target'=>'',
+			'user'=>0
+		);
 
 
 		/* END MODULEBUILDER LEFTMENU STUDENT */
@@ -1080,7 +1311,7 @@ class modCollege extends DolibarrModules
 		$sql = array(
       //"TRUNCATE TABLE ".MAIN_DB_PREFIX."college_notes",
       //"TRUNCATE TABLE ".MAIN_DB_PREFIX."college_subject",
-      "TRUNCATE TABLE ".MAIN_DB_PREFIX."college_assys",
+      //"TRUNCATE TABLE ".MAIN_DB_PREFIX."college_assys",
       //"TRUNCATE TABLE ".MAIN_DB_PREFIX."college_inscriptions",
       //"DELETE FROM ".MAIN_DB_PREFIX."const WHERE name = 'COLLEGE_MYPARAM_CICLO_LECTIVO'",
     );

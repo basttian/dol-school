@@ -136,50 +136,32 @@ div.mainmenu.college {
 }
 
 
+.questionindex{
+  background: #263C5C;
+  border-radius: 50%;
+  color: rgba(255,255,255,.85);
+  display: inline-block;
+  font-size: .8rem;
+  font-weight: 300;
+  height: 1.6rem;
+  line-height: 1.25;
+  width: 1.6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
+.contenedorbtntexto {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.contenedorloadingtext {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
 
 
 
