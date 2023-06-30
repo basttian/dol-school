@@ -243,6 +243,8 @@ jQuery(document).ready(function(){
 // 		init_myfunc();
 // 	});
 // ;butActionRefused
+
+    $("div.tabBar div.photoref").hide();
     $("#btnpdfdoc").click(function(event){
       $('#loader').show();
       $(this).addClass( "butActionDelete").addClass("butActionRefused");
@@ -384,45 +386,33 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	// ------------------------------------------------------------
 	$linkback = '<a href="'.dol_buildpath('/college/students_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
-	$morehtmlref = '<div class="refidno">';
-	/*
-	 // Ref customer
-	 $morehtmlref.=$form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', 0, 1);
-	 $morehtmlref.=$form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', null, null, '', 1);
-	 // Thirdparty
-	 $morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . (is_object($object->thirdparty) ? $object->thirdparty->getNomUrl(1) : '');
-	 // Project
-	 if (! empty($conf->projet->enabled)) {
-	 $langs->load("projects");
-	 $morehtmlref .= '<br>'.$langs->trans('Project') . ' ';
-	 if ($permissiontoadd) {
-	 //if ($action != 'classify') $morehtmlref.='<a class="editfielda" href="' . $_SERVER['PHP_SELF'] . '?action=classify&token='.newToken().'&id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> ';
-	 $morehtmlref .= ' : ';
-	 if ($action == 'classify') {
-	 //$morehtmlref .= $form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'projectid', 0, 0, 1, 1);
-	 $morehtmlref .= '<form method="post" action="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'">';
-	 $morehtmlref .= '<input type="hidden" name="action" value="classin">';
-	 $morehtmlref .= '<input type="hidden" name="token" value="'.newToken().'">';
-	 $morehtmlref .= $formproject->select_projects($object->socid, $object->fk_project, 'projectid', $maxlength, 0, 1, 0, 1, 0, 0, '', 1);
-	 $morehtmlref .= '<input type="submit" class="button valignmiddle" value="'.$langs->trans("Modify").'">';
-	 $morehtmlref .= '</form>';
-	 } else {
-	 $morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'none', 0, 0, 0, 1);
-	 }
-	 } else {
-	 if (! empty($object->fk_project)) {
-	 $proj = new Project($db);
-	 $proj->fetch($object->fk_project);
-	 $morehtmlref .= ': '.$proj->getNomUrl();
-	 } else {
-	 $morehtmlref .= '';
-	 }
-	 }
-	 }*/
-	$morehtmlref .= '</div>';
+	$morehtmlref =  '<div class="refidno inline-block valignmiddle">';
+	$dir = $conf->college->dir_output.'/students/'.get_exdir(0, 0, 0, 1, $object, 'students').'/';
+	// Obtener la lista de archivos en la carpeta
+	$archivos = scandir($dir);
+	// Filtrar solo los archivos de imagen
+	if(!empty($archivos)){ // Si no esta vacia la carpeta
+		$imagenes = array_filter($archivos, function ($archivo) {
+			$extensiones_permitidas = ['jpg', 'jpeg', 'png', 'gif']; // Puedes agregar más extensiones si lo deseas
+			$extension = strtolower(pathinfo($archivo, PATHINFO_EXTENSION));
+			return in_array($extension, $extensiones_permitidas);
+		});
+		// Obtener la primera imagen de la carpeta
+		$primera_imagen = reset($imagenes);
+		// Verificar si se encontró alguna imagen
+		if ($primera_imagen !== false) {
+			$ruta_primera_imagen = DOL_URL_ROOT.'/viewimage.php?modulepart=college&file=/students/'.get_exdir(0, 0, 0, 1, $object, 'students').'/'. $primera_imagen;
+			$morehtmlref .= '<img src="' . $ruta_primera_imagen . '" alt="Foto subida" class="phototest photowithmargin photoref" >';
+		}else{
+			$morehtmlref .= '<img class="phototest photowithmargin photoref" alt="" src="../../public/theme/common/nophoto.png">';
+		};
+	}else{
+		$morehtmlref .= '<img class="phototest photowithmargin photoref" alt="" src="../../public/theme/common/nophoto.png">';
+	};
+	$morehtmlref .=  '</div>';
 
-
-	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+    dol_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', '', '', 0, '','', 0, $morehtmlref);
+	//dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
 
 
 	print '<div class="fichecenter">';
@@ -536,9 +526,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
                               	
       
       // Send
-			if (empty($user->socid)) {
-				print dolGetButtonAction($langs->trans('SendMail'), '', 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presend&mode=init&token='.newToken().'#formmailbeforetitle');
-			}
+			
+			print dolGetButtonAction($langs->trans('SendMail'), '', 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presend&mode=init&token='.newToken().'#formmailbeforetitle','',$permissiontoadd);
+			
 
 			// Back to draft
 			if ($object->status == $object::STATUS_VALIDATED) {

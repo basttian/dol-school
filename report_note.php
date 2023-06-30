@@ -1,6 +1,6 @@
 <?php
 /* Copyright (C) 2007-2017 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) ---Put here your own copyright and developer email---
+ * Copyright (C) 2023 SuperAdmin
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
  */
 
 /**
- *  \file       students_note.php
+ *  \file       report_note.php
  *  \ingroup    college
- *  \brief      Tab for notes on Students
+ *  \brief      Tab for notes on Report
  */
 
 //if (! defined('NOREQUIREDB'))              define('NOREQUIREDB', '1');				// Do not create database handler $db
@@ -28,7 +28,6 @@
 //if (! defined('NOREQUIRETRAN'))            define('NOREQUIRETRAN', '1');				// Do not load object $langs
 //if (! defined('NOSCANGETFORINJECTION'))    define('NOSCANGETFORINJECTION', '1');		// Do not check injection attack on GET parameters
 //if (! defined('NOSCANPOSTFORINJECTION'))   define('NOSCANPOSTFORINJECTION', '1');		// Do not check injection attack on POST parameters
-//if (! defined('NOCSRFCHECK'))              define('NOCSRFCHECK', '1');				// Do not check CSRF attack (test on referer + on token if option MAIN_SECURITY_CSRF_WITH_TOKEN is on).
 //if (! defined('NOTOKENRENEWAL'))           define('NOTOKENRENEWAL', '1');				// Do not roll the Anti CSRF token (used if MAIN_SECURITY_CSRF_WITH_TOKEN is on)
 //if (! defined('NOSTYLECHECK'))             define('NOSTYLECHECK', '1');				// Do not check style html tag into posted data
 //if (! defined('NOREQUIREMENU'))            define('NOREQUIREMENU', '1');				// If there is no need to load and show top and left menu
@@ -38,8 +37,7 @@
 //if (! defined('NOIPCHECK'))                define('NOIPCHECK', '1');					// Do not check IP defined into conf $dolibarr_main_restrict_ip
 //if (! defined("MAIN_LANG_DEFAULT"))        define('MAIN_LANG_DEFAULT', 'auto');					// Force lang to a particular value
 //if (! defined("MAIN_AUTHENTICATION_MODE")) define('MAIN_AUTHENTICATION_MODE', 'aloginmodule');	// Force authentication handler
-//if (! defined("NOREDIRECTBYMAINTOLOGIN"))  define('NOREDIRECTBYMAINTOLOGIN', 1);		// The main.inc.php does not make a redirect if not logged, instead show simple error message
-//if (! defined("FORCECSP"))                 define('FORCECSP', 'none');				// Disable all Content Security Policies
+//if (! defined("MAIN_SECURITY_FORCECSP"))   define('MAIN_SECURITY_FORCECSP', 'none');				// Disable all Content Security Policies
 //if (! defined('CSRFCHECK_WITH_TOKEN'))     define('CSRFCHECK_WITH_TOKEN', '1');		// Force use of CSRF protection with tokens even for GET
 //if (! defined('NOBROWSERNOTIF'))     		 define('NOBROWSERNOTIF', '1');				// Disable browser notification
 
@@ -74,8 +72,8 @@ if (!$res) {
 	die("Include of main fails");
 }
 
-dol_include_once('/college/class/students.class.php');
-dol_include_once('/college/lib/college_students.lib.php');
+dol_include_once('/college/class/report.class.php');
+dol_include_once('/college/lib/college_report.lib.php');
 
 // Load translation files required by the page
 $langs->loadLangs(array("college@college", "companies"));
@@ -88,27 +86,27 @@ $cancel     = GETPOST('cancel', 'aZ09');
 $backtopage = GETPOST('backtopage', 'alpha');
 
 // Initialize technical objects
-$object = new Students($db);
+$object = new Report($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->college->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('studentsnote', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('reportnote', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
 // Load object
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once  // Must be include, not include_once. Include fetch and fetch_thirdparty but not fetch_optionals
 if ($id > 0 || !empty($ref)) {
-	$upload_dir = $conf->college->multidir_output[!empty($object->entity) ? $object->entity : $conf->entity]."/".$object->id;
+	$upload_dir = $conf->college->multidir_output[empty($object->entity) ? $conf->entity : $object->entity]."/".$object->id;
 }
 
 
 // There is several ways to check permission.
 // Set $enablepermissioncheck to 1 to enable a minimum low level of checks
-$enablepermissioncheck = 1;
+$enablepermissioncheck = 0;
 if ($enablepermissioncheck) {
-	$permissiontoread = $user->rights->college->students->read;
-	$permissiontoadd = $user->rights->college->students->write;
-	$permissionnote = $user->rights->college->students->write; // Used by the include of actions_setnotes.inc.php
+	$permissiontoread = $user->rights->college->report->read;
+	$permissiontoadd = $user->rights->college->report->write;
+	$permissionnote = $user->rights->college->report->write; // Used by the include of actions_setnotes.inc.php
 } else {
 	$permissiontoread = 1;
 	$permissiontoadd = 1;
@@ -119,8 +117,10 @@ if ($enablepermissioncheck) {
 //if ($user->socid > 0) accessforbidden();
 //if ($user->socid > 0) $socid = $user->socid;
 //$isdraft = (($object->status == $object::STATUS_DRAFT) ? 1 : 0);
-//restrictedArea($user, $object->element, $object->id, $object->table_element, '', 'fk_soc', 'rowid', $isdraft);
-if (empty($conf->college->enabled)) accessforbidden();
+//restrictedArea($user, $object->module, $object->id, $object->table_element, $object->element, 'fk_soc', 'rowid', $isdraft);
+if (!isModEnabled("college")) {
+	accessforbidden();
+}
 if (!$permissiontoread) accessforbidden();
 
 
@@ -146,28 +146,29 @@ $form = new Form($db);
 
 //$help_url='EN:Customers_Orders|FR:Commandes_Clients|ES:Pedidos de clientes';
 $help_url = '';
-llxHeader('<script type="text/javascript" src="./js/printThis.js"></script>', $langs->trans('Students').' | '.$object->label , $help_url);
+$title = $langs->trans('Report').' - '.$langs->trans("Notes");
+llxHeader('', $title, $help_url);
 
 if ($id > 0 || !empty($ref)) {
 	$object->fetch_thirdparty();
 
-	$head = studentsPrepareHead($object);
+	$head = reportPrepareHead($object);
 
-	print dol_get_fiche_head($head, 'note', $langs->trans("Students"), -1, $object->picto);
+	print dol_get_fiche_head($head, 'note', $langs->trans("Report"), -1, $object->picto);
 
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/college/students_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$linkback = '<a href="'.dol_buildpath('/college/report_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
 	$morehtmlref = '<div class="refidno">';
-	
+	/*
 	 // Ref customer
-	 //$morehtmlref.=$form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', 0, 1);
-	 //$morehtmlref.=$form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', null, null, '', 1);
+	 $morehtmlref.=$form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', 0, 1);
+	 $morehtmlref.=$form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', null, null, '', 1);
 	 // Thirdparty
-	 $morehtmlref.='<br>'.$langs->trans('thirdpartytab') . ' : ' . (is_object($object->thirdparty) ? $object->thirdparty->getNomUrl(1) : '-------');
+	 $morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . (is_object($object->thirdparty) ? $object->thirdparty->getNomUrl(1) : '');
 	 // Project
-	 /*if (! empty($conf->projet->enabled))
+	 if (!empty($conf->project->enabled))
 	 {
 	 $langs->load("projects");
 	 $morehtmlref.='<br>'.$langs->trans('Project') . ' ';
@@ -188,7 +189,7 @@ if ($id > 0 || !empty($ref)) {
 	 $morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'none', 0, 0, 0, 1);
 	 }
 	 } else {
-	 if (! empty($object->fk_project)) {
+	 if (!empty($object->fk_project)) {
 	 $proj = new Project($db);
 	 $proj->fetch($object->fk_project);
 	 $morehtmlref .= ': '.$proj->getNomUrl();
@@ -211,25 +212,10 @@ if ($id > 0 || !empty($ref)) {
 	include DOL_DOCUMENT_ROOT.'/core/tpl/notes.tpl.php';
 
 	print '</div>';
+
 	print dol_get_fiche_end();
 }
 
 // End of page
 llxFooter();
 $db->close();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

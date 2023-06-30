@@ -109,17 +109,17 @@ $('#msj').colorbox({innerWidth:"90%",innerHeight:"30%", href:"ajaxmsj.php"});
         <?php echo $langs->trans("card-body-notas") ;?>
       </div>
       <div class="card-footer">
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_list.php"; ?>" class="float-left btn btn-primary"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_list.php"; ?>" title="<?php echo $langs->trans('tooltipmainmenunoteslist'); ?>" class="float-left btn btn-primary classfortooltip"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
         
         <?php if($user->rights->college->notes->generate_xlsx){ ;?>
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_card.php?action=mynotes"; ?>" class="float-right btn btn-primary classfortooltip"  title="<?php echo $langs->trans('tooltipmainmenuxlsx'); ?>"><i class="fa fa-file-excel" aria-hidden="true"></i>&nbsp;</a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_card.php?action=mynotes"; ?>" class="mrl-10 float-right btn btn-primary classfortooltip"  title="<?php echo $langs->trans('tooltipmainmenuxlsx'); ?>" ><i class="fa fa-file-excel" aria-hidden="true"></i>&nbsp;</a>
         <?php } ;?>
 
         <?php if ($user->rights->college->notes->write){ ;?>
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_card.php?action=create"; ?>" class="mrl-10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_card.php?action=createlist"; ?>" class="float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i><i class="fa fa-bars" aria-hidden="true"></i></a>
+        <!-- <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_card.php?action=create"; ?>" title="<?php echo $langs->trans('tooltipmainmenunotesnew'); ?>" class="mrl-10 float-right btn btn-primary classfortooltip"><i class="fa fa-plus" aria-hidden="true"></i></a> -->
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/notes_card.php?action=createlist"; ?>" title="<?php echo $langs->trans('tooltipmainmenunotesmesh'); ?>" class="float-right btn btn-primary classfortooltip"><i class="fa fa-plus" aria-hidden="true"></i><i class="fa fa-bars" aria-hidden="true"></i></a>
         <?php } ;?>
-      
+
       </div>
     </div>
   </div>
@@ -138,9 +138,9 @@ $('#msj').colorbox({innerWidth:"90%",innerHeight:"30%", href:"ajaxmsj.php"});
         <?php echo $langs->trans("card-body-assys") ;?>
       </div>
       <div class="card-footer">
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/assys_list.php"; ?>" class="float-left btn btn-primary"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/assys_list.php"; ?>" class="float-left btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenuassyslist'); ?>"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
         <?php if ($user->rights->college->assys->write){ ;?>
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/assys_card.php?action=create"; ?>" class="mrl-10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/assys_card.php?action=create"; ?>" class="mrl-10 float-right btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenuassysnew'); ?>"><i class="fa fa-plus" aria-hidden="true"></i></a>
         <?php } ;?>
       </div>
     </div>
@@ -160,9 +160,9 @@ $('#msj').colorbox({innerWidth:"90%",innerHeight:"30%", href:"ajaxmsj.php"});
         <?php echo $langs->trans("card-body-inscriptions") ;?>
       </div>
       <div class="card-footer">
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/inscriptions_list.php"; ?>" class="float-left btn btn-primary"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/inscriptions_list.php"; ?>" class="float-left btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenuinscriptionslist'); ?>"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
         <?php if($user->rights->college->inscriptions->write){  ;?>
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/inscriptions_card.php?action=create"; ?>" class="m10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/inscriptions_card.php?action=create"; ?>" class="m10 float-right btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenuinscriptions'); ?>"><i class="fa fa-plus" aria-hidden="true"></i></a>
         <?php }  ;?>
       </div>
     </div>
@@ -182,9 +182,9 @@ $('#msj').colorbox({innerWidth:"90%",innerHeight:"30%", href:"ajaxmsj.php"});
         <?php echo $langs->trans("card-body-students") ;?>
       </div>
       <div class="card-footer">
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/students_list.php"; ?>" class="float-left btn btn-primary"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/students_list.php"; ?>" class="float-left btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenustudentlist'); ?>"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
         <?php if($user->rights->college->students->write){ ;?>
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/students_card.php?action=create"; ?>" class="m10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/students_card.php?action=create"; ?>" class="m10 float-right btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenustudentnew'); ?>"><i class="fa fa-plus" aria-hidden="true"></i></a>
         <?php } ;?>
       </div>
     </div>
@@ -204,11 +204,11 @@ $('#msj').colorbox({innerWidth:"90%",innerHeight:"30%", href:"ajaxmsj.php"});
       <?php echo $langs->trans("card-body-subject") ;?>
     </div>
       <div class="card-footer">
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/subject_list.php"; ?>" class="float-left btn btn-primary"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/subject_list.php"; ?>" class="float-left btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenusubjectlist'); ?>"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
         <?php if($user->rights->college->subject->write) { ;?>
         
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/subject_card.php?action=create"; ?>" class="mrl-10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/subject_card.php?action=createadds"; ?>" class="float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i><i class="fa fa-bars" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/subject_card.php?action=create"; ?>" class="mrl-10 float-right btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenusubjectnew'); ?>"><i class="fa fa-plus" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/subject_card.php?action=createadds"; ?>" class="float-right btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenusubjectnews'); ?>"><i class="fa fa-plus" aria-hidden="true"></i><i class="fa fa-bars" aria-hidden="true"></i></a>
         <?php } ;?>
       </div>
     </div>
@@ -228,9 +228,9 @@ $('#msj').colorbox({innerWidth:"90%",innerHeight:"30%", href:"ajaxmsj.php"});
       <?php echo $langs->trans("card-body-class") ;?>
     </div>
       <div class="card-footer">
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/classrooms_list.php"; ?>" class="float-left btn btn-primary"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/classrooms_list.php"; ?>" class="float-left btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenuclasslist'); ?>"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
         <?php if($user->rights->college->classrooms->write){ ;?>
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/classrooms_card.php?action=create"; ?>" class="m10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/classrooms_card.php?action=create"; ?>" class="m10 float-right btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenuclassnew'); ?>"><i class="fa fa-plus" aria-hidden="true"></i></a>
         <?php } ;?> 
       </div>
     </div>
@@ -250,10 +250,44 @@ $('#msj').colorbox({innerWidth:"90%",innerHeight:"30%", href:"ajaxmsj.php"});
       <?php echo $langs->trans("card-body-periods") ;?>
     </div>
       <div class="card-footer">
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/periods_list.php"; ?>" class="float-left btn btn-primary"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/periods_list.php"; ?>" class="float-left btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenuperiodslist'); ?>"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
         <?php if($user->rights->college->periods->write){ ;?>
-        <a href="<?php echo DOL_URL_ROOT."/custom/college/periods_card.php?action=create"; ?>" class="m10 float-right btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></a>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/periods_card.php?action=create"; ?>" class="m10 float-right btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenuperiodsnew'); ?>"><i class="fa fa-plus" aria-hidden="true"></i></a>
         <?php } ;?> 
+      </div>
+    </div>
+  </div>
+<?php } ;?>
+<?php if($user->rights->college->report->read){ ;?>
+<div class="column col-4 col-xs-12 p-10">
+  <div class="card">
+    <div class="card-image m-10">
+      <i class="fa fa-address-card fa-5x" aria-hidden="true"></i>
+    </div>
+    <div class="card-header">
+      <div class="card-title h5"><?php echo $langs->trans("card-header-a-report") ;?></div>
+      <div class="card-subtitle text-gray"><?php echo $langs->trans("card-header-b-report") ;?></i></div>
+    </div>
+    <div class="card-body">
+      <?php echo $langs->trans("card-body-report") ;?>
+    </div>
+      <div class="card-footer">
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/report_list.php"; ?>" class=" float-left btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenureportlist'); ?>"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <?php if($user->rights->college->report->write){ ;?>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/report_card.php?action=create"; ?>" class="mrl-10 float-left btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenureportnew'); ?>"><i class="fa fa-plus" aria-hidden="true"></i></a>
+        <?php } ;?> 
+       <!-- OCULTAMOS PARA ELIMINAR
+        <?php if($user->rights->college->questions->write){ ;?>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/questions_card.php?action=create"; ?>" class="float-right btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenuquestionsnew'); ?>"><i class="fa fa-question-circle-o" aria-hidden="true"></i> | <i class="fa fa-plus" aria-hidden="true"></i></a>
+        <?php } ;?>
+        <?php if($user->rights->college->questions->read){ ;?>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/questions_list.php"; ?>" class="mrl-10 float-right btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenuquestionslist'); ?>"><i class="fa fa-question-circle-o" aria-hidden="true"></i> | <i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <?php } ;?>
+
+        <?php if($user->rights->college->survey->write){ ;?>
+        <a href="<?php echo DOL_URL_ROOT."/custom/college/surveytype_list.php"; ?>" class="mrl-10 float-right btn btn-primary classfortooltip" title="<?php echo $langs->trans('tooltipmainmenusurveylist'); ?>"><i class="fa fa-paperclip" aria-hidden="true"></i> | <i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <?php } ;?>
+        -->
       </div>
     </div>
   </div>

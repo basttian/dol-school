@@ -76,31 +76,18 @@ if (!$res) {
 
 dol_include_once('/college/class/students.class.php');
 dol_include_once('/college/lib/college_students.lib.php');
+dol_include_once('/custom/college/class/classrooms.class.php');
+dol_include_once('/custom/college/class/inscriptions.class.php');
+dol_include_once('/custom/college/class/notes.class.php');
+dol_include_once('/custom/college/class/subject.class.php');
 
 // Load translation files required by the page
-$langs->loadLangs(array("college@college", "companies"));
+$langs->loadLangs(array("college@college", "notes"));
 
-// Get parameters
 $id = GETPOST('id', 'int');
-$ref        = GETPOST('ref', 'alpha');
-$action = GETPOST('action', 'aZ09');
-$cancel     = GETPOST('cancel', 'aZ09');
-$backtopage = GETPOST('backtopage', 'alpha');
-
 // Initialize technical objects
 $object = new Students($db);
-$extrafields = new ExtraFields($db);
-$diroutputmassaction = $conf->college->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('studentsnote', 'globalcard')); // Note that conf->hooks_modules contains array
-// Fetch optionals attributes and labels
-$extrafields->fetch_name_optionals_label($object->table_element);
-
-// Load object
-include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once  // Must be include, not include_once. Include fetch and fetch_thirdparty but not fetch_optionals
-if ($id > 0 || !empty($ref)) {
-	$upload_dir = $conf->college->multidir_output[!empty($object->entity) ? $object->entity : $conf->entity]."/".$object->id;
-}
-
+$object->fetch($id);
 
 // There is several ways to check permission.
 // Set $enablepermissioncheck to 1 to enable a minimum low level of checks
@@ -114,122 +101,134 @@ if ($enablepermissioncheck) {
 	$permissiontoadd = 1;
 	$permissionnote = 1;
 }
-
-// Security check (enable the most restrictive one)
-//if ($user->socid > 0) accessforbidden();
-//if ($user->socid > 0) $socid = $user->socid;
-//$isdraft = (($object->status == $object::STATUS_DRAFT) ? 1 : 0);
-//restrictedArea($user, $object->element, $object->id, $object->table_element, '', 'fk_soc', 'rowid', $isdraft);
 if (empty($conf->college->enabled)) accessforbidden();
 if (!$permissiontoread) accessforbidden();
 
-
-/*
- * Actions
- */
-
-$parameters = array();
-$reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
-if ($reshook < 0) {
-	setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
-}
-if (empty($reshook)) {
-	include DOL_DOCUMENT_ROOT.'/core/actions_setnotes.inc.php'; // Must be include, not include_once
-}
-
-
-/*
- * View
- */
-
 $form = new Form($db);
 
-//$help_url='EN:Customers_Orders|FR:Commandes_Clients|ES:Pedidos de clientes';
 $help_url = '';
-llxHeader('<script type="text/javascript" src="./js/printThis.js"></script>', $langs->trans('Students').' | '.$object->label , $help_url);
-
-if ($id > 0 || !empty($ref)) {
-	$object->fetch_thirdparty();
-
+llxHeader('<link rel="stylesheet" href="./js/print-js/dist/print.css"><script type="text/javascript" src="./js/print-js/dist/print.js"></script>', $langs->trans('StudentsNotes').' | '.$object->label , $help_url);
+if ($id > 0 ) {
 	$head = studentsPrepareHead($object);
-
-	print dol_get_fiche_head($head, 'note', $langs->trans("Students"), -1, $object->picto);
-
-	// Object card
-	// ------------------------------------------------------------
+	print dol_get_fiche_head($head, '5', $langs->trans("StudentsNotes"), -1, $object->picto);
 	$linkback = '<a href="'.dol_buildpath('/college/students_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
-	$morehtmlref = '<div class="refidno">';
-	
-	 // Ref customer
-	 //$morehtmlref.=$form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', 0, 1);
-	 //$morehtmlref.=$form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', null, null, '', 1);
-	 // Thirdparty
-	 $morehtmlref.='<br>'.$langs->trans('thirdpartytab') . ' : ' . (is_object($object->thirdparty) ? $object->thirdparty->getNomUrl(1) : '-------');
-	 // Project
-	 /*if (! empty($conf->projet->enabled))
-	 {
-	 $langs->load("projects");
-	 $morehtmlref.='<br>'.$langs->trans('Project') . ' ';
-	 if ($permissiontoadd)
-	 {
-	 if ($action != 'classify')
-	 //$morehtmlref.='<a class="editfielda" href="' . $_SERVER['PHP_SELF'] . '?action=classify&token='.newToken().'&id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> : ';
-	 $morehtmlref.=' : ';
-	 if ($action == 'classify') {
-	 //$morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'projectid', 0, 0, 1, 1);
-	 $morehtmlref.='<form method="post" action="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'">';
-	 $morehtmlref.='<input type="hidden" name="action" value="classin">';
-	 $morehtmlref.='<input type="hidden" name="token" value="'.newToken().'">';
-	 $morehtmlref.=$formproject->select_projects($object->socid, $object->fk_project, 'projectid', $maxlength, 0, 1, 0, 1, 0, 0, '', 1);
-	 $morehtmlref.='<input type="submit" class="button valignmiddle" value="'.$langs->trans("Modify").'">';
-	 $morehtmlref.='</form>';
-	 } else {
-	 $morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'none', 0, 0, 0, 1);
-	 }
-	 } else {
-	 if (! empty($object->fk_project)) {
-	 $proj = new Project($db);
-	 $proj->fetch($object->fk_project);
-	 $morehtmlref .= ': '.$proj->getNomUrl();
-	 } else {
-	 $morehtmlref .= '';
-	 }
-	 }
-	 }*/
-	 $morehtmlref .= '</div>';
+    $morehtmlref = '<div class="refidno">';
+    $morehtmlref.='<br>'.$langs->trans('thirdpartytab') . ' : ' . (is_object($object->thirdparty) ? $object->thirdparty->getNomUrl(1) : '-------');
+    $morehtmlref .= '</div>';
 
-
-	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
-
-
-	print '<div class="fichecenter">';
+    dol_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
+    print '<div class="fichecenter">';
 	print '<div class="underbanner clearboth"></div>';
+    ?>
+    <script type="text/javascript">
+    jQuery(document).ready(function() {
+      var txtyear;
+      var msj = '<?php echo $langs->trans("nodatafound") ;?>';
+      $("#tableDataNotess>tbody").append("<tr class='pair'><td colspan='3'>"+msj+"</td></tr>");
+      
+      $('#loader').hide();
+      $('#txtsearch').on('keyup',function(){
+        var idarrays=[];
+        if ($(this).val().length === 4 ) {
+          txtyear = $(this).val();
+          $('#loader').show();
+          $.getJSON( "./ajax.php?action=getnotesforstudent",{
+            yeartab:$(this).val(),
+            studenttab:<?php echo $object->id ;?>,
+            token:"<?php echo newToken() ;?>"}, function() {
+            $("#tableDataNotess>tbody").find("tr").remove();
+          }).done(function(datanotestudent){
+            //console.log(datanotestudent);
+            if (datanotestudent != 0) {
+              Object.keys(datanotestudent).forEach(function(key,index,arr) {
+                $("#tableDataNotess>tbody").append(
+                "<tr class='pair'><td>"+datanotestudent[key].asignatura+
+                "</td><td>"+datanotestudent[key].promedio+
+                "</td><td>"+((datanotestudent[key].noterecovery==0)?'-':datanotestudent[key].noterecovery)+
+                "</td></tr><tr><td colspan='3'><table id='tablerecord'><thead><tr></tr></thead><tbody><tr id="+key+"></tr></tbody></table></td></tr>");
+              });
+              $.getJSON( "./ajax.php?action=getperiods",{ token:"<?php echo newToken() ;?>" }, function(dataperiods) {
+              Object.keys(dataperiods).forEach(function(kk,index,arr) {
+                $("#tableDataNotess>tbody>tr").find("table>thead>tr:eq(0)").append("<th>"+dataperiods[kk].label+"</th><th></th>");
+              });}).done(function(dataperiods){ 
+                Object.keys(datanotestudent).forEach(function(key,index,arr) {
+                  Object.keys(dataperiods).forEach(function(k,i,a){
+                  $("#tableDataNotess>tbody>tr>").find("table>tbody>tr#"+key+" ").append(
+                  "<td>"+datanotestudent[key].data[dataperiods[k].rowid]+"</td></td><td>");
+                  });
+                });
+              $('#loader').hide();
+              });
+            }else{
+              $("#tableDataNotess>tbody").append("<tr class='pair'><td colspan='3'>"+msj+"</td></tr>");
+              $('#loader').hide();
+            }
+          })
+        }else{
+          if($(this).val().length < 4 ){
+            $("#tableDataNotess>tbody").find("tr").remove();
+          }
+          $("#tableDataNotess>tbody").append("<tr class='pair'><td colspan='3'>"+msj+"</td></tr>");
+          $('#loader').hide();
+        }  
+      })
+    
+    });
+    </script>
+    <div class="centpercent">
+    <div style="vertical-align: middle">
+    <div class="pagination paginationref" style="padding-top: 2em;">
+    <div class="right">
+      <img style="display: none;" class="valignmiddle" id="loader" src="../../custom/college/img/spinner.gif" height="20px" />
+      <input class="flat minwidth300" type="search" id="txtsearch" placeholder="<?php echo $langs->trans("inputfilterplaceholder") ;?>"/>
+      <!-- <a href="#" onclick="printDiv()" class="hideonsmartphoneimp valignmiddle" style="float: right;"><i class="fa fa-print fa-1x"></i></a> -->
+    </div>
+    </div>
+    <div class="inline-block floatleft">
+    <div class="maxwidth750 refid">
+      <h1><?php echo $langs->trans("titlenotas") ;?></h1>
+    </div>
+    </div>
+    </div>
+    </div>
+    <div id="idprint">
+    <div class="div-table-responsive">
+    <table id="tableDataNotess" class="tagtable nobottomiftotal liste">
+    <!--<caption class="right"><em><b><?php echo $object->label ;?></b></em></caption>-->
+      <thead>
+        <tr class="liste_titre">
+          <th><?php echo $langs->trans("tablenotesheader1") ;?></th>
+          <th><?php echo $form->textwithpicto($langs->trans("tablenotesheader2"),$langs->trans("tablenotesheader2Tooltip"));?></th>
+          <th><?php echo $form->textwithpicto($langs->trans("tablenotesheader3"),$langs->trans("tablenotesheader3Tooltip"));?></th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+      <tfoot>
+      </tfoot>
+    </table>
+    </div>
+    </div>
+   
+    <?php
+	print '</div><br>';
+  print '<a class="butAction" href="#" onclick="printDiv()" ><i class="fa fa-print" aria-hidden="true"></i></a>';
 
-
-	$cssclass = "titlefield";
-	include DOL_DOCUMENT_ROOT.'/core/tpl/notes.tpl.php';
-
-	print '</div>';
-	print dol_get_fiche_end();
+    ?>
+    <script>
+    function printDiv() {
+      printJS({ 
+        printable: "idprint", 
+        type: "html", 
+        header: "<h3><?php echo $object->label;?></h3>",
+        documentTitle:"<?php echo $object->label;?>",
+        style:"table, th, td {border-bottom: 1px solid #ddd;} tr:nth-child(even) {background-color: #f2f2f2;}",
+      });
+	 }
+    </script>
+    <?php
 }
-
 // End of page
 llxFooter();
 $db->close();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,6 +1,6 @@
 <?php
 /* Copyright (C) 2017 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) ---Put here your own copyright and developer email---
+ * Copyright (C) 2023 SuperAdmin
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
  */
 
 /**
- *  \file       subject_agenda.php
+ *  \file       report_agenda.php
  *  \ingroup    college
- *  \brief      Tab of events on Subject
+ *  \brief      Tab of events on Report
  */
 
 //if (! defined('NOREQUIREDB'))              define('NOREQUIREDB', '1');				// Do not create database handler $db
@@ -28,7 +28,6 @@
 //if (! defined('NOREQUIRETRAN'))            define('NOREQUIRETRAN', '1');				// Do not load object $langs
 //if (! defined('NOSCANGETFORINJECTION'))    define('NOSCANGETFORINJECTION', '1');		// Do not check injection attack on GET parameters
 //if (! defined('NOSCANPOSTFORINJECTION'))   define('NOSCANPOSTFORINJECTION', '1');		// Do not check injection attack on POST parameters
-//if (! defined('NOCSRFCHECK'))              define('NOCSRFCHECK', '1');				// Do not check CSRF attack (test on referer + on token if option MAIN_SECURITY_CSRF_WITH_TOKEN is on).
 //if (! defined('NOTOKENRENEWAL'))           define('NOTOKENRENEWAL', '1');				// Do not roll the Anti CSRF token (used if MAIN_SECURITY_CSRF_WITH_TOKEN is on)
 //if (! defined('NOSTYLECHECK'))             define('NOSTYLECHECK', '1');				// Do not check style html tag into posted data
 //if (! defined('NOREQUIREMENU'))            define('NOREQUIREMENU', '1');				// If there is no need to load and show top and left menu
@@ -38,8 +37,7 @@
 //if (! defined('NOIPCHECK'))                define('NOIPCHECK', '1');					// Do not check IP defined into conf $dolibarr_main_restrict_ip
 //if (! defined("MAIN_LANG_DEFAULT"))        define('MAIN_LANG_DEFAULT', 'auto');					// Force lang to a particular value
 //if (! defined("MAIN_AUTHENTICATION_MODE")) define('MAIN_AUTHENTICATION_MODE', 'aloginmodule');	// Force authentication handler
-//if (! defined("NOREDIRECTBYMAINTOLOGIN"))  define('NOREDIRECTBYMAINTOLOGIN', 1);		// The main.inc.php does not make a redirect if not logged, instead show simple error message
-//if (! defined("FORCECSP"))                 define('FORCECSP', 'none');				// Disable all Content Security Policies
+//if (! defined("MAIN_SECURITY_FORCECSP"))   define('MAIN_SECURITY_FORCECSP', 'none');	// Disable all Content Security Policies
 //if (! defined('CSRFCHECK_WITH_TOKEN'))     define('CSRFCHECK_WITH_TOKEN', '1');		// Force use of CSRF protection with tokens even for GET
 //if (! defined('NOBROWSERNOTIF'))     		 define('NOBROWSERNOTIF', '1');				// Disable browser notification
 
@@ -77,9 +75,8 @@ if (!$res) {
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-dol_include_once('/college/class/subject.class.php');
-dol_include_once('/college/lib/college_subject.lib.php');
-
+dol_include_once('/college/class/report.class.php');
+dol_include_once('/college/lib/college_report.lib.php');
 
 // Load translation files required by the page
 $langs->loadLangs(array("college@college", "other"));
@@ -99,6 +96,7 @@ if (GETPOST('actioncode', 'array')) {
 } else {
 	$actioncode = GETPOST("actioncode", "alpha", 3) ? GETPOST("actioncode", "alpha", 3) : (GETPOST("actioncode") == '0' ? '0' : (empty($conf->global->AGENDA_DEFAULT_FILTER_TYPE_FOR_OBJECT) ? '' : $conf->global->AGENDA_DEFAULT_FILTER_TYPE_FOR_OBJECT));
 }
+$search_rowid = GETPOST('search_rowid');
 $search_agenda_label = GETPOST('search_agenda_label');
 
 $limit = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
@@ -119,10 +117,10 @@ if (!$sortorder) {
 }
 
 // Initialize technical objects
-$object = new Subject($db);
+$object = new Report($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->college->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('subjectagenda', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('reportagenda', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
@@ -134,10 +132,10 @@ if ($id > 0 || !empty($ref)) {
 
 // There is several ways to check permission.
 // Set $enablepermissioncheck to 1 to enable a minimum low level of checks
-$enablepermissioncheck = 1;
+$enablepermissioncheck = 0;
 if ($enablepermissioncheck) {
-	$permissiontoread = $user->rights->college->subject->read;
-	$permissiontoadd = $user->rights->college->subject->write;
+	$permissiontoread = $user->rights->college->report->read;
+	$permissiontoadd = $user->rights->college->report->write;
 } else {
 	$permissiontoread = 1;
 	$permissiontoadd = 1;
@@ -147,9 +145,12 @@ if ($enablepermissioncheck) {
 //if ($user->socid > 0) accessforbidden();
 //if ($user->socid > 0) $socid = $user->socid;
 //$isdraft = (($object->status == $object::STATUS_DRAFT) ? 1 : 0);
-//restrictedArea($user, $object->element, $object->id, $object->table_element, '', 'fk_soc', 'rowid', $isdraft);
-if (empty($conf->college->enabled)) accessforbidden();
+//restrictedArea($user, $object->module, $object->id, $object->table_element, $object->element, 'fk_soc', 'rowid', $isdraft);
+if (!isModEnabled("college")) {
+	accessforbidden();
+}
 if (!$permissiontoread) accessforbidden();
+
 
 /*
  *  Actions
@@ -184,23 +185,22 @@ if (empty($reshook)) {
 $form = new Form($db);
 
 if ($object->id > 0) {
-
 	$title = $langs->trans("Agenda");
-	//if (! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/',$conf->global->MAIN_HTML_TITLE) && $object->name) $title=$object->name." - ".$title;
+	//if (!empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/',$conf->global->MAIN_HTML_TITLE) && $object->name) $title=$object->name." - ".$title;
 	$help_url = 'EN:Module_Agenda_En';
 	llxHeader('', $title, $help_url);
 
-	if (!empty($conf->notification->enabled)) {
+	if (isModEnabled('notification')) {
 		$langs->load("mails");
 	}
-	$head = subjectPrepareHead($object);
+	$head = reportPrepareHead($object);
 
 
-	print dol_get_fiche_head($head, 'agenda', $langs->trans("Subject"), -1, $object->picto);
+	print dol_get_fiche_head($head, 'agenda', $langs->trans("Report"), -1, $object->picto);
 
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/college/subject_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$linkback = '<a href="'.dol_buildpath('/college/report_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
 	$morehtmlref = '<div class="refidno">';
 	/*
@@ -210,7 +210,7 @@ if ($object->id > 0) {
 	// Thirdparty
 	$morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . (is_object($object->thirdparty) ? $object->thirdparty->getNomUrl(1) : '');
 	// Project
-	if (! empty($conf->projet->enabled)) {
+	if (!empty($conf->project->enabled)) {
 		$langs->load("projects");
 		$morehtmlref.='<br>'.$langs->trans('Project') . ' ';
 		if ($permissiontoadd) {
@@ -230,7 +230,7 @@ if ($object->id > 0) {
 				$morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'none', 0, 0, 0, 1);
 			}
 		} else {
-			if (! empty($object->fk_project)) {
+			if (!empty($object->fk_project)) {
 				$proj = new Project($db);
 				$proj->fetch($object->fk_project);
 				$morehtmlref .= ': '.$proj->getNomUrl();
@@ -242,24 +242,7 @@ if ($object->id > 0) {
 	$morehtmlref .= '</div>';
 
 
-	dol_banner_tab($object, 'ref', $linkback, $user->rights->college->readalllist->read, 'ref', 'ref', $morehtmlref);
-
-	
-	/*BLOQUEAR ACCESO*/
-	if($object->fk_user != $user->id || $user->admin ){ 
-		if(!$user->rights->college->readalllist->read){
-		print info_admin( 	  	
-			$user->firstname.' '.$user->lastname.'. You have attempted to enter an area to which you do not have access, please do not attempt this action again.',
-			$infoonimgalt = 0,
-			$nodiv = 0,
-			$admin = '0',
-			$morecss = 'error',//More CSS ('', 'warning', 'error') 
-			$textfordropdown = '403 Forbidden' 
-		);
-		accessforbidden($langs->trans('NotEnoughPermissions'), 0, 1);
-		exit;
-		}
-	}
+	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
 
 	print '<div class="fichecenter">';
 	print '<div class="underbanner clearboth"></div>';
@@ -270,6 +253,7 @@ if ($object->id > 0) {
 	print '</div>';
 
 	print dol_get_fiche_end();
+
 
 
 	// Actions buttons
@@ -292,21 +276,26 @@ if ($object->id > 0) {
 		//$out.="</a>";
 	}
 
+	$morehtmlright = '';
 
-	print '<div class="tabsAction">';
+	//$messagingUrl = DOL_URL_ROOT.'/societe/messaging.php?socid='.$object->id;
+	//$morehtmlright .= dolGetButtonTitle($langs->trans('ShowAsConversation'), '', 'fa fa-comments imgforviewmode', $messagingUrl, '', 1);
+	//$messagingUrl = DOL_URL_ROOT.'/societe/agenda.php?socid='.$object->id;
+	//$morehtmlright .= dolGetButtonTitle($langs->trans('MessageListViewType'), '', 'fa fa-bars imgforviewmode', $messagingUrl, '', 2);
 
-	if (!empty($conf->agenda->enabled)) {
+	if (isModEnabled('agenda')) {
 		if (!empty($user->rights->agenda->myactions->create) || !empty($user->rights->agenda->allactions->create)) {
-			print '<a class="butAction" href="'.DOL_URL_ROOT.'/comm/action/card.php?action=create'.$out.'">'.$langs->trans("AddAction").'</a>';
+			$morehtmlright .= dolGetButtonTitle($langs->trans('AddAction'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/comm/action/card.php?action=create'.$out);
 		} else {
-			print '<a class="butActionRefused classfortooltip" href="#">'.$langs->trans("AddAction").'</a>';
+			$morehtmlright .= dolGetButtonTitle($langs->trans('AddAction'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/comm/action/card.php?action=create'.$out, '', 0);
 		}
 	}
 
-	print '</div>';
 
-	if (!empty($conf->agenda->enabled) && (!empty($user->rights->agenda->myactions->read) || !empty($user->rights->agenda->allactions->read))) {
-		$param = '&id='.$object->id.'&socid='.$socid;
+	if (isModEnabled('agenda') && (!empty($user->rights->agenda->myactions->read) || !empty($user->rights->agenda->allactions->read))) {
+		print '<br>';
+
+		$param = '&id='.$object->id.(!empty($socid) ? '&socid='.$socid : '');
 		if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) {
 			$param .= '&contextpage='.urlencode($contextpage);
 		}
@@ -314,12 +303,13 @@ if ($object->id > 0) {
 			$param .= '&limit='.urlencode($limit);
 		}
 
-
-		//print load_fiche_titre($langs->trans("ActionsOnSubject"), '', '');
+		//print load_fiche_titre($langs->trans("ActionsOnReport"), '', '');
+		print_barre_liste($langs->trans("ActionsOnReport"), 0, $_SERVER["PHP_SELF"], '', $sortfield, $sortorder, '', 0, -1, '', 0, $morehtmlright, '', 0, 1, 1);
 
 		// List of all actions
 		$filters = array();
 		$filters['search_agenda_label'] = $search_agenda_label;
+		$filters['search_rowid'] = $search_rowid;
 
 		// TODO Replace this with same code than into list.php
 		show_actions_done($conf, $langs, $db, $object, null, 0, $actioncode, '', $filters, $sortfield, $sortorder, $object->module);

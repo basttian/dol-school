@@ -1,6 +1,6 @@
 <?php
 /* Copyright (C) 2017 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) ---Put here your own copyright and developer email---
+ * Copyright (C) 2023 SuperAdmin
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
  */
 
 /**
- *   	\file       inscriptions_card.php
+ *   	\file       questions_card.php
  *		\ingroup    college
- *		\brief      Page to create/edit/view inscriptions
+ *		\brief      Page to create/edit/view questions
  */
 
 //if (! defined('NOREQUIREDB'))              define('NOREQUIREDB', '1');				// Do not create database handler $db
@@ -28,7 +28,6 @@
 //if (! defined('NOREQUIRETRAN'))            define('NOREQUIRETRAN', '1');				// Do not load object $langs
 //if (! defined('NOSCANGETFORINJECTION'))    define('NOSCANGETFORINJECTION', '1');		// Do not check injection attack on GET parameters
 //if (! defined('NOSCANPOSTFORINJECTION'))   define('NOSCANPOSTFORINJECTION', '1');		// Do not check injection attack on POST parameters
-//if (! defined('NOCSRFCHECK'))              define('NOCSRFCHECK', '1');				// Do not check CSRF attack (test on referer + on token).
 //if (! defined('NOTOKENRENEWAL'))           define('NOTOKENRENEWAL', '1');				// Do not roll the Anti CSRF token (used if MAIN_SECURITY_CSRF_WITH_TOKEN is on)
 //if (! defined('NOSTYLECHECK'))             define('NOSTYLECHECK', '1');				// Do not check style html tag into posted data
 //if (! defined('NOREQUIREMENU'))            define('NOREQUIREMENU', '1');				// If there is no need to load and show top and left menu
@@ -38,8 +37,7 @@
 //if (! defined('NOIPCHECK'))                define('NOIPCHECK', '1');					// Do not check IP defined into conf $dolibarr_main_restrict_ip
 //if (! defined("MAIN_LANG_DEFAULT"))        define('MAIN_LANG_DEFAULT', 'auto');					// Force lang to a particular value
 //if (! defined("MAIN_AUTHENTICATION_MODE")) define('MAIN_AUTHENTICATION_MODE', 'aloginmodule');	// Force authentication handler
-//if (! defined("NOREDIRECTBYMAINTOLOGIN"))  define('NOREDIRECTBYMAINTOLOGIN', 1);		// The main.inc.php does not make a redirect if not logged, instead show simple error message
-//if (! defined("FORCECSP"))                 define('FORCECSP', 'none');				// Disable all Content Security Policies
+//if (! defined("MAIN_SECURITY_FORCECSP"))   define('MAIN_SECURITY_FORCECSP', 'none');	// Disable all Content Security Policies
 //if (! defined('CSRFCHECK_WITH_TOKEN'))     define('CSRFCHECK_WITH_TOKEN', '1');		// Force use of CSRF protection with tokens even for GET
 //if (! defined('NOBROWSERNOTIF'))     		 define('NOBROWSERNOTIF', '1');				// Disable browser notification
 //if (! defined('NOSESSION'))     		     define('NOSESSION', '1');				    // Disable session
@@ -78,12 +76,8 @@ if (!$res) {
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formmargin.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-
-dol_include_once('/college/class/inscriptions.class.php');
-dol_include_once('/college/lib/college_inscriptions.lib.php');
+dol_include_once('/college/class/questions.class.php');
+dol_include_once('/college/lib/college_questions.lib.php');
 
 // Load translation files required by the page
 $langs->loadLangs(array("college@college", "other"));
@@ -91,23 +85,23 @@ $langs->loadLangs(array("college@college", "other"));
 // Get parameters
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');
+$lineid   = GETPOST('lineid', 'int');
+
 $action = GETPOST('action', 'aZ09');
 $confirm = GETPOST('confirm', 'alpha');
 $cancel = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'inscriptionscard'; // To manage different context of search
+$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : str_replace('_', '', basename(dirname(__FILE__)).basename(__FILE__, '.php')); // To manage different context of search
 $backtopage = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
-$lineid   = GETPOST('lineid', 'int');
+$dol_openinpopup = GETPOST('dol_openinpopup', 'aZ09');
+
+
 
 // Initialize technical objects
-$object = new Inscriptions($db);
+$object = new Questions($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->college->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('inscriptionscard', 'globalcard')); // Note that conf->hooks_modules contains array
-
-/**/
-$value = GETPOST('value', 'int');
-
+$hookmanager->initHooks(array('questionscard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -134,11 +128,11 @@ include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be includ
 // Set $enablepermissioncheck to 1 to enable a minimum low level of checks
 $enablepermissioncheck = 1;
 if ($enablepermissioncheck) {
-	$permissiontoread = $user->rights->college->inscriptions->read;
-	$permissiontoadd = $user->rights->college->inscriptions->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
-	$permissiontodelete = $user->rights->college->inscriptions->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
-	$permissionnote = $user->rights->college->inscriptions->write; // Used by the include of actions_setnotes.inc.php
-	$permissiondellink = $user->rights->college->inscriptions->write; // Used by the include of actions_dellink.inc.php
+	$permissiontoread = $user->hasRight('college', 'questions', 'read');
+	$permissiontoadd = $user->hasRight('college', 'questions', 'write'); // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
+	$permissiontodelete = $user->hasRight('college', 'questions', 'delete') || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
+	$permissionnote = $user->hasRight('college', 'questions', 'write'); // Used by the include of actions_setnotes.inc.php
+	$permissiondellink = $user->hasRight('college', 'questions', 'write'); // Used by the include of actions_dellink.inc.php
 } else {
 	$permissiontoread = 1;
 	$permissiontoadd = 1; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
@@ -147,15 +141,19 @@ if ($enablepermissioncheck) {
 	$permissiondellink = 1;
 }
 
-$upload_dir = $conf->college->multidir_output[isset($object->entity) ? $object->entity : 1].'/inscriptions';
+$upload_dir = $conf->college->multidir_output[isset($object->entity) ? $object->entity : 1].'/questions';
 
 // Security check (enable the most restrictive one)
 //if ($user->socid > 0) accessforbidden();
 //if ($user->socid > 0) $socid = $user->socid;
 //$isdraft = (isset($object->status) && ($object->status == $object::STATUS_DRAFT) ? 1 : 0);
-//restrictedArea($user, $object->element, $object->id, $object->table_element, '', 'fk_soc', 'rowid', $isdraft);
-if (empty($conf->college->enabled)) accessforbidden();
-if (!$permissiontoread) accessforbidden();
+//restrictedArea($user, $object->module, $object->id, $object->table_element, $object->element, 'fk_soc', 'rowid', $isdraft);
+if (!isModEnabled("college")) {
+	accessforbidden();
+}
+if (!$permissiontoread) {
+	accessforbidden();
+}
 
 
 /*
@@ -171,21 +169,19 @@ if ($reshook < 0) {
 if (empty($reshook)) {
 	$error = 0;
 
-	$backurlforlist = dol_buildpath('/college/inscriptions_list.php', 1);
+	$backurlforlist = dol_buildpath('/college/questions_list.php', 1);
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($id) && (($action != 'add' && $action != 'create') || $cancel)) {
 				$backtopage = $backurlforlist;
 			} else {
-				$backtopage = dol_buildpath('/college/inscriptions_card.php', 1).'?id='.((!empty($id) && $id > 0) ? $id : '__ID__');
+				$backtopage = dol_buildpath('/college/questions_card.php', 1).'?id='.((!empty($id) && $id > 0) ? $id : '__ID__');
 			}
 		}
 	}
-	
-	include DOL_DOCUMENT_ROOT.'/custom/college/builddoc.php';
 
-	$triggermodname = 'COLLEGE_INSCRIPTIONS_MODIFY'; // Name of trigger action code to execute when we modify record
+	$triggermodname = 'COLLEGE_QUESTIONS_MODIFY'; // Name of trigger action code to execute when we modify record
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
@@ -200,7 +196,7 @@ if (empty($reshook)) {
 	//include DOL_DOCUMENT_ROOT.'/core/actions_lineupdown.inc.php';
 
 	// Action to build doc
-	//include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
+	include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 
 	if ($action == 'set_thirdparty' && $permissiontoadd) {
 		$object->setValueFrom('fk_soc', GETPOST('fk_soc', 'int'), '', '', 'date', '', $user, $triggermodname);
@@ -209,27 +205,47 @@ if (empty($reshook)) {
 		$object->setProject(GETPOST('projectid', 'int'));
 	}
 
+	/** Obtengo los id de opciones de preguntas */
+	$optionsarrays = $object->getOptiosnFromQuestionsId($object->id);
+
+	/**Borrar en cascada */
+	if($action == 'confirmdelete' && !empty($permissiontodelete)){
+		
+		$db->begin();
+		$sql =  "DELETE FROM ".MAIN_DB_PREFIX."college_questions";
+		$sql .= " WHERE rowid =".(int)$object->id;
+		$resql = $db->query($sql);
+		if($resql){
+		  $db->commit();
+		  $query = "DELETE FROM llx_college_questions WHERE parent_id =".(int)$object->id;
+		  $resql2 = $db->query($query);
+		  if($resql2){
+			$db->commit();
+			header("Location: " . $backurlforlist);
+		  	setEventMessages($langs->trans('RecordDeleted'), null, 'mesgs');
+			exit;
+			}
+		}
+		else
+		{
+		  $db->rollback();
+		  header("Location: ".$backtopage);
+		  setEventMessages('ERROR!!', null, 'errors');
+		  dol_print_error($db);
+		  exit;
+		}
+		$action ='';
+	}
+
 	// Actions to send emails
-	$triggersendname = 'COLLEGE_INSCRIPTIONS_SENTBYMAIL';
-	$autocopy = 'MAIN_MAIL_AUTOCOPY_INSCRIPTIONS_TO';
-	$trackid = 'inscriptions'.$object->id;
+	$triggersendname = 'COLLEGE_QUESTIONS_SENTBYMAIL';
+	$autocopy = 'MAIN_MAIL_AUTOCOPY_QUESTIONS_TO';
+	$trackid = 'questions'.$object->id;
 	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
 }
 
 
-/*Filtrar por tutor*/
-if($action == 'getTutor'){
-    $sql = "SELECT fk_soc FROM ".MAIN_DB_PREFIX."college_students WHERE rowid = ".$value."";
-    $resql = $db->query($sql);
-    $object = $db->fetch_object($resql);
-    if ($resql) {
-        echo json_encode((int)$object->fk_soc);
-        exit;
-    }else{
-        echo json_encode(0);
-        exit;
-    }
-}
+
 
 
 /*
@@ -242,66 +258,37 @@ $form = new Form($db);
 $formfile = new FormFile($db);
 $formproject = new FormProjets($db);
 
-$title = $langs->trans("Inscriptions");
+$title = $langs->trans("Questions");
 $help_url = '';
 llxHeader('', $title, $help_url);
 
 // Example : Adding jquery code
-?>
-<script type='text/javascript'>
+// print '<script type="text/javascript">
+// jQuery(document).ready(function() {
+// 	function init_myfunc()
+// 	{
+// 		jQuery("#myid").removeAttr(\'disabled\');
+// 		jQuery("#myid").attr(\'disabled\',\'disabled\');
+// 	}
+// 	init_myfunc();
+// 	jQuery("#mybutton").click(function() {
+// 		init_myfunc();
+// 	});
+// });
+// </script>';
 
-jQuery(document).ready(function() {
-
- 	/*function init_myfunc()
- 	{
- 		$.ajax({
- 	    	type: "POST",
- 	    	url: "<?php echo DOL_URL_ROOT.'/custom/college/inscriptions_card.php'; ?>",
- 	    	data: { action: 'builddoc' , id:'<?php echo $object->id; ?>' , token: '<?php echo currentToken(); ?>' }	
- 		});
- 	}*/
- 	//init_myfunc();
-
-    jQuery('#fk_student').change(function() {
-        var option = $(this).find("option:selected");
-        var value = option.val();
-        //var text = $option.text();
-        $.get( "./inscriptions_card.php?action=getTutor&value="+value, function(tutorid) {
-        	jQuery('#fk_tutor').val(tutorid).change();
-        	});
-    });
-
-    
-    jQuery('.btn-print').on("click",function() {
-      $('#loader').show();
-     	$.ajax({
- 	    	type: "POST",
- 	    	url: "<?php echo DOL_URL_ROOT.'/custom/college/inscriptions_card.php'; ?>",
- 	    	data: { action: 'builddoc' , id:'<?php echo $object->id; ?>' , token: '<?php echo currentToken(); ?>' }	
- 		}).done(function( msg ) {
- 		         //$('#loader').hide();
-             window.location.href='inscriptions_card.php?id=<?php echo $object->id; ?>';
-	   });
-    });
-    
-    
-});
-</script>
-<?php
 
 // Part to create
 if ($action == 'create') {
 	if (empty($permissiontoadd)) {
-		accessforbidden($langs->trans('NotEnoughPermissions'), 0, 1);
-		exit;
+		accessforbidden('NotEnoughPermissions', 0, 1);
 	}
 
-	print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv("Inscriptions")), '', 'object_'.$object->picto);
+	print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv("Questions")), '', 'object_'.$object->picto);
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-	print '<input type="hidden" name="token" value="'.newToken().'">';    
+	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="action" value="add">';
-    
 	if ($backtopage) {
 		print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 	}
@@ -313,9 +300,7 @@ if ($action == 'create') {
 
 	// Set some default values
 	//if (! GETPOSTISSET('fieldname')) $_POST['fieldname'] = 'myvalue';
-    //if (! GETPOSTISSET('model_pdf')) $_POST['model_pdf'] = 'standard_inscriptions';
-    //if (! GETPOSTISSET('status')) $_POST['status'] = 0;
- 
+
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
 	// Common attributes
@@ -337,24 +322,22 @@ if ($action == 'create') {
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
-	print load_fiche_titre($langs->trans("Inscriptions"), '', 'object_'.$object->picto);
-	print '<form id="target" method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+	print load_fiche_titre($langs->trans("Questions"), '', 'object_'.$object->picto);
+
+	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="action" value="update">';
 	print '<input type="hidden" name="id" value="'.$object->id.'">';
-	
 	if ($backtopage) {
 		print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 	}
 	if ($backtopageforcancel) {
 		print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 	}
-    
+
 	print dol_get_fiche_head();
-    
+
 	print '<table class="border centpercent tableforfieldedit">'."\n";
-	
-    //if (!GETPOSTISSET('status')) $_POST['status'] = 0;
 
 	// Common attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
@@ -363,32 +346,31 @@ if (($id || $ref) && $action == 'edit') {
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_edit.tpl.php';
 
 	print '</table>';
-	
+
 	print dol_get_fiche_end();
 
-	print $form->buttonsSaveCancel('Update','Cancel',null,0,"");
-    
+	print $form->buttonsSaveCancel();
+
 	print '</form>';
-	
 }
 
 // Part to show record
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create'))) {
-	$res = $object->fetch_optionals();
+	$head = questionsPrepareHead($object);
 
-	$head = inscriptionsPrepareHead($object);
-	print dol_get_fiche_head($head, 'card', $langs->trans("Inscriptions"), -1, $object->picto);
+	print dol_get_fiche_head($head, 'card', $langs->trans("Questions"), -1, $object->picto);
 
 	$formconfirm = '';
 
 	// Confirmation to delete
 	if ($action == 'delete') {
-		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteInscriptions'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteQuestions'), $langs->trans('ConfirmDeleteObject'), 'confirmdelete', '', 0, 1);
 	}
 	// Confirmation to delete line
 	if ($action == 'deleteline') {
-		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id.'&lineid='.$lineid, $langs->trans('DeleteLine'), $langs->trans('ConfirmDeleteLine'), 'confirm_deleteline', '', 0, 1);
+		//$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id.'&lineid='.$lineid, $langs->trans('DeleteLine'), $langs->trans('ConfirmDeleteLine'), 'confirm_deleteline', '', 0, 1);
 	}
+
 	// Clone confirmation
 	if ($action == 'clone') {
 		// Create an array for form
@@ -396,9 +378,19 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ToClone'), $langs->trans('ConfirmCloneAsk', $object->ref), 'confirm_clone', $formquestion, 'yes', 1);
 	}
 
-	// Confirmation of action xxxx
+	// Confirmation of action xxxx (You can use it for xxx = 'close', xxx = 'reopen', ...)
 	if ($action == 'xxx') {
+		$text = $langs->trans('ConfirmActionQuestions', $object->ref);
+		/*if (isModEnabled('notification'))
+		{
+			require_once DOL_DOCUMENT_ROOT . '/core/class/notify.class.php';
+			$notify = new Notify($db);
+			$text .= '<br>';
+			$text .= $notify->confirmMessage('QUESTIONS_CLOSE', $object->socid, $object);
+		}*/
+
 		$formquestion = array();
+
 		/*
 		$forcecombo=0;
 		if ($conf->browser->name == 'ie') $forcecombo = 1;	// There is a bug in IE10 that make combo inside popup crazy
@@ -411,7 +403,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		*/
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('XXX'), $text, 'confirm_xxx', $formquestion, 0, 1, 220);
 	}
-    
 
 	// Call Hook formConfirm
 	$parameters = array('formConfirm' => $formconfirm, 'lineid' => $lineid);
@@ -428,46 +419,44 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/college/inscriptions_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$linkback = '<a href="'.dol_buildpath('/college/questions_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+
 	$morehtmlref = '<div class="refidno">';
 	/*
-	 // Ref customer
-	 $morehtmlref.=$form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', 0, 1);
-	 $morehtmlref.=$form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', null, null, '', 1);
-	 // Thirdparty
-	 $morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . (is_object($object->thirdparty) ? $object->thirdparty->getNomUrl(1) : '');
-	 // Project
-	 if (! empty($conf->projet->enabled)) {
-	 $langs->load("projects");
-	 $morehtmlref .= '<br>'.$langs->trans('Project') . ' ';
-	 if ($permissiontoadd) {
-	 //if ($action != 'classify') $morehtmlref.='<a class="editfielda" href="' . $_SERVER['PHP_SELF'] . '?action=classify&token='.newToken().'&id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> ';
-	 $morehtmlref .= ' : ';
-	 if ($action == 'classify') {
-	 //$morehtmlref .= $form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'projectid', 0, 0, 1, 1);
-	 $morehtmlref .= '<form method="post" action="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'">';
-	 $morehtmlref .= '<input type="hidden" name="action" value="classin">';
-	 $morehtmlref .= '<input type="hidden" name="token" value="'.newToken().'">';
-	 $morehtmlref .= $formproject->select_projects($object->socid, $object->fk_project, 'projectid', $maxlength, 0, 1, 0, 1, 0, 0, '', 1);
-	 $morehtmlref .= '<input type="submit" class="button valignmiddle" value="'.$langs->trans("Modify").'">';
-	 $morehtmlref .= '</form>';
-	 } else {
-	 $morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'none', 0, 0, 0, 1);
-	 }
-	 } else {
-	 if (! empty($object->fk_project)) {
-	 $proj = new Project($db);
-	 $proj->fetch($object->fk_project);
-	 $morehtmlref .= ': '.$proj->getNomUrl();
-	 } else {
-	 $morehtmlref .= '';
-	 }
-	 }
-	 }*/
+		// Ref customer
+		$morehtmlref .= $form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, $usercancreate, 'string', '', 0, 1);
+		$morehtmlref .= $form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, $usercancreate, 'string'.(isset($conf->global->THIRDPARTY_REF_INPUT_SIZE) ? ':'.$conf->global->THIRDPARTY_REF_INPUT_SIZE : ''), '', null, null, '', 1);
+		// Thirdparty
+		$morehtmlref .= '<br>'.$object->thirdparty->getNomUrl(1, 'customer');
+		if (empty($conf->global->MAIN_DISABLE_OTHER_LINK) && $object->thirdparty->id > 0) {
+			$morehtmlref .= ' (<a href="'.DOL_URL_ROOT.'/commande/list.php?socid='.$object->thirdparty->id.'&search_societe='.urlencode($object->thirdparty->name).'">'.$langs->trans("OtherOrders").'</a>)';
+		}
+		// Project
+		if (isModEnabled('project')) {
+			$langs->load("projects");
+			$morehtmlref .= '<br>';
+			if ($permissiontoadd) {
+				$morehtmlref .= img_picto($langs->trans("Project"), 'project', 'class="pictofixedwidth"');
+				if ($action != 'classify') {
+					$morehtmlref .= '<a class="editfielda" href="'.$_SERVER['PHP_SELF'].'?action=classify&token='.newToken().'&id='.$object->id.'">'.img_edit($langs->transnoentitiesnoconv('SetProject')).'</a> ';
+				}
+				$morehtmlref .= $form->form_project($_SERVER['PHP_SELF'].'?id='.$object->id, $object->socid, $object->fk_project, ($action == 'classify' ? 'projectid' : 'none'), 0, 0, 0, 1, '', 'maxwidth300');
+			} else {
+				if (!empty($object->fk_project)) {
+					$proj = new Project($db);
+					$proj->fetch($object->fk_project);
+					$morehtmlref .= $proj->getNomUrl(1);
+					if ($proj->title) {
+						$morehtmlref .= '<span class="opacitymedium"> - '.dol_escape_htmltag($proj->title).'</span>';
+					}
+				}
+			}
+		}
+	*/
 	$morehtmlref .= '</div>';
 
 
-	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+	dol_banner_tab($object, 'ref', $linkback, 0, 'ref', 'ref', $morehtmlref);
 
 
 	print '<div class="fichecenter">';
@@ -483,7 +472,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_view.tpl.php';
-	
+
 	print '</table>';
 	print '</div>';
 	print '</div>';
@@ -500,14 +489,15 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	if (!empty($object->table_element_line)) {
 		// Show object lines
 		$result = $object->getLinesArray();
-		
+
 		print '	<form name="addproduct" id="addproduct" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.(($action != 'editline') ? '' : '#line_'.GETPOST('lineid', 'int')).'" method="POST">
 		<input type="hidden" name="token" value="' . newToken().'">
 		<input type="hidden" name="action" value="' . (($action != 'editline') ? 'addline' : 'updateline').'">
 		<input type="hidden" name="mode" value="">
 		<input type="hidden" name="page_y" value="">
 		<input type="hidden" name="id" value="' . $object->id.'">
-        
+		<input type="hidden" name="idSurveytype" value="'.$object->survey_id.'">
+		
 		';
 
 		if (!empty($conf->use_javascript_ajax) && $object->status == 0) {
@@ -544,21 +534,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print "</form>\n";
 	}
 
-  
-        /*print '<form method="GET" action="'.$_SERVER["PHP_SELF"].'">';
-        print '<input type="hidden" name="action" value="builddoc">';
-        print '<input type="hidden" name="token" value="'. newToken().'">';
-        print '<input type="hidden" name="id" value="' . $object->id.'">';
-        print $form->buttonsSaveCancel( 	  	
-                $save_label = 'File',
-    		  	$cancel_label = '',
-    		  	$morebuttons = array(),
-    		  	$withoutdiv = 1,
-    		  	$morecss = '',
-    		  	$dol_openinpopup = '' 
-    	);
-        print '</form>';*/
-
 
 	// Buttons for actions
 
@@ -566,41 +541,27 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print '<div class="tabsAction">'."\n";
 		$parameters = array();
 		$reshook = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
-		if ($reshook < 0) {
+		/*if ($reshook < 0) {
 			setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
-		}
+		}*/
 
 		if (empty($reshook)) {
-
-           //Print
-           //print dolGetButtonAction($langs->trans('printinsc'), '<span class="fa fa-print" style="color: white"></span>', '', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=generate_pdf&token='.newToken());
-		    /*print '<a class="butAction"
-                      href="'.$_SERVER["PHP_SELF"].'?inscrid='.$object->id.'&action=printinscr"
-                      title="'.$langs->trans("print").'"><span class="fa fa-file-pdf-o" style="color: white"></span></a>';*/
-        
-        if (!empty($permissiontoadd)) {
-            print '<img style="display: none;" id="loader" class="valignmiddle" src="../../custom/college/img/spinner.gif" height="20px">';
-		    print '<span class="butAction btn-print" title="'.$langs->transcountrynoentities("PDF","AR").'" ><span class="fa fa-file-pdf-o" style="color: white"></span></span>';
-        }
-
-
-          
 			// Send
-			if (empty($user->socid)) {
-				print dolGetButtonAction($langs->trans('SendMail'), '', 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presend&mode=init&token='.newToken().'#formmailbeforetitle');
-			}
+			/*if (empty($user->socid)) {
+				print dolGetButtonAction('', $langs->trans('SendMail'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presend&token='.newToken().'&mode=init#formmailbeforetitle');
+			}*/
 
 			// Back to draft
 			if ($object->status == $object::STATUS_VALIDATED) {
-				print dolGetButtonAction($langs->trans('SetToDraft'), '', 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=confirm_setdraft&confirm=yes&token='.newToken(), '', $permissiontoadd);
+				print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=confirm_setdraft&confirm=yes&token='.newToken(), '', $permissiontoadd);
 			}
 
-			print dolGetButtonAction($langs->trans('Modify'), '', 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=edit&token='.newToken(), '', $permissiontoadd);
+			print dolGetButtonAction('', $langs->trans('Modify'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=edit&token='.newToken(), '', $permissiontoadd);
 
 			// Validate
 			if ($object->status == $object::STATUS_DRAFT) {
 				if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) > 0)) {
-					print dolGetButtonAction($langs->trans('Validate'), '', 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=confirm_validate&confirm=yes&token='.newToken(), '', $permissiontoadd);
+					print dolGetButtonAction('', $langs->trans('Validate'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=confirm_validate&confirm=yes&token='.newToken(), '', $permissiontoadd);
 				} else {
 					$langs->load("errors");
 					print dolGetButtonAction($langs->trans("ErrorAddAtLeastOneLineFirst"), $langs->trans("Validate"), 'default', '#', '', 0);
@@ -608,76 +569,188 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			}
 
 			// Clone
-			print dolGetButtonAction($langs->trans('ToClone'), '', 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid)?'&socid='.$object->socid:'').'&action=clone&token='.newToken(), '', $permissiontoadd);
+			if ($permissiontoadd) {
+				print dolGetButtonAction('', $langs->trans('ToClone'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid)?'&socid='.$object->socid:'').'&action=clone&token='.newToken(), '', $permissiontoadd);
+			}
 
 			/*
 			if ($permissiontoadd) {
 				if ($object->status == $object::STATUS_ENABLED) {
-					print dolGetButtonAction($langs->trans('Disable'), '', 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=disable&token='.newToken(), '', $permissiontoadd);
+					print dolGetButtonAction('', $langs->trans('Disable'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=disable&token='.newToken(), '', $permissiontoadd);
 				} else {
-					print dolGetButtonAction($langs->trans('Enable'), '', 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=enable&token='.newToken(), '', $permissiontoadd);
+					print dolGetButtonAction('', $langs->trans('Enable'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=enable&token='.newToken(), '', $permissiontoadd);
 				}
 			}
 			if ($permissiontoadd) {
 				if ($object->status == $object::STATUS_VALIDATED) {
-					print dolGetButtonAction($langs->trans('Cancel'), '', 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=close&token='.newToken(), '', $permissiontoadd);
+					print dolGetButtonAction('', $langs->trans('Cancel'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=close&token='.newToken(), '', $permissiontoadd);
 				} else {
-					print dolGetButtonAction($langs->trans('Re-Open'), '', 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=reopen&token='.newToken(), '', $permissiontoadd);
+					print dolGetButtonAction('', $langs->trans('Re-Open'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=reopen&token='.newToken(), '', $permissiontoadd);
 				}
 			}
 			*/
-			// Delete (need delete permission, or if draft, just need create/modify permission)
-			print dolGetButtonAction($langs->trans('Delete'), '', 'delete', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=delete&token='.newToken(), '', $permissiontodelete || ($object->status == $object::STATUS_DRAFT && $permissiontoadd));
+
+			// Delete
+			$params = array();
+			print dolGetButtonAction('', $langs->trans("Delete"), 'delete', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=delete&token='.newToken(), 'delete', $permissiontodelete, $params);
 		}
+
+
+		/** añadir otra nota desde edit page  */
+		print '<div class="pull-left valignmiddle">';
+		print dolGetButtonAction('<span class="fa fa-plus-circle btnTitle-icon"></span>&nbsp;'.$langs->trans('addotherquestionsbtn'), '', 'default', $_SERVER["PHP_SELF"].'?action=create&token='.newToken(), '', $permissiontoadd,array('class' => 'valignmiddle'));
+		print '</div>';
+
 		print '</div>'."\n";
 	}
-
 
 	// Select mail models is same action as presend
 	if (GETPOST('modelselected')) {
 		$action = 'presend';
 	}
 
-	if ($action != 'presend') {
-		print '<div class="fichecenter"><div class="fichehalfleft">';
-		print '<a name="builddoc"></a>'; // ancre
+	if ($action != 'presend') {}
 
-		$includedocgeneration = 1;
+	if ($object->id > 0 && (empty($action) || ($action == 'options'))) {
+		
+		$numlines = count($optionsarrays);
 
-		// Documents
-		if ($includedocgeneration) {
-			$objref = dol_sanitizeFileName($object->ref);
-			$relativepath = $objref.'/'.$objref.'.pdf';
-			$filedir = $conf->college->dir_output.'/'.$object->element.'/'.$objref;
-			$urlsource = $_SERVER["PHP_SELF"]."?id=".$object->id;
-			$genallowed = $permissiontoread; // If you can read, you can build the PDF to read content
-			$delallowed = 0;//$permissiontoadd; // If you can create/edit, you can remove a file on card
-			print $formfile->showdocuments(
-                'college:Inscriptions', 
-                $object->element.'/'.$objref, 
-                $filedir, $urlsource, $genallowed, $delallowed, 
-                $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', 
-                $langs->defaultlang,'',$object,0,'remove_file');
+		print '<div class="fichehalfleft">';
+		print '<div class="refid">'.$langs->trans("TxtQuestionsCreateOptions").' | '.$object->ref.'</div>';
+		print '</div>';
+		print '<div class="fichehalfright">';
+
+		if($object->type != 3 && $object->type != 4 && $permissiontoread && $permissiontoadd ){
+			print '<a href="javascript:void(0)" id="rowAdder" style="float: right; type="button">
+			<i class="fa fa-plus" aria-hidden="true"></i>&nbsp;'.$langs->trans("btnNewOption").'
+			</a>';
 		}
 
-		// Show links to link elements
-		//$linktoelem = $form->showLinkToObjectBlock($object, null, array('inscriptions'));
-		//$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
+		print '</div>';
+		print '<br>';
 
-
-		print '</div><div class="fichehalfright">';
-
-		$MAXEVENT = 10;
-
-		$morehtmlcenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-list-alt imgforviewmode', dol_buildpath('/college/inscriptions_agenda.php', 1).'?id='.$object->id);
-
-		// List of actions on element
-		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
-		$formactions = new FormActions($db);
-		$somethingshown = $formactions->showactions($object, $object->element.'@'.$object->module, (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlcenter);
-
-		print '</div></div>';
+		print '<div class="fichecenter">';
+		print '<div id="reloaddiv">';
+		print'
+		<div class="div-table-responsive">
+		<table id="tbloptions" class="tagtable nobottomiftotal liste">
+		<thead>
+		<tr colspan="2"><th>'.$langs->trans("TblHeaderQuestionsOptions").' ('.$numlines.')</th></tr>
+		</thead>
+		<tbody>
+		<tr id="newinput"></tr>
+		<tbody>
+		</table></div>';
+		print '</div>';
+		print '</div>';
 	}
+
+	?>
+	<script type="text/javascript">
+	jQuery(document).ready(function() {
+
+		var datavalues = <?php echo json_encode($optionsarrays);?>;
+
+		/** Recuperar las respuestas y cargar las opciones */
+		Object.keys(datavalues).forEach(function(key,index,arr) {
+			newRowAdd =
+            '<tr id="row" class="pair">' +
+			'<td style="width: 100%;">' +
+			<?php if($permissiontoadd){ ?>
+			'<input style="width: 100%" type="text" data-toggle=\''+datavalues[key].rowid+'\' ></td>' +
+			<?php }else{;?>
+			'<span>'+datavalues[key].label+'</span>'+
+			<?php };?>
+            '<td>' +
+			<?php if($permissiontodelete){ ?>
+            '<a href="javascript:void(0)" id="DeleteRow" data-toggle=\''+datavalues[key].rowid+'\' type="button"><i class="fa fa-trash" aria-hidden="true"></i></a>' +
+            <?php };?>
+			'</td>' +
+            '</tr>';
+			$('#newinput').append(newRowAdd);
+            $("[data-toggle='"+datavalues[key].rowid+"']").val(datavalues[key].label);
+        });
+
+		/** Crear  nuevas opciones */
+		$("#rowAdder").click(function(e) {
+			e.preventDefault();
+            newRowAdd =
+            '<tr id="row" class="pair">' +
+			'<td style="width: 100%;">' +
+			'<input style="width: 100%;" type="text"></td>' +
+            '<td>' +
+            '<button id="DeleteRow" type="button"><i class="fa fa-trash" aria-hidden="true"></i></button>' +
+            '</td>' +
+            '</tr>';
+			$.ajax({
+				method: "POST",
+				context: document.body,
+				dataType: "html",
+				url: './ajax.php?action=newquestion&token=<?php echo currentToken() ;?>',
+				data:{'idQuestions':<?php echo $object->id;?>,'idSurveytype':<?php echo $object->survey_id;?>},
+			}).done(function(response){
+				if(response>0){
+					setTimeout(function () {
+						//$("#reloaddiv").load(" #reloaddiv > *");
+						window.location.href = '<?php echo $_SERVER["PHP_SELF"]."?id=".$object->id."&action=options&token=".currentToken(); ?>';
+						$('#newinput').append(newRowAdd);
+						console.log("Registro insertado/actualizado con exito.");
+					},500);
+				}
+			}).fail(function() {
+				console.log("Error in confirm validation in question_card action new option");
+			});
+			
+        });
+ 
+		//DELETE ROW ID
+        $("#tbloptions").on("click", "#DeleteRow", function () {
+			var id = $(this).data('toggle');
+			$.ajax({
+				method: "POST",
+				context: document.body,
+				dataType: "html",
+				url: './ajax.php?action=deleteOption&token=<?php echo currentToken() ;?>',
+				data:{'idOption':parseInt(id)},
+			}).done(function(response){
+				if(response>0){
+					setTimeout(function () {
+						//$("#reloaddiv").load(" #reloaddiv > *");
+						window.location.href = '<?php echo $_SERVER["PHP_SELF"]."?id=".$object->id."&action=options&token=".currentToken(); ?>';
+						$(this).parents("#row").remove();
+						console.log("Registro insertado/actualizado con exito.");
+					},500);
+				}
+			}).fail(function() {
+				console.log("Error in confirm validation in question_card action delete");
+			});
+        })
+
+		//UPDATE
+		$('input[data-toggle]').on('change', function(e){
+      		e.stopPropagation();
+      		var rowid = $(this).data('toggle');
+			var label = $("[data-toggle='"+rowid+"']").val();
+			$.post( "./ajax.php?action=updatequestion&token=<?php echo newToken() ;?>" ,
+			{
+				'idOption':rowid, 
+				'lblQuestion': label,
+			}).done(function(response){
+				if(response>0){
+					setTimeout(function () {
+						//$("#reloaddiv").load(" #reloaddiv > *");
+						//window.location.href = '<?php echo $_SERVER["PHP_SELF"]."?id=".$object->id."&action=options&token=".currentToken(); ?>';
+						console.log("Registro actualizado con exito.");
+					},100);
+				}
+			}).fail(function() {
+				console.log("Error in confirm validation in question_card action new option");
+			});
+		});
+
+	});
+	</script>
+	<?php
 
 	//Select mail models is same action as presend
 	if (GETPOST('modelselected')) {
@@ -685,10 +758,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	}
 
 	// Presend form
-	$modelmail = 'inscriptions';
+	$modelmail = 'questions';
 	$defaulttopic = 'InformationMessage';
 	$diroutput = $conf->college->dir_output;
-	$trackid = 'inscriptions'.$object->id;
+	$trackid = 'questions'.$object->id;
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
 }

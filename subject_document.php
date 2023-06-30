@@ -80,6 +80,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 dol_include_once('/college/class/subject.class.php');
 dol_include_once('/college/lib/college_subject.lib.php');
+dol_include_once('/college/class/periods.class.php');
+dol_include_once('/college/class/classrooms.class.php');
 
 // Load translation files required by the page
 $langs->loadLangs(array("college@college", "companies", "other", "mails"));
@@ -128,11 +130,13 @@ if ($id > 0 || !empty($ref)) {
 // Set $enablepermissioncheck to 1 to enable a minimum low level of checks
 $enablepermissioncheck = 1;
 if ($enablepermissioncheck) {
-	$permissiontoread = $user->rights->college->subject->read;
-	$permissiontoadd = $user->rights->college->subject->write; // Used by the include of actions_addupdatedelete.inc.php and actions_linkedfiles.inc.php
+	$permissiontoread = $user->rights->college->subject->read || $user->rights->college->uploadfile->write;
+	$permissiontoadd = $user->rights->college->subject->write || $user->rights->college->uploadfile->write;
+	$permissiontodelete = $user->rights->college->subject->delete;
 } else {
 	$permissiontoread = 1;
 	$permissiontoadd = 1;
+	$permissiontodelete = 1;
 }
 
 // Security check (enable the most restrictive one)
@@ -178,51 +182,40 @@ if ($object->id) {
 		$totalsize += $file['size'];
 	}
 
+	//OBJECTS
+	$objectClass = new Classrooms($db);
+	$objectClass->fetch($object->fk_class);
+	$profesor = new User($db);
+	$profesor->fetch($object->fk_user);
+
+
 	// Object card
 	// ------------------------------------------------------------
 	$linkback = '<a href="'.dol_buildpath('/college/subject_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
 	$morehtmlref = '<div class="refidno">';
-	/*
-	 // Ref customer
-	 $morehtmlref.=$form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', 0, 1);
-	 $morehtmlref.=$form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', null, null, '', 1);
-	 // Thirdparty
-	 $morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . (is_object($object->thirdparty) ? $object->thirdparty->getNomUrl(1) : '');
-	 // Project
-	 if (! empty($conf->projet->enabled))
-	 {
-	 $langs->load("projects");
-	 $morehtmlref.='<br>'.$langs->trans('Project') . ' ';
-	 if ($permissiontoadd)
-	 {
-	 if ($action != 'classify')
-	 //$morehtmlref.='<a class="editfielda" href="' . $_SERVER['PHP_SELF'] . '?action=classify&token='.newToken().'&id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> : ';
-	 $morehtmlref.=' : ';
-	 if ($action == 'classify') {
-	 //$morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'projectid', 0, 0, 1, 1);
-	 $morehtmlref.='<form method="post" action="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'">';
-	 $morehtmlref.='<input type="hidden" name="action" value="classin">';
-	 $morehtmlref.='<input type="hidden" name="token" value="'.newToken().'">';
-	 $morehtmlref.=$formproject->select_projects($object->socid, $object->fk_project, 'projectid', $maxlength, 0, 1, 0, 1, 0, 0, '', 1);
-	 $morehtmlref.='<input type="submit" class="button valignmiddle" value="'.$langs->trans("Modify").'">';
-	 $morehtmlref.='</form>';
-	 } else {
-	 $morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'none', 0, 0, 0, 1);
-	 }
-	 } else {
-	 if (! empty($object->fk_project)) {
-	 $proj = new Project($db);
-	 $proj->fetch($object->fk_project);
-	 $morehtmlref .= ': '.$proj->getNomUrl();
-	 } else {
-	 $morehtmlref .= '';
-	 }
-	 }
-	 }*/
+	$morehtmlref.= ''.$profesor->lastname.', '.$profesor->firstname.'<br>';
+	$morehtmlref.= ''.$objectClass->label.', '.$object->school_year.'';
 	$morehtmlref .= '</div>';
 
-	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+	dol_banner_tab($object, 'ref', $linkback, $user->rights->college->readalllist->read, 'ref', 'ref', $morehtmlref);
+
+		/*BLOQUEAR ACCESO*/
+		if($object->fk_user != $user->id || $user->admin ){ 
+			if(!$user->rights->college->readalllist->read){
+			print info_admin( 	  	
+				$user->firstname.' '.$user->lastname.'. You have attempted to enter an area to which you do not have access, please do not attempt this action again.',
+				$infoonimgalt = 0,
+				$nodiv = 0,
+				$admin = '0',
+				$morecss = 'error',//More CSS ('', 'warning', 'error') 
+				$textfordropdown = '403 Forbidden' 
+			);
+			accessforbidden($langs->trans('NotEnoughPermissions'), 0, 1);
+			exit;
+			}
+		}
+
 
 	print '<div class="fichecenter">';
 
@@ -242,10 +235,11 @@ if ($object->id) {
 	print dol_get_fiche_end();
 
 	$modulepart = 'college';
-	//$permissiontoadd = $user->rights->college->subject->write;
-	$permissiontoadd = 1;
-	//$permtoedit = $user->rights->college->subject->write;
-	$permtoedit = 1;
+	$permissiontoadd = $user->rights->college->subject->write || $user->rights->college->uploadfile->write;
+	//$permissiontoadd = 1;
+	$permtoedit = $user->rights->college->subject->write;
+	//$permtoedit = 1;
+	
 	$param = '&id='.$object->id;
 
 	//$relativepathwithnofile='subject/' . dol_sanitizeFileName($object->id).'/';

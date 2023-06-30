@@ -80,6 +80,9 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 dol_include_once('/college/class/notes.class.php');
 dol_include_once('/college/lib/college_notes.lib.php');
+dol_include_once('/college/class/students.class.php');
+dol_include_once('/college/class/subject.class.php');
+dol_include_once('/college/class/classrooms.class.php');
 
 require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 
@@ -221,12 +224,12 @@ if (empty($reshook)) {
 
     if ($action  == 'getFilterStudent' ){
         $resql=$db->query("SELECT fk_student from ".MAIN_DB_PREFIX."college_inscriptions
-         WHERE status = 1 and school_year = ".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO." 
+         WHERE status = 1 and school_year = ".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO."
          AND fk_class = ".(int)$idClass." ");
         if ($resql)
         {
 		$num = $db->num_rows($resql);
-        
+
         $i = 0;
         if ($num > 0)
         {
@@ -234,8 +237,8 @@ if (empty($reshook)) {
             {
                 $obj = $db->fetch_object($resql);
                 if ($obj)
-                {  
-                	$arrClass[$i] = $obj->fk_student;      
+                {
+                	$arrClass[$i] = $obj->fk_student;
                 }
                 $i++;
             }
@@ -245,18 +248,18 @@ if (empty($reshook)) {
          	echo json_encode(array(0));
          	exit;
          }
-       
+
         }
     }
-    
+
     if ($action  == 'getFilterSubject' ){
-        $resql = $db->query("SELECT rowid, label from ".MAIN_DB_PREFIX."college_subject 
-        WHERE fk_class = ".(int)$idClass." AND status = 1 and school_year = ".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO." 
+        $resql = $db->query("SELECT rowid, label from ".MAIN_DB_PREFIX."college_subject
+        WHERE fk_class = ".(int)$idClass." AND status = 1 and school_year = ".$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO."
         AND fk_user = ".$user->id." ");
         if ($resql)
         {
 		$num = $db->num_rows($resql);
-        
+
         $i = 0;
         if ($num > 0)
         {
@@ -264,8 +267,8 @@ if (empty($reshook)) {
             {
                 $obj = $db->fetch_object($resql);
                 if ($obj)
-                {  
-                	$arrClass[] = (object)array('ides'=>$obj->rowid);      
+                {
+                	$arrClass[] = (object)array('ides'=>$obj->rowid);
                 }
                 $i++;
             }
@@ -275,7 +278,7 @@ if (empty($reshook)) {
          	echo json_encode(array(0));
          	exit;
          }
-       
+
         }
     }
 	/** ELIMINAR ARCHIVO XLSX */
@@ -294,7 +297,7 @@ if (empty($reshook)) {
 				$object = null,
 				$allowdotdot = false,
 				$indexdatabase = 1,
-				$nolog = 0 
+				$nolog = 0
 			);
 
 			if($solicitudDeEliminacion){
@@ -302,16 +305,16 @@ if (empty($reshook)) {
 					$langs->trans('mssgdeletexlsx').' '.basename($f),
 					$mesgs,
 					$style = 'mesgs',
-					$messagekey = '' 
+					$messagekey = ''
 				);
-				header('Location:'.$_SERVER["PHP_SELF"].'?action=mynotes');	
-				exit;	
+				header('Location:'.$_SERVER["PHP_SELF"].'?action=mynotes');
+				exit;
 			}else{
 				setEventMessages(
 					$langs->trans('mssgerrorxlsx').' '.basename($f),
 					$mesgs,
 					$style = 'errors',
-					$messagekey = '' 
+					$messagekey = ''
 				);
 				exit;
 			}
@@ -320,14 +323,13 @@ if (empty($reshook)) {
 				$langs->trans('mssgerrorfilediesnotexistxlsx'),
 				$mesgs,
 				$style = 'errors',
-				$messagekey = '' 
+				$messagekey = ''
 			);
-			header('Location:'.$_SERVER["PHP_SELF"].'?action=mynotes');	
+			header('Location:'.$_SERVER["PHP_SELF"].'?action=mynotes');
 			exit;
 		};
-		
-	}
 
+	}
 
 /*
  * View
@@ -347,10 +349,10 @@ llxHeader('', $title, $help_url);
 <script type="text/javascript">
 // Example : Adding jquery code
  jQuery(document).ready(function() {
-	 
-	/** 
+
+	/**
    * Ocultar el teclado del telefono cuando se hace click en el select
-  
+
   $('#select_class').on('select2:open', function() {
     $('.select2-search__field').prop('focus', true);
   });
@@ -363,7 +365,7 @@ llxHeader('', $title, $help_url);
 	 $('#select_subject').on('select2:open', function() {
     $('.select2-search__field').prop('readonly', true);
   });
-	 
+
  	/*function init_myfunc()
  	{
  		jQuery("#myid").removeAttr(\'disabled\');
@@ -373,11 +375,11 @@ llxHeader('', $title, $help_url);
  	jQuery("#mybutton").click(function() {
  		init_myfunc();
  	});*/
-    
-    //$("#fk_user").attr('disabled','disabled');
-    
 
-    /*FILTRAR POR CLASE Y ASIGNATURA*/ 
+    //$("#fk_user").attr('disabled','disabled');
+
+
+    /*FILTRAR POR CLASE Y ASIGNATURA*/
     $("#fk_class").change(function(){
        $('[data-select2-id="fk_student"]').val(null).change();
        $('[data-select2-id="fk_subject"]').val(null).change();
@@ -386,9 +388,9 @@ llxHeader('', $title, $help_url);
        var students = [];
        var subjects = [];
        $.getJSON( "./notes_card.php?action=getFilterStudent",{ idClass: idclass , token: '<?php echo newToken();?>' }, function(jsonresp) {
-       		$.each(jsonresp, function(index,element) {
+       		/*$.each(jsonresp, function(index,element) {
 		        students.push({'id':Number(element)})
-			}); 
+			});
             matchCustomStu = function(params,data){
                 params.term = $.map(students, function (obj) {
                     obj.id = obj.id || obj.id;
@@ -402,7 +404,7 @@ llxHeader('', $title, $help_url);
                         var modifiedData = $.extend({}, data, true);
                         modifiedData.text += '';
                         return modifiedData;
-                    } 
+                    }
                 }
                 return null;
             }
@@ -414,12 +416,21 @@ llxHeader('', $title, $help_url);
                 },
                 allowClear: true,
             	matcher: matchCustomStu
-            	
             });
+       });*/
+	   /**FILTER STUDENT */
+		$('[data-select2-id="fk_student"]').select2({
+			placeholder:  {
+				id: '-1',
+				text: 'Select an option'
+			},
+			allowClear: true,
+		});
+     
        });
        /*FILTER SUBJECT*/
        $.getJSON( "./notes_card.php?action=getFilterSubject",{ idClass: idclass , token: '<?php echo newToken();?>' }, function(jsonresp) {
-       		
+
             matchCustomSubj = function(params,data){
                 for(i in jsonresp){
                   if (data.id.indexOf(jsonresp[i].ides) > -1) {
@@ -436,18 +447,18 @@ llxHeader('', $title, $help_url);
                 },
                 allowClear: true,
             	matcher: matchCustomSubj
-            	
+
             });
        });
      });
 
-    
+
  });
 </script>
 
 <script type="text/javascript">
 jQuery(document).ready(function() {
-  
+
   $('.btn_create').attr('disabled','disabled');
   function init_btn_button(){
     if($('#select_class').val() != -1 && $('#select_subject').val() != -1 ){
@@ -456,11 +467,11 @@ jQuery(document).ready(function() {
       $('.btn_create').prop('disabled',true);
     }
   }
-  
+
   /*ONLY ORDER*/
   var selectedValuesClass;
   var selectedValuesSubject;
-  
+
   $('#select_class').on('change', function(e) {
     $('#loader').show();
     init_btn_button();
@@ -469,7 +480,7 @@ jQuery(document).ready(function() {
     $('[data-select2-id="select_subject"]').find('option').not(':first').remove();
     $('[data-select2-id="select_subject"]').val('-1').trigger("change");
   });
-  
+
    $('#select_subject').on('change', function(e) {
       $('#loader').show();
       $('[data-toggle]').val(null);
@@ -483,14 +494,14 @@ jQuery(document).ready(function() {
       }).done(function(datanotas){
           Object.keys(datanotas).forEach(function(key,index,arr) {
             $("[data-toggle='"+datanotas[key].data+"']").val(datanotas[key].nota);
-            
+
           });
           $('#loader').hide();
       }).fail(function(){$('#loader').hide();});
   });
-  
-  
-  
+
+
+
   /*Get note from data-toggle*/
   $('#select_subject').on('change', function(e) {
     e.stopPropagation();
@@ -507,13 +518,13 @@ jQuery(document).ready(function() {
     $('#loader').show();
     var datavalue = $("[data-toggle='"+arr+"']").val();
     //console.log(datavalue)
-    $.post( "./ajax.php?action=senddata&token=<?php echo newToken() ;?>" , 
-    { 
+    $.post( "./ajax.php?action=senddata&token=<?php echo newToken() ;?>" ,
+    {
       //idNota: datanotas[key].rowid,
       idClass: selectedValuesClass,
       idSubjejct: selectedValuesSubject,
       arralumnoperiodo: arr,
-      notavalue: datavalue, 
+      notavalue: datavalue,
     }).done(function(dataresponse){
       if(dataresponse){
 		console.log(dataresponse);
@@ -534,7 +545,7 @@ jQuery(document).ready(function() {
   }
 
 
-  
+
   $('#select_class').on('change',function(){
     var option = $(this).find("option:selected");
     var idclass = option.val();
@@ -558,12 +569,12 @@ jQuery(document).ready(function() {
           $("#tableDataNotes>tbody").append("<tr class='liste_titre'><th><?php echo $langs->trans("nodatafound") ;?></th></tr>");
         }else{
           $.getJSON( "./ajax.php?action=getperiods",{ token:"<?php echo newToken() ;?>" }, function(dataperiods) {
-          $("#tableDataNotes>thead").append("<tr class='liste_titre'><th>ID</th><th>Name</th></tr>");
-          Object.keys(dataperiods).forEach(function(key,index,arr) { 
+          $("#tableDataNotes>thead").append("<tr class='liste_titre'><th><?php echo $langs->trans("students")?></th></tr>");
+          Object.keys(dataperiods).forEach(function(key,index,arr) {
             $("#tableDataNotes>thead").find("tr:eq(0)").append("<th>"+dataperiods[key].label+"</th>");
           });
-          Object.keys(datastudent).forEach(function(key,index,arr) {  
-            $("#tableDataNotes>tbody").append("<tr class='pair'><td>"+datastudent[key].fk_student+"</td><td>"+datastudent[key].label+"</td></tr>")
+          Object.keys(datastudent).forEach(function(key,index,arr) {
+            $("#tableDataNotes>tbody").append("<tr class='pair'><td>"+datastudent[key].label+"</td></tr>")
             Object.keys(dataperiods).forEach(function(k,i,a){
               $("#tableDataNotes>tbody").find("tr:eq(\'"+key+"'\)").append("<td><input data-toggle=\'"+datastudent[key].fk_student+","+dataperiods[k].rowid+"\' step='0.5' min='1' max='10' type='number' /></td>");
             });
@@ -573,8 +584,8 @@ jQuery(document).ready(function() {
         }
       });
     });
-    
-  }); 
+
+  });
 
   /*CREATE LIST OF STUDENT SIN USO*/
   $('#formucreate').on('submit',function(e){
@@ -597,17 +608,21 @@ jQuery(document).ready(function() {
 		context: document.body,
 		dataType: "html"
 	}).done(function(data, status) {
-		$('#loader').hide();
 		if(status == 'success'){
 			setTimeout(function () {
+				$('#loader').hide();
 				//$('#donwloadlink').show();
-				window.location.href = '<?php echo $_SERVER["PHP_SELF"]."?action=mynotes&token=".currentToken(); ?>';
+				$("#reloaddiv").load(" #reloaddiv > *");
+				/*window.location.href = '<?php echo $_SERVER["PHP_SELF"]."?action=mynotes&token=".currentToken(); ?>';*/
 			}, 100);
 		}
+	}).fail(function (jqXHR, textStatus) {
+    	$('#loader').hide();
 	});
   })
 
-  $('#id_generate_xlsx').on("click",function(e){
+ /* 
+ $('#id_generate_xlsx').on("click",function(e){
 	e.preventDefault();
 	$('#loaderb').show();
 	$('#id_generate_xlsx').hide();
@@ -634,7 +649,7 @@ jQuery(document).ready(function() {
 		e.preventDefault();
 	}, 5000);
   });
-
+  */
 
 });
 </script>
@@ -655,16 +670,16 @@ if($action == 'createxlsx'){
 			$langs->trans('mssgcreatexlsx'),
 			$mesgs,
 			$style = 'mesgs',
-			$messagekey = '' 
+			$messagekey = ''
 		);
-		header('Location:'.$_SERVER["PHP_SELF"].'?action=mynotes');	
+		header('Location:'.$_SERVER["PHP_SELF"].'?action=mynotes');
 		exit;
 	}
 }
 /**
- * 
+ *
  * MIS NOTAS PAGE
- * 
+ *
  */
 if ($action == 'mynotes') {
 	if (empty($permissiongeneratexlsx) && empty($permissiongenerateallxlsx)) {
@@ -677,30 +692,30 @@ if ($action == 'mynotes') {
 
 	print load_fiche_titre($langs->trans("MyNotes"), '', 'object_'.$object->picto);
 	print dol_get_fiche_head(array(), '');
-	
-	print '<div class="div-table-responsive-no-min">';
-	print '<table class="noshadow" width="100%">';
-	print '<tr class="nohover"><td>';
-	if(empty($data)){
-		print '<tr><th>'.$langs->trans("nodatafound").'</th></tr>';
-	}
 	print'<div class="refid"><i class="fa fa-list-alt" aria-hidden="true"></i> ';
 	print $form->textwithpicto($langs->trans("notestext"),$langs->trans("noteshelp"));
 	print '</div>'."<br>";
+	print '<div class="div-table-responsive-no-min">';
+	print '<table class="noshadow" width="100%">';
+	print '<tr class="nohover">';
+	if(empty($data)){
+		print '<tr><th>'.$langs->trans("nodatafound").'</th></tr>';
+	}
+	print '<td>';
 	$total_de_notas = 0;
 	$total_de_alumnos = 0;
 	foreach($data as $values){
-	$total_de_notas += $values['qtytotal'];
-	$total_de_alumnos += $values['qtynotes'];
-	print '<a href="'.$_SERVER["PHP_SELF"]."?idClasse=".$values['idclass']."&action=createxlsx&token=".newToken().' " name="idbtn_generate_xlsx" class="boxstatsindicator thumbstat nobold nounderline">';
-	print '<div class="boxstats">';
-	print '<span class="boxstatstext">'.$values['class'].'</span><br>';
-	print '<span class="boxstatsindicator"><span class="fa fa-graduation-cap inline-block" style=" color:  #bb7f16;"></span> '.$values['qtynotes'].'</span>';
-	print '</div>';
-	print '</a>';
+		$total_de_notas += $values['qtytotal'];
+		$total_de_alumnos += $values['qtynotes'];
+		print '<a href="'.$_SERVER["PHP_SELF"]."?idClasse=".$values['idclass']."&action=createxlsx&token=".newToken().' " name="idbtn_generate_xlsx" class="boxstatsindicator thumbstat nobold nounderline">';
+		print '<div class="boxstats">';
+		print '<span class="boxstatstext">'.$values['class'].'</span><br>';
+		print '<span class="boxstatsindicator"><span class="fa fa-graduation-cap inline-block" style=" color:  #bb7f16;"></span> '.$values['qtynotes'].'</span>';
+		print '</div>';
+		print '</a>';
 	}
 	/**LINK A TODAS MIS NOTAS */
-	if($permissiongenerateallxlsx){
+	if( $permissiongenerateallxlsx && $total_de_notas > 0 ? 1 : 0 ){
 		print '<a href="'.$_SERVER["PHP_SELF"]."?action=createxlsx&token=".newToken().' " name="idbtn_generate_xlsx" class="boxstatsindicator thumbstat nobold nounderline">';
 		print '<div class="boxstats">';
 		print '<span class="boxstatstext">'.$langs->trans('lbltodolink').'</span><br>';
@@ -712,29 +727,35 @@ if ($action == 'mynotes') {
 		print '</a>';
 	};
 	print '</td>';
+	print '<td>';
+		/*Loading*/
+		print '<img style="display: none;" id="loader" class="m-10" src="../../custom/college/img/loading.gif" height="20px">';
+		/*Loading b*/
+		print '<img style="display: none;" id="loaderb" class="m-10" src="../../custom/college/img/loading.gif" height="20px">';
+	print '</td>';
 	print '</tr>';
 	print '</table>';
     print '</div>';
-	
+
 	print dol_get_fiche_end();
 
 	print '<div class="fichecenter">';
 	/************************************************************************************************************************ */
 	print '<div class="fichethirdleft">';
-	
+
 	//print'<table class="noborder boxtable" width="100%"><tbody><tr class="liste_titre box_titre">';
 	//print '<th>';
 	//print '<div class="tdoverflowmax400 maxwidth250onsmartphone float">'.$langs->trans('tbl1titlehead').'</div>';
 	//print '<div class="nocellnopadd boxclose floatright nowraponall"><span class="total_de_notas-o opacitymedium marginleftonly"></span></div>';
 	//print'</th></tr><tr><td class="tdoverflowmax150 maxwidth150onsmartphone">';
 	/*Loading*/
-	print '<img style="display: none;" id="loader" class="m-10" src="../../custom/college/img/loading.gif" height="20px">';
+	//print '<img style="display: none;" id="loader" class="m-10" src="../../custom/college/img/loading.gif" height="20px">';
 	//print '<div style="display: none;" id="donwloadlink">';
 	/** DOWNLOAD NOTES */
-	/*print dolGetButtonTitle("", 
-		$helpText = '', 
-		'fa fa-download', 
-		$url = ''.DOL_URL_ROOT.'/document.php?modulepart=college&file='.$object->element."/".$user->id.'.xlsx&token='.newToken().'', 
+	/*print dolGetButtonTitle("",
+		$helpText = '',
+		'fa fa-download',
+		$url = ''.DOL_URL_ROOT.'/document.php?modulepart=college&file='.$object->element."/".$user->id.'.xlsx&token='.newToken().'',
 		$id = '',
 		$status = $permissiongeneratexlsx && $permissiontoread && $permissiontoadd,
 		$params = array()
@@ -742,7 +763,7 @@ if ($action == 'mynotes') {
 	//print '</div>';
 	//print '<div id="simbolicbtn"><span class="btnTitle refused classfortooltip" title="'.$langs->trans('refusedbtntootip').'"><span class="fa fa-download valignmiddle btnTitle-icon"></span></span></div>';
 	//print '</td></tr></tbody></table>';
-	
+
 	print '</div>';
 	/************************************************************************************************************************ */
 	print '<div class="fichetwothirdright">';
@@ -754,7 +775,7 @@ if ($action == 'mynotes') {
 
 	//print'</th></tr><tr><td class="tdoverflowmax150 maxwidth150onsmartphone">';
 	/*Loading b*/
-	print '<img style="display: none;" id="loaderb" class="m-10" src="../../custom/college/img/loading.gif" height="20px">';
+	//print '<img style="display: none;" id="loaderb" class="m-10" src="../../custom/college/img/loading.gif" height="20px">';
 	/** DOWNLOAD ALL NOTES #563*/
 	/*if($permissiongenerateallxlsx){
 		print dolGetButtonTitle(
@@ -772,9 +793,9 @@ if ($action == 'mynotes') {
 	print '<div style="display: none;" id="donwloadlinkb">';
 	print dolGetButtonTitle(
 		"",
-		$helpText = $langs->trans('lbltodolinktootltip'), 
+		$helpText = $langs->trans('lbltodolinktootltip'),
 		'fa fa-download',
-		$url = ''.DOL_URL_ROOT.'/document.php?modulepart=college&file='.$object->element."/".$user->id.'.xlsx&token='.newToken().'', 
+		$url = ''.DOL_URL_ROOT.'/document.php?modulepart=college&file='.$object->element."/".$user->id.'.xlsx&token='.newToken().'',
 		$id = 'btndownloadallnotes',
 		$status = $permissiongeneratexlsx && $permissiongenerateallxlsx && $permissiontoread && $permissiontoadd && $total_de_notas > 0 ? 1 : 0,
 		$params = array()
@@ -787,7 +808,7 @@ if ($action == 'mynotes') {
 	/**DEBBUG */
 	//print dol_syslog('antion mynotes',4);
 
-		/**Test 
+		/**Test
 		print $formfile->showdocuments(
 			$modulepart = 'college',
 			$modulesubdir = $object->element.'/'.$user->id,
@@ -809,20 +830,21 @@ if ($action == 'mynotes') {
 			$object,
 			$hideifempty = 0,
 			$removeaction = 'remove_file_xlsx',
-			$tooltipontemplatecombo = '' 
-		);*/ 
+			$tooltipontemplatecombo = ''
+		);*/
 
-		
+
 		$includedocgeneration = $permissiongeneratexlsx;
 		// Documents
 		if ($includedocgeneration) {
-			$genallowed = $permissiontoread; 
-			$delallowed = $permissiontoadd; 
+			print '<div id="reloaddiv">';
+			$genallowed = $permissiontoread;
+			$delallowed = $permissiontoadd;
 			print $formfile->showdocuments(
 				'college:Notes',
-				$object->element.'/'.$user->id,  
-				$conf->college->dir_output.'/'.$object->element.'/'.$user->id, $_SERVER["PHP_SELF"]."?action=mynotes&token=".newToken(), 
-				$genallowed, 
+				$object->element.'/'.$user->id,
+				$conf->college->dir_output.'/'.$object->element.'/'.$user->id, $_SERVER["PHP_SELF"]."?action=mynotes&token=".newToken(),
+				$genallowed,
 				$delallowed,
 				'',
 				1,
@@ -832,20 +854,21 @@ if ($action == 'mynotes') {
 				0,
 				'',
 				$langs->trans('tbl1titlehead'),
-				'', 
+				'',
 				$langs->defaultlang,
 				$morepicto = '',
 				$object,
 				$hideifempty = 0,
 				$removeaction = 'remove_file_xlsx',
-				$tooltipontemplatecombo = '' 
+				$tooltipontemplatecombo = ''
 			);
+			print '</div>';
 		}
 
 
 
 }
-  
+
 // Part to create
 if ($action == 'create') {
 	if (empty($permissiontoadd)) {
@@ -887,10 +910,10 @@ if ($action == 'create') {
 	print '</form>';
 
 	//dol_set_focus('input[name="trimestre"]');
-  
+
   print '<hr>';
   dol_include_once('/college/notes_list_student.php' );
-  
+
 }
 
 // Part to edit record
@@ -934,19 +957,23 @@ if($action == 'createlist') {
 		accessforbidden($langs->trans('NotEnoughPermissions'), 0, 1);
 		exit;
 	}
-  print load_fiche_titre($langs->trans("CollegeAreaTitle_a"), '', 'object_notes@college');
-  print '<span>'.$langs->trans("CollegeAreaTitle_b").', '.$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO.'</span>';
+  print load_fiche_titre($langs->trans("CollegeAreaTitle_a"), '', 'object_'.$object->picto);
+  print '<div class="contenedorloadingtext p-10">';
+  print '<span class="valignmiddle">'.$langs->trans("CollegeAreaTitle_b").', '.$conf->global->COLLEGE_MYPARAM_CICLO_LECTIVO.'</span>';
+  print '<img style="display: none;" id="loader" class="valignmiddle prl-10" src="../../custom/college/img/spinner.gif" height="20px">';
+  print '</div>';
+
   print dol_get_fiche_head(array(), '');
   // Initialize technical objects
   $object = new Notes($db);
   $objectClass = new ClassroomsLine($db);
-  
+
   print '<div class="div-table-responsive-no-min">';
 	print '<table class="centpercent">'."\n";
 
   /*
   print $form->selectArrayFilter(
-    'select_class', 
+    'select_class',
     $objectClass->getClass(),
     $id = 'id',
   	$moreparam = '',
@@ -956,20 +983,20 @@ if($action == 'createlist') {
   	$morecss = 'flat maxwidth500 widthcentpercentminusxx',
   	$callurlonselect = 0,
   	$placeholder = 'Search option class',
-  	$acceptdelayedhtml = 0 
+  	$acceptdelayedhtml = 0
   );
   print '<p></p>';
   print $form->selectArrayAjax(
-    'select_subject', 
-    $url = DOL_URL_ROOT.'/custom/college/ajax.php?action=getsubject', 
-    $id = '', 
-    $moreparam = '', 
-    $moreparamtourl = '', 
-    $disabled = 0, 
-    $minimumInputLength = 1, 
-    $morecss = 'flat maxwidth500 widthcentpercentminusxx', 
-    $callurlonselect = 0, 
-    $placeholder = 'Search option subjects', 
+    'select_subject',
+    $url = DOL_URL_ROOT.'/custom/college/ajax.php?action=getsubject',
+    $id = '',
+    $moreparam = '',
+    $moreparamtourl = '',
+    $disabled = 0,
+    $minimumInputLength = 1,
+    $morecss = 'flat maxwidth500 widthcentpercentminusxx',
+    $callurlonselect = 0,
+    $placeholder = 'Search option subjects',
     $acceptdelayedhtml = 0
  	);
   */
@@ -982,7 +1009,7 @@ if($action == 'createlist') {
     'select_class',
     $objectClass->getClass(),
     $id = '-1',
-  	$show_empty = 1,
+  	$show_empty = $langs->trans("CollegeSelect_ClassInfo"),
   	$key_in_label = 0,
   	$value_as_key = 0,
   	$moreparam = '',
@@ -994,19 +1021,19 @@ if($action == 'createlist') {
   	$addjscombo = 1,
   	$moreparamonempty = '',
   	$disablebademail = 0,
-  	$nohtmlescape = 0 
+  	$nohtmlescape = 0
   );
   print '</td><td rowspan="2">';
-    /*Loading*/
-  print '<img style="display: none;" id="loader" class="m-10" src="../../custom/college/img/spinner.gif" height="20px">';
+    /*Loading
+  print '<img style="display: none;" id="loader" class="m-10" src="../../custom/college/img/spinner.gif" height="20px">';*/
   print '</td>';
   print '</tr><tr>';
-  print '<td class="hideonsmartphoneimp ">';
+  print '<td class="hideonsmartphoneimp">';
   print $form->textwithpicto($langs->trans("CollegeSelect_Subject"),$langs->trans("CollegeSelect_SubjectInfo"));
   print '</td>';
   print '<td>';
   print $form->selectarray(
-    'select_subject', 
+    'select_subject',
     '',
     $id = '',
   	$show_empty = 1,
@@ -1021,7 +1048,7 @@ if($action == 'createlist') {
   	$addjscombo = 1,
   	$moreparamonempty = '',
   	$disablebademail = 0,
-  	$nohtmlescape = 0 
+  	$nohtmlescape = 0
   );
   print '</td>';
   print '</tr>';
@@ -1033,7 +1060,7 @@ if($action == 'createlist') {
     $morecss = 'flat maxwidth500 widthcentpercentminusxx btn_create',
     $dol_openinpopup = ''
   );*/
-	
+
   print '</table>'."\n";
   print '</div>';
   print '<p></p>';
@@ -1057,6 +1084,24 @@ if($action == 'createlist') {
 
 // Part to show record
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create'))) {
+    
+    /*ACCESO NO PERMITIDO SI NO CONCUERDA LA NOTA INGRESADA CON EL USUARIO ACTUAL*/
+    if($object->fk_user_creat != $user->id || $user->admin){
+        if(!$user->rights->college->readalllist->read){
+    		print info_admin( 	  	
+    			$user->firstname.' '.$user->lastname.'. You have attempted to enter an area to which you do not have access, please do not attempt this action again.',
+    			$infoonimgalt = 0,
+    			$nodiv = 0,
+    			$admin = '0',
+    			$morecss = 'error',//More CSS ('', 'warning', 'error') 
+    			$textfordropdown = '403 Forbidden' 
+    		);
+    		accessforbidden($langs->trans('NotEnoughPermissions'), 0, 1);
+    		exit;
+        }
+	}
+    
+    
 	$res = $object->fetch_optionals();
 
 	$head = notesPrepareHead($object);
@@ -1110,48 +1155,26 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	// Object card
 	// ------------------------------------------------------------
+	
+	$stu = new Students($db);
+	$stu->fetch((int)$object->fk_student);
+	$asignatura = new Subject($db);
+	$asignatura->fetch($object->fk_subject);
+	$clase = new Classrooms($db);
+	$clase->fetch($object->fk_class);
+
 	$linkback = '<a href="'.dol_buildpath('/college/notes_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
 	$morehtmlref = '<div class="refidno">';
-	/*
-	 // Ref customer
-	 $morehtmlref.=$form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', 0, 1);
-	 $morehtmlref.=$form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', null, null, '', 1);
-	 // Thirdparty
-	 $morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . (is_object($object->thirdparty) ? $object->thirdparty->getNomUrl(1) : '');
-	 // Project
-	 if (! empty($conf->projet->enabled)) {
-	 $langs->load("projects");
-	 $morehtmlref .= '<br>'.$langs->trans('Project') . ' ';
-	 if ($permissiontoadd) {
-	 //if ($action != 'classify') $morehtmlref.='<a class="editfielda" href="' . $_SERVER['PHP_SELF'] . '?action=classify&token='.newToken().'&id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> ';
-	 $morehtmlref .= ' : ';
-	 if ($action == 'classify') {
-	 //$morehtmlref .= $form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'projectid', 0, 0, 1, 1);
-	 $morehtmlref .= '<form method="post" action="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'">';
-	 $morehtmlref .= '<input type="hidden" name="action" value="classin">';
-	 $morehtmlref .= '<input type="hidden" name="token" value="'.newToken().'">';
-	 $morehtmlref .= $formproject->select_projects($object->socid, $object->fk_project, 'projectid', $maxlength, 0, 1, 0, 1, 0, 0, '', 1);
-	 $morehtmlref .= '<input type="submit" class="button valignmiddle" value="'.$langs->trans("Modify").'">';
-	 $morehtmlref .= '</form>';
-	 } else {
-	 $morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'none', 0, 0, 0, 1);
-	 }
-	 } else {
-	 if (! empty($object->fk_project)) {
-	 $proj = new Project($db);
-	 $proj->fetch($object->fk_project);
-	 $morehtmlref .= ': '.$proj->getNomUrl();
-	 } else {
-	 $morehtmlref .= '';
-	 }
-	 }
-	 }*/
+	$morehtmlref .= '<b>'.$stu->label.'</b><br>';
+	$morehtmlref .= '<em>'.$asignatura->label.' - '.$clase->label.'</em>';
+	
 	$morehtmlref .= '</div>';
 
 
-	dol_banner_tab($object, 'ref', $linkback, 0, 'ref', 'ref', $morehtmlref);
+	dol_banner_tab($object, 'id', $linkback, $user->rights->college->readalllist->read, $object->rowid, 'ref', $morehtmlref);
 
+	
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
@@ -1346,7 +1369,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$trackid = 'notes'.$object->id;
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
-    
+
 }
 // End of page
 llxFooter();

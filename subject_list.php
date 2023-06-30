@@ -356,6 +356,13 @@ $reshook = $hookmanager->executeHooks('printFieldListHaving', $parameters, $obje
 $sql .= empty($hookmanager->resPrint) ? "" : " HAVING 1=1 ".$hookmanager->resPrint;
 */
 
+/*VERIFICAR**************************************************************/
+if($user->admin != 1){
+    if(!$user->rights->college->readalllist->read){
+        $sql .= " AND fk_user = ".$user->id." ";
+    }
+}
+
 // Count total nb of records
 $nbtotalofrecords = '';
 if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {

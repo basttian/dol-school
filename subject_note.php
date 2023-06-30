@@ -200,7 +200,25 @@ if ($id > 0 || !empty($ref)) {
 	 $morehtmlref .= '</div>';
 
 
-	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+	dol_banner_tab($object, 'ref', $linkback, $user->rights->college->readalllist->read, 'ref', 'ref', $morehtmlref);
+
+
+
+		/*BLOQUEAR ACCESO*/
+		if($object->fk_user != $user->id || $user->admin ){ 
+			if(!$user->rights->college->readalllist->read){
+			print info_admin( 	  	
+				$user->firstname.' '.$user->lastname.'. You have attempted to enter an area to which you do not have access, please do not attempt this action again.',
+				$infoonimgalt = 0,
+				$nodiv = 0,
+				$admin = '0',
+				$morecss = 'error',//More CSS ('', 'warning', 'error') 
+				$textfordropdown = '403 Forbidden' 
+			);
+			accessforbidden($langs->trans('NotEnoughPermissions'), 0, 1);
+			exit;
+			}
+		}
 
 
 	print '<div class="fichecenter">';
